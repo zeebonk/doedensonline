@@ -1,0 +1,5 @@
+[flake8]
+ignore =
+    E501,  # Line to long, handled by Black
+    E231,  # Missing whitespace after ',', handled by Black
+    F401,  # imported but unused, re-enable later
