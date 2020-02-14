@@ -16,11 +16,11 @@
       </button>
       <div class="collapse navbar-collapse" id="navbar-content">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Home</a>
+          <li class="nav-item {% if app_name == 'home' %}active{% endif %}">
+              <a class="nav-link" href="{% url 'home:index' %}">Home</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Nieuwtjes</a>
+          <li class="nav-item {% if app_name == 'posts' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'posts:list' %}">Nieuwtjes</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Fotoalbums</a>
@@ -36,9 +36,15 @@
     </nav>
 
     <div class="container">
-        <h1>{% block body_title %}Unknown{% endblock %}</h1>
-        {% block content %}
-        {% endblock %}
+        <div class="row">
+            <div class="col">
+                <h1>{% block body_title %}Unknown{% endblock %}</h1>
+            </div>
+        </div>
+        <div class="row">
+            {% block content %}
+            {% endblock %}
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>

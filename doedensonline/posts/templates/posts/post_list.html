@@ -1,0 +1,47 @@
+{% extends 'home/base.html' %}
+
+{% block head_title %}Nieuwtjes{% endblock %}
+{% block body_title %}Nieuwtjes{% endblock %}
+
+{% block content %}
+    <div class="col">
+        <ul>
+            {% for post in page_obj %}
+            <li><strong>{{ post.author.username }}:</strong> {{ post.message }}</li>
+            {% endfor %}
+        </ul>
+
+        <nav>
+            <ul class="pagination">
+                <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                    <a class="page-link" href="{% if page_obj.has_previous %}?page=1{% else %}#{% endif %}">
+                        &laquo; first
+                    </a>
+                </li>
+                <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                    <a class="page-link" href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}">
+                        previous
+                    </a>
+                </li>
+
+                <li class="page-item disabled">
+                    <a class="page-link" href="?page={{ page_obj.number }}">
+                        {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                    </a>
+                </li>
+
+                <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}">
+                        next
+                    </a>
+                </li>
+                <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{% if page_obj.has_next %}?page=1{% else %}#{% endif %}">
+                        last &raquo;
+                    </a>
+                </li>
+            </div>
+        </nav>
+    </div>
+
+{% endblock %}
