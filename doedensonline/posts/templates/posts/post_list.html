@@ -5,43 +5,68 @@
 
 {% block content %}
     <div class="col">
-        <ul>
-            {% for post in page_obj %}
-            <li><strong>{{ post.author.username }}:</strong> {{ post.message }}</li>
-            {% endfor %}
-        </ul>
 
-        <nav>
-            <ul class="pagination">
-                <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page_obj.has_previous %}?page=1{% else %}#{% endif %}">
-                        &laquo; first
-                    </a>
-                </li>
-                <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}">
-                        previous
-                    </a>
-                </li>
-
-                <li class="page-item disabled">
-                    <a class="page-link" href="?page={{ page_obj.number }}">
-                        {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
-                    </a>
-                </li>
-
-                <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}">
-                        next
-                    </a>
-                </li>
-                <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page_obj.has_next %}?page=1{% else %}#{% endif %}">
-                        last &raquo;
-                    </a>
-                </li>
+        <div class="row">
+            <div class="col">
+                <a class="btn btn-primary pull-right" href="{% url 'posts:create' %}">Nieuwtje toevoegen...</a>
+                <br>
+                <br>
             </div>
-        </nav>
+        </div>
+
+        {% for post in page_obj %}
+            {% with flip=forloop.counter|divisibleby:2 %}
+                <div class="row {% if flip %}justify-content-end{% endif %}">
+                    <div class="col-lg-8">
+
+                        <div class="card" style="margin-bottom: 2em">
+                            <h6 class="card-header {% if flip %}text-right{% endif %}">{{ post.author.username }}</h6>
+                            <div class="card-body">
+                                <p class="card-text">{{ post.message }}</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            {% endwith %}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col">
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                            <a class="page-link" href="{% if page_obj.has_previous %}?page=1{% else %}#{% endif %}">
+                                &laquo;
+                            </a>
+                        </li>
+                        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                            <a class="page-link" href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}">
+                                &lt;
+                            </a>
+                        </li>
+
+                        <li class="page-item disabled">
+                            <a class="page-link" href="?page={{ page_obj.number }}">
+                                {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                            </a>
+                        </li>
+
+                        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                            <a class="page-link" href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}">
+                                &gt;
+                            </a>
+                        </li>
+                        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                            <a class="page-link" href="{% if page_obj.has_next %}?page={{ page_obj.paginator.num_pages }}{% else %}#{% endif %}">
+                                &raquo;
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
     </div>
 
 {% endblock %}

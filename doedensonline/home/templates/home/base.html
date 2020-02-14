@@ -6,11 +6,14 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/litera/bootstrap.min.css" crossorigin="anonymous">
+
+
     <title>{% block head_title %}Unknown{% endblock %} - Doedensonline.nl</title>
   </head>
   <body>
-    <nav class="navbar sticky-top sticky-top navbar-expand-md navbar-light bg-light">
-      <a class="navbar-brand" href="#">Doedensonline.nl</a>
+    <nav class="navbar sticky-top sticky-top navbar-expand-md  navbar-dark bg-primary ">
+      <a class="navbar-brand mb-0 h1" href="#">Doedensonline.nl</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-content">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -36,7 +39,7 @@
     </nav>
 
     <div class="container">
-        <div class="row">
+        <div class="row" style="padding: 1.5em 0">
             <div class="col">
                 <h1>{% block body_title %}Unknown{% endblock %}</h1>
             </div>
