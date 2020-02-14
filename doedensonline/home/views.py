@@ -1,5 +1,8 @@
-from django.http import HttpResponse
+from django.shortcuts import render
+
+from posts.models import Post
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
+    posts = Post.objects.order_by("-created_at")[:3]
+    return render(request, "home/index.html", {"posts": posts})
