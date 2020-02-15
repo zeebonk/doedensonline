@@ -1,0 +1,32 @@
+<div class="row mb-5 {% if flip %}justify-content-end{% endif %}">
+    <div class="col-lg-{{ size }}">
+        <div class="card {% if highlight %}bg-light border-dark{% endif %}">
+            <div class="card-body">
+                <h5 class="card-title {% if flip %}text-lg-right{% endif %}">
+                    {{ item.author.get_full_name }}
+                </h5>
+                <p class="card-text">{{ item.message }}</p>
+                {% if show_tools %}
+                <hr>
+                <div class="button-group mb-0 {% if flip %}text-lg-right{% endif %}">
+                    {% if detail_view %}
+                    <a href="{% url detail_view item.id %}" class="btn btn-link py-0 px-1">
+                        Bekijk/plaats reacties ({{ item.comment_set.count }})
+                    </a>
+                    {% endif %}
+                    {% if update_view %}
+                    <a href="{% url update_view item.id %}" class="btn btn-link py-0 px-1">
+                        Aanpassen
+                    </a>
+                    {% endif %}
+                    {% if delete_view %}
+                    <a href="{% url delete_view item.id %}" class="btn btn-link py-0 px-1">
+                        Verwijderen
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
