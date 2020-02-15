@@ -30,6 +30,11 @@
                                     </li>
                                         {% if post.author == request.user %}
                                             <li class="list-inline-item ml-3">
+                                                <a href="{% url 'posts:update' post.id %}">
+                                                    Aanpassen
+                                                </a>
+                                            </li>
+                                            <li class="list-inline-item ml-3">
                                                 <a href="{% url 'posts:delete' post.id %}">
                                                     Verwijderen
                                                 </a>
