@@ -8,8 +8,8 @@ from .models import Post
 
 
 class PostListView(BaseMixin, ListView):
-    page_title = "Laaste nieuwtjes"
-    paginate_by = 5
+    page_title = "Nieuwtjes"
+    paginate_by = 10
     queryset = Post.objects.filter(status=Post.Status.LIVE)
     ordering = ["-created_at"]
 

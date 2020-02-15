@@ -1,41 +1,11 @@
 {% extends 'home/base.html' %}
 
-{% block head_title %}Nieuwtjes{% endblock %}
-{% block body_title %}Nieuwtjes{% endblock %}
+{% load cards %}
 
 {% block content %}
-    <div class="col">
+    {% post_card post request.user size=8 %}
 
-        <div class="row">
-            <div class="col">
-
-                <div class="card mb-4">
-                    <div class="card-body">
-                    <h6 class="card-title">{{ post.author.username }}</h6>
-                        <p class="card-text">{{ post.message }}</p>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        {% for comment in post.comment_set.all %}
-            {% with flip=forloop.counter|divisibleby:2 %}
-                <div class="row {% if flip %}justify-content-end{% endif %}">
-                    <div class="col-lg-8">
-
-                        <div class="card mb-4">
-                            <div class="card-body">
-                            <h6 class="card-title {% if flip %}text-right{% endif %}">{{ comment.author.username }}</h6>
-                                <p class="card-text">{{ comment.message }}</p>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            {% endwith %}
-        {% endfor %}
-
-    </div>
-
+    {% for comment in post.comment_set.all %}
+        {% comment_card comment request.user size=8 flip=True %}
+    {% endfor %}
 {% endblock %}
