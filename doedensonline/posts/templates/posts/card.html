@@ -2,10 +2,21 @@
     <div class="col-lg-{{ size }}">
         <div class="card {% if highlight %}bg-light border-dark{% endif %}">
             <div class="card-body">
-                <h5 class="card-title {% if flip %}text-lg-right{% endif %}">
-                    {{ item.author.get_full_name }}
-                </h5>
-                <p class="card-text">{{ item.message }}</p>
+
+                <div class="row">
+                    <div class="col-lg-5 col-xl-4 {% if flip %}order-lg-2 text-lg-right{% endif %}">
+                        <h5 class="card-title">
+                            {{ item.author.get_full_name }}
+                        </h5>
+                        <p class="card-subtitle text-muted mb-2">
+                            {{ item.created_at }}
+                        </p>
+                    </div>
+                    <div class="col-lg-7 col-xl-8 {% if flip %}order-lg-1{% endif %}">
+                        <p class="card-text">{{ item.message }}</p>
+                    </div>
+                </div>
+
                 {% if show_tools %}
                 <hr>
                 <div class="button-group mb-0 {% if flip %}text-lg-right{% endif %}">
