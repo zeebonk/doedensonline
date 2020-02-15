@@ -3,6 +3,9 @@ from django.db import models
 
 
 class Post(models.Model):
+    class Meta:
+        ordering = ["-created_at"]
+
     class Status(models.TextChoices):
         LIVE = ("live", "Live")
         DELETED = ("deleted", "Deleted")
@@ -17,6 +20,9 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
+    class Meta:
+        ordering = ["-created_at"]
+
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="post_comments"

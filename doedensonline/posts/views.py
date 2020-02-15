@@ -4,14 +4,13 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from doedensonline.mixins import BaseMixin
 
-from .models import Post
+from .models import Comment, Post
 
 
 class PostListView(BaseMixin, ListView):
     page_title = "Nieuwtjes"
     paginate_by = 10
     queryset = Post.objects.filter(status=Post.Status.LIVE)
-    ordering = ["-created_at"]
 
 
 class PostDetailView(BaseMixin, DetailView):
@@ -78,4 +77,34 @@ class PostDeleteView(BaseMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.status = Post.Status.DELETED
+        return super().form_valid(form)
+
+
+class CommentCreateView(BaseMixin, CreateView):
+    page_title = "Reactie plaatsen"
+    model = Comment
+    fields = ["message"]
+
+    form_layout = Layout(
+        Field("message"),
+        Div(
+            Submit("submit", "Plaatsen", css_class="btn btn-primary"),
+            HTML(
+                """<a href="{% url 'posts:detail' post_pk %}" class="btn btn-secondary">Terug</a>"""
+            ),
+            css_class="btn-group",
+        ),
+    )
+
+    def get_success_url(self):
+        return reverse_lazy("posts:detail", kwargs={"pk": self.kwargs["post_pk"]})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["post_pk"] = self.kwargs["post_pk"]
+        return context
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.post = Post.objects.get(id=self.kwargs["post_pk"])
         return super().form_valid(form)
