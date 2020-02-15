@@ -3,6 +3,13 @@ from django.db import models
 
 
 class Post(models.Model):
+    class Status(models.TextChoices):
+        LIVE = ("live", "Live")
+        DELETED = ("deleted", "Deleted")
+
+    status = models.CharField(
+        max_length=10, choices=Status.choices, default=Status.LIVE
+    )
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

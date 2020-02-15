@@ -1,13 +1,12 @@
 {% extends 'home/base.html' %}
 
+{% load crispy_forms_tags %}
+
 {% block head_title %}Nieuwtje toevoegen{% endblock %}
 {% block body_title %}Nieuwtje toevoegen{% endblock %}
 
 {% block content %}
     <div class="col">
-        <form method="post">{% csrf_token %}
-            {{ form.as_p }}
-            <input type="submit" value="Save">
-        </form>
+	{% crispy form %}
     </div>
 {% endblock %}
