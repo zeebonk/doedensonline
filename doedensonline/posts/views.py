@@ -49,7 +49,13 @@ class PostCreateView(BaseMixin, CreateView):
 
     form_layout = Layout(
         Field("message"),
-        ButtonHolder(Submit("submit", "Plaatsen", css_class="btn btn-primary"),),
+        Div(
+            Submit("submit", "Toevoegen", css_class="btn btn-primary"),
+            HTML(
+                """<a href="{% url 'posts:list' %}" class="btn btn-secondary">Terug</a>"""
+            ),
+            css_class="btn-group"
+        )
     )
 
     def form_valid(self, form):
