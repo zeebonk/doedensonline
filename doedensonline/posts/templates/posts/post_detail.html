@@ -3,6 +3,12 @@
 {% load cards %}
 
 {% block content %}
+    <div class="row">
+        <div class="col mb-4">
+            <a class="btn btn-primary" href="{% url 'posts:add_comment' post.id %}">Reactie plaatsen</a>
+        </div>
+    </div>
+
     {% post_card post request.user size=8 %}
 
     {% for comment in post.comment_set.all %}
