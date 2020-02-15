@@ -10,6 +10,7 @@ flake8 = "==3.7.9"
 
 [packages]
 django = "==3.0.3"
+django-crispy-forms = "==1.8.1"
 
 [requires]
 python_version = "3.8"
