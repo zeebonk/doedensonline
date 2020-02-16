@@ -22,7 +22,7 @@
                 <div class="button-group mb-0 {% if flip %}text-lg-right{% endif %}">
                     {% if detail_view %}
                     <a href="{% url detail_view item.id %}" class="btn btn-link py-0 px-1">
-                        Bekijk/plaats reacties ({{ item.comment_set.count }})
+                        Bekijk/plaats reacties ({{ item.comments.count }})
                     </a>
                     {% endif %}
                     {% if update_view %}
