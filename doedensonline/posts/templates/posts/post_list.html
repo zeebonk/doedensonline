@@ -11,7 +11,7 @@
 
     {% for post in posts %}
         {% cycle False True as flip silent %}
-        {% post_card post request.user size=8 details_link=True flip=flip %}
+        {% post_card post request.user details_link=True flip=flip %}
     {% endfor %}
 
     <div class="row">

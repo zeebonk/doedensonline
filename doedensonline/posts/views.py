@@ -66,7 +66,13 @@ class PostDeleteView(BaseMixin, UpdateView):
     success_url = reverse_lazy("posts:list")
 
     form_layout = Layout(
-        HTML("<p>Weet je zeker dat je dit nieuwtje wilt verwijderen?</p>"),
+        HTML(
+            """
+            {% load cards %}
+            {% post_card post request.user size=12 tools=False %}
+            <p>Weet je zeker dat je bovenstaande nieuwtje wilt verwijderen?</p>
+        """
+        ),
         Div(
             Submit("submit", "Ja, verwijder", css_class="btn btn-primary"),
             HTML(
@@ -127,6 +133,14 @@ class CommentUpdateView(BaseMixin, UpdateView):
         ),
     )
 
+    def get_queryset(self, *args, **kwargs):
+        return (
+            super()
+            .get_queryset(*args, **kwargs)
+            .live()
+            .filter(author=self.request.user)
+        )
+
     def get_success_url(self):
         return reverse_lazy("posts:detail", kwargs={"pk": self.object.post.id})
 
@@ -137,7 +151,13 @@ class CommentDeleteView(BaseMixin, UpdateView):
     fields = []
 
     form_layout = Layout(
-        HTML("<p>Weet je zeker dat je deze reactie wilt verwijderen?</p>"),
+        HTML(
+            """
+            {% load cards %}
+            {% comment_card comment request.user size=12 tools=False %}
+            <p>Weet je zeker dat je bovenstaande reactie wilt verwijderen?</p>
+        """
+        ),
         Div(
             Submit("submit", "Ja, verwijder", css_class="btn btn-primary"),
             HTML(
@@ -146,6 +166,14 @@ class CommentDeleteView(BaseMixin, UpdateView):
             css_class="btn-group",
         ),
     )
+
+    def get_queryset(self, *args, **kwargs):
+        return (
+            super()
+            .get_queryset(*args, **kwargs)
+            .live()
+            .filter(author=self.request.user)
+        )
 
     def form_valid(self, form):
         form.instance.status = Comment.Status.DELETED
