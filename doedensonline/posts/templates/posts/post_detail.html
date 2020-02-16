@@ -9,9 +9,9 @@
         </div>
     </div>
 
-    {% post_card post request.user size=8 %}
+    {% post_card post request.user %}
 
     {% for comment in post.comments.live %}
-        {% comment_card comment request.user size=8 flip=True %}
+        {% comment_card comment request.user flip=True %}
     {% endfor %}
 {% endblock %}

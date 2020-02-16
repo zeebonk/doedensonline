@@ -1,5 +1,5 @@
 <div class="row mb-5 {% if flip %}justify-content-end{% endif %}">
-    <div class="col-lg-{{ size }}">
+    <div class="col-lg-{{ size|default:9 }}">
         <div class="card {% if highlight %}bg-light border-dark{% endif %}">
             <div class="card-body">
 
