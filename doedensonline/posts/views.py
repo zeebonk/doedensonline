@@ -111,6 +111,26 @@ class CommentCreateView(BaseMixin, CreateView):
         return super().form_valid(form)
 
 
+class CommentUpdateView(BaseMixin, UpdateView):
+    page_title = "Reactie aanpassen"
+    model = Comment
+    fields = ["message"]
+
+    form_layout = Layout(
+        Field("message"),
+        Div(
+            Submit("submit", "Wijzingen opslaan", css_class="btn btn-primary"),
+            HTML(
+                """<a href="{% url 'posts:detail' comment.post.id %}" class="btn btn-secondary">Terug</a>"""
+            ),
+            css_class="btn-group",
+        ),
+    )
+
+    def get_success_url(self):
+        return reverse_lazy("posts:detail", kwargs={"pk": self.object.post.id})
+
+
 class CommentDeleteView(BaseMixin, UpdateView):
     page_title = "Reactie verwijderen"
     model = Comment

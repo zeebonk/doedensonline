@@ -27,7 +27,7 @@ def comment_card(item, user, size, flip=False):
         "size": size,
         "show_tools": user_is_author,
         "detail_view": None,
-        "update_view": "posts:update" if user_is_author else None,
+        "update_view": "posts:update_comment" if user_is_author else None,
         "delete_view": "posts:delete_comment" if user_is_author else None,
         "flip": flip,
         "highlight": False,
