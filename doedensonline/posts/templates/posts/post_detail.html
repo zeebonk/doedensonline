@@ -11,7 +11,7 @@
 
     {% post_card post request.user size=8 %}
 
-    {% for comment in post.comments.all %}
+    {% for comment in post.comments.live %}
         {% comment_card comment request.user size=8 flip=True %}
     {% endfor %}
 {% endblock %}

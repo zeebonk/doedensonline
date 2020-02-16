@@ -15,4 +15,7 @@ urlpatterns = [
         views.CommentCreateView.as_view(),
         name="add_comment",
     ),
+    path(
+        "comments/<int:pk>/", views.CommentDeleteView.as_view(), name="delete_comment",
+    ),
 ]

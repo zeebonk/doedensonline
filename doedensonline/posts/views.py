@@ -10,7 +10,7 @@ from .models import Comment, Post
 class PostListView(BaseMixin, ListView):
     page_title = "Nieuwtjes"
     paginate_by = 10
-    queryset = Post.objects.filter(status=Post.Status.LIVE)
+    queryset = Post.objects.live()
     context_object_name = "posts"
 
 
@@ -109,3 +109,27 @@ class CommentCreateView(BaseMixin, CreateView):
         form.instance.author = self.request.user
         form.instance.post = Post.objects.get(id=self.kwargs["post_pk"])
         return super().form_valid(form)
+
+
+class CommentDeleteView(BaseMixin, UpdateView):
+    page_title = "Reactie verwijderen"
+    model = Comment
+    fields = []
+
+    form_layout = Layout(
+        HTML("<p>Weet je zeker dat je deze reactie wilt verwijderen?</p>"),
+        Div(
+            Submit("submit", "Ja, verwijder", css_class="btn btn-primary"),
+            HTML(
+                """<a href="{% url 'posts:detail' comment.post.id %}" class="btn btn-secondary">Nee, ga terug</a>"""
+            ),
+            css_class="btn-group",
+        ),
+    )
+
+    def form_valid(self, form):
+        form.instance.status = Comment.Status.DELETED
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("posts:detail", kwargs={"pk": self.object.post.id})
