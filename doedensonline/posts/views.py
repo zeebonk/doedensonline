@@ -11,6 +11,7 @@ class PostListView(BaseMixin, ListView):
     page_title = "Nieuwtjes"
     paginate_by = 10
     queryset = Post.objects.filter(status=Post.Status.LIVE)
+    context_object_name = "posts"
 
 
 class PostDetailView(BaseMixin, DetailView):

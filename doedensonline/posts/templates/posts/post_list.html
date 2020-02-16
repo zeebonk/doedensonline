@@ -9,10 +9,9 @@
         </div>
     </div>
 
-    {% for post in page_obj %}
-        {% with flip=forloop.counter|divisibleby:2 %}
-            {% post_card post request.user size=8 details_link=True flip=flip %}
-        {% endwith %}
+    {% for post in posts %}
+        {% cycle False True as flip silent %}
+        {% post_card post request.user size=8 details_link=True flip=flip %}
     {% endfor %}
 
     <div class="row">
