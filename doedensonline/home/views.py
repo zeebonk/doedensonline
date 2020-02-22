@@ -12,8 +12,11 @@ from posts.models import Post
 class IndexView(BaseMixin, ListView):
     page_title = "Home"
     template_name = "home/index.html"
-    queryset = Post.objects.live()[:3]
+    model = Post
     context_object_name = "posts"
+
+    def get_queryset(self, *args, **kwargs):
+        return (super().get_queryset(*args, **kwargs).live())[:3]
 
 
 class LoginView(BaseMixin, LoginView):
@@ -21,7 +24,7 @@ class LoginView(BaseMixin, LoginView):
     login_required = False
 
     form_layout = Layout(
-        Field("username"), Field("password"), ButtonGroup(PrimarySubmit("Inloggen"),),
+        Field("username"), Field("password"), ButtonGroup(PrimarySubmit("Inloggen")),
     )
 
 
@@ -32,7 +35,7 @@ class LogoutView(BaseMixin, FormView):
     success_url = reverse_lazy("home:index")
 
     form_layout = Layout(
-        ButtonGroup(PrimarySubmit("Ja"), SecondayLink("Nee", "home:index"),),
+        ButtonGroup(PrimarySubmit("Ja"), SecondayLink("Nee", "home:index")),
     )
 
     def post(self, request, *args, **kwargs):
