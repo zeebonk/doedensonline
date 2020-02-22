@@ -39,9 +39,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "crispy_forms",
-    "home",
-    "posts",
-    "albums",
+    "doedensonline.home",
+    "doedensonline.posts",
+    "doedensonline.albums",
 ]
 
 MIDDLEWARE = [
@@ -54,7 +54,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "doedensonline.urls"
+ROOT_URLCONF = "doedensonline.core.urls"
 
 TEMPLATES = [
     {
@@ -67,13 +67,13 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "home.context_processors.app_name",
+                "doedensonline.core.context_processors.app_name",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = "doedensonline.wsgi.application"
+WSGI_APPLICATION = "doedensonline.core.wsgi.application"
 
 
 # Database

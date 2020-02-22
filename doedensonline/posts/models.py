@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 
-from doedensonline.models import BaseModel
+from doedensonline.core.models import BaseModel
 
 
 class PostQuerySet(models.QuerySet):

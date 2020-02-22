@@ -4,9 +4,15 @@ from django.forms import Form
 from django.urls import reverse_lazy
 from django.views.generic import FormView, ListView
 
-from doedensonline.layout import ButtonGroup, Field, Layout, PrimarySubmit, SecondayLink
-from doedensonline.mixins import BaseMixin
-from posts.models import Post
+from doedensonline.core.layout import (
+    ButtonGroup,
+    Field,
+    Layout,
+    PrimarySubmit,
+    SecondayLink,
+)
+from doedensonline.core.mixins import BaseMixin
+from doedensonline.posts.models import Post
 
 
 class IndexView(BaseMixin, ListView):
