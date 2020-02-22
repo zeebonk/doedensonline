@@ -17,8 +17,11 @@ from .models import Comment, Post
 class PostListView(BaseMixin, ListView):
     page_title = "Nieuwtjes"
     paginate_by = 10
-    queryset = Post.objects.live()
+    model = Post
     context_object_name = "posts"
+
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).live()
 
 
 class PostDetailView(BaseMixin, DetailView):
@@ -56,7 +59,12 @@ class PostUpdateView(BaseMixin, UpdateView):
     )
 
     def get_queryset(self, *args, **kwargs):
-        return super().get_queryset().live().filter(author=self.request.user)
+        return (
+            super()
+            .get_queryset(*args, **kwargs)
+            .live()
+            .filter(author=self.request.user)
+        )
 
 
 class PostDeleteView(BaseMixin, UpdateView):
@@ -79,7 +87,12 @@ class PostDeleteView(BaseMixin, UpdateView):
     )
 
     def get_queryset(self, *args, **kwargs):
-        return super().get_queryset().live().filter(author=self.request.user)
+        return (
+            super()
+            .get_queryset(*args, **kwargs)
+            .live()
+            .filter(author=self.request.user)
+        )
 
     def form_valid(self, form):
         form.instance.status = Post.Status.DELETED
