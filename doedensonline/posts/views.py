@@ -1,7 +1,14 @@
-from crispy_forms.layout import HTML, Div, Field, Layout, Submit
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
+from doedensonline.layout import (
+    HTML,
+    ButtonGroup,
+    Field,
+    Layout,
+    PrimarySubmit,
+    SecondayLink,
+)
 from doedensonline.mixins import BaseMixin
 
 from .models import Comment, Post
@@ -27,13 +34,7 @@ class PostCreateView(BaseMixin, CreateView):
 
     form_layout = Layout(
         Field("message"),
-        Div(
-            Submit("submit", "Toevoegen", css_class="btn btn-primary"),
-            HTML(
-                """<a href="{% url 'posts:list' %}" class="btn btn-secondary">Terug</a>"""
-            ),
-            css_class="btn-group",
-        ),
+        ButtonGroup(PrimarySubmit("Toevoegen"), SecondayLink("Terug", "posts:list"),),
     )
 
     def form_valid(self, form):
@@ -49,14 +50,13 @@ class PostUpdateView(BaseMixin, UpdateView):
 
     form_layout = Layout(
         Field("message"),
-        Div(
-            Submit("submit", "Wijzingen opslaan", css_class="btn btn-primary"),
-            HTML(
-                """<a href="{% url 'posts:list' %}" class="btn btn-secondary">Terug</a>"""
-            ),
-            css_class="btn-group",
+        ButtonGroup(
+            PrimarySubmit("Wijzingen opslaan"), SecondayLink("Terug", "posts:list"),
         ),
     )
+
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset().live().filter(author=self.request.user)
 
 
 class PostDeleteView(BaseMixin, UpdateView):
@@ -71,16 +71,15 @@ class PostDeleteView(BaseMixin, UpdateView):
             {% load cards %}
             {% post_card post request.user size=12 tools=False %}
             <p>Weet je zeker dat je bovenstaande nieuwtje wilt verwijderen?</p>
-        """
+            """
         ),
-        Div(
-            Submit("submit", "Ja, verwijder", css_class="btn btn-primary"),
-            HTML(
-                """<a href="{% url 'posts:list' %}" class="btn btn-secondary">Nee, ga terug</a>"""
-            ),
-            css_class="btn-group",
+        ButtonGroup(
+            PrimarySubmit("Ja, verwijder"), SecondayLink("Nee, ga terug", "posts:list"),
         ),
     )
+
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset().live().filter(author=self.request.user)
 
     def form_valid(self, form):
         form.instance.status = Post.Status.DELETED
@@ -94,12 +93,8 @@ class CommentCreateView(BaseMixin, CreateView):
 
     form_layout = Layout(
         Field("message"),
-        Div(
-            Submit("submit", "Plaatsen", css_class="btn btn-primary"),
-            HTML(
-                """<a href="{% url 'posts:detail' post_pk %}" class="btn btn-secondary">Terug</a>"""
-            ),
-            css_class="btn-group",
+        ButtonGroup(
+            PrimarySubmit("Plaatsen"), SecondayLink("Terug", "posts:detail", "post_pk"),
         ),
     )
 
@@ -124,12 +119,9 @@ class CommentUpdateView(BaseMixin, UpdateView):
 
     form_layout = Layout(
         Field("message"),
-        Div(
-            Submit("submit", "Wijzingen opslaan", css_class="btn btn-primary"),
-            HTML(
-                """<a href="{% url 'posts:detail' comment.post.id %}" class="btn btn-secondary">Terug</a>"""
-            ),
-            css_class="btn-group",
+        ButtonGroup(
+            PrimarySubmit("Wijzingen opslaan"),
+            SecondayLink("Terug", "posts:detail", "comment.post.id"),
         ),
     )
 
@@ -158,12 +150,9 @@ class CommentDeleteView(BaseMixin, UpdateView):
             <p>Weet je zeker dat je bovenstaande reactie wilt verwijderen?</p>
         """
         ),
-        Div(
-            Submit("submit", "Ja, verwijder", css_class="btn btn-primary"),
-            HTML(
-                """<a href="{% url 'posts:detail' comment.post.id %}" class="btn btn-secondary">Nee, ga terug</a>"""
-            ),
-            css_class="btn-group",
+        ButtonGroup(
+            PrimarySubmit("Ja, verwijder"),
+            SecondayLink("Nee, ga gerug", "posts:detail", "comment.post.id"),
         ),
     )
 

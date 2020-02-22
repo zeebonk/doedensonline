@@ -1,0 +1,17 @@
+{% extends 'home/base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-4 card mt-5">
+        <div class="card-body">
+            <p class="card-text">
+                Weet je zeker dat je wilt uitloggen?
+            </p>
+            <hr>
+            {% crispy form %}
+        </div>
+    </div>
+</div>
+{% endblock %}
