@@ -1,4 +1,5 @@
 doedensonline/db.sqlite3
+env.sh
 
 # Below is copied from https://github.com/github/gitignore/blob/583f11eddde230f6df9f1cece498be98c3a90773/Python.gitignore
 
