@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from doedensonline.layout import (
+from doedensonline.core.layout import (
     HTML,
     ButtonGroup,
     Field,
@@ -9,9 +9,8 @@ from doedensonline.layout import (
     PrimarySubmit,
     SecondayLink,
 )
-from doedensonline.mixins import BaseMixin
-
-from .models import Comment, Post
+from doedensonline.core.mixins import BaseMixin
+from doedensonline.posts.models import Comment, Post
 
 
 class PostListView(BaseMixin, ListView):
