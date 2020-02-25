@@ -21,12 +21,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ["SECRET_KEY"]
+SECRET_KEY = os.environ["DDO_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ["DEBUG"].lower() == "true"
+DEBUG = os.environ["DDO_DEBUG"].lower() == "true"
 
-ALLOWED_HOSTS = [h.strip() for h in os.environ["ALLOWED_HOSTS"].split(",")]
+ALLOWED_HOSTS = [h.strip() for h in os.environ["DDO_ALLOWED_HOSTS"].split(",")]
 
 
 # Application definition
@@ -81,8 +81,11 @@ WSGI_APPLICATION = "doedensonline.core.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": os.environ["DDO_DATABASE_HOST"],
+        "USER": os.environ["DDO_DATABASE_USER"],
+        "PASSWORD": os.environ["DDO_DATABASE_PASSWORD"],
+        "NAME": os.environ["DDO_DATABASE_NAME"],
     }
 }
 
