@@ -14,4 +14,3 @@ RUN pipenv install --deploy
 
 COPY manage.py ./
 COPY doedensonline ./doedensonline
-
