@@ -16,9 +16,11 @@ jobs:
         pipenv install --dev --deploy
     - name: Build container
       run: docker-compose build app
+    - name: docker-compose up
+      run: docker-compose up
     - name: Check formatting
       run: |
         ./format.sh
-        git diff-index --quiet HEAD -- || echo "Changes after formatting"
+        git diff-index --quiet HEAD --
     - name: Run checks
       run: ./check.sh
