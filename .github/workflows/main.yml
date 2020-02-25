@@ -16,8 +16,10 @@ jobs:
         pipenv install --dev --deploy
     - name: Build container
       run: docker-compose build app
-    - name: docker-compose up
-      run: docker-compose up
+    - name: docker-compose up postgres
+      run: |
+          docker-compose up -d postgres
+          sleep 5
     - name: Check formatting
       run: |
         ./format.sh
