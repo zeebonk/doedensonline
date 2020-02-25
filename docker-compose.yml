@@ -1,0 +1,39 @@
+version: '3'
+services:
+
+    postgres:
+        image: postgres:12.2-alpine
+        environment:
+            POSTGRES_PASSWORD: postgres
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+
+    app:
+        build: .
+        ports:
+            - "8000:8000"
+        command:
+            - /bin/sh
+            - -ecx
+            - |
+                pipenv run ./manage.py migrate --no-input \
+                && pipenv run ./manage.py createsuperuser --no-input || true \
+                && pipenv run ./manage.py runserver 0.0.0.0:8000
+        depends_on:
+            - postgres
+        volumes:
+            - ./:/app
+        environment:
+            DDO_DEBUG: 'true'
+            DDO_SECRET_KEY: thisissecret
+            DDO_ALLOWED_HOSTS: "*"
+            DDO_DATABASE_HOST: postgres
+            DDO_DATABASE_USER: postgres
+            DDO_DATABASE_PASSWORD: postgres
+            DDO_DATABASE_NAME: postgres
+            DJANGO_SUPERUSER_USERNAME: admin
+            DJANGO_SUPERUSER_PASSWORD: admin
+            DJANGO_SUPERUSER_EMAIL: admin@test.com
+
+volumes:
+    pgdata: {}
