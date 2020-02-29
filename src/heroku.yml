@@ -1,10 +1,25 @@
 build:
-  docker:
-    web: Dockerfile
+    docker:
+        web: Dockerfile
 run:
-  web: python manage.py runserver 0.0.0.0:$PORT
+    web: >
+        ./manage.py collectstatic --no-input &&
+        uwsgi
+        --module=doedensonline.core.wsgi:application
+        --http=:$PORT
+        --master
+        --lazy-apps
+        --post-buffering
+        --enable-threads
+        --processes=5
+        --harakiri=20
+        --max-requests=5000
+        --static-map $DDO_STATIC_URL=$DDO_STATIC_ROOT
+        --vacuum
 release:
-  command:
-    - python manage.py migrate --no-input &&
-      python manage.py createsuperuser --no-input || true
-  image: web
+    command:
+        # Even though command is an array, it can't execute multiple commands,
+        # hence the && chaining.
+        - ./manage.py migrate --no-input &&
+          ./manage.py createsuperuser --no-input || true
+    image: web

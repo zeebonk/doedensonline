@@ -3,6 +3,8 @@ provider "heroku" {}
 variable ddo_secret_key {}
 variable ddo_debug {}
 variable ddo_allowed_hosts {}
+variable ddo_static_url {}
+variable ddo_static_root {}
 
 variable django_superuser_username {}
 variable django_superuser_password {}
@@ -16,6 +18,8 @@ resource "heroku_app" "doedensonline" {
     config_vars = {
         DDO_DEBUG = var.ddo_debug
         DDO_ALLOWED_HOSTS = var.ddo_allowed_hosts
+        DDO_STATIC_URL = var.ddo_static_url
+        DDO_STATIC_ROOT = var.ddo_static_root
     }
 
     sensitive_config_vars = {

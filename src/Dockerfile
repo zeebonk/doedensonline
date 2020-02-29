@@ -2,9 +2,11 @@ FROM python:3.8.1-slim-buster
 
 WORKDIR /app
 
-# Curl is used by Heroku in the release phase for capturing logs
-RUN apt-get update -yqq \
- && apt-get install curl -yqq
+RUN apt-get update -yqq && apt-get install -yqq \
+    # Used by Heroku in the release phase for capturing logs
+    curl \
+    # For building uWSGI
+    build-essential
 
 # Keep build logs clean
 ENV PIPENV_NOSPIN=1
