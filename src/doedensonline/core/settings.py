@@ -80,6 +80,8 @@ WSGI_APPLICATION = "doedensonline.core.wsgi.application"
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
+    # dj_database_url expects the DATABASE_URL environment variable, as done by
+    # Heroku.
     "default": dj_database_url.config(conn_max_age=600)
 }
 
