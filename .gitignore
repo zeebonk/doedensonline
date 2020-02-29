@@ -1,6 +1,11 @@
 doedensonline/db.sqlite3
 env.sh
 
+# Terraform specific stuff
+terraform.tfstate
+terraform.tfstate.backup
+.terraform
+
 # Below is copied from https://github.com/github/gitignore/blob/583f11eddde230f6df9f1cece498be98c3a90773/Python.gitignore
 
 # Byte-compiled / optimized / DLL files
