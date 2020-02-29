@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+import dj_database_url
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -80,13 +82,9 @@ WSGI_APPLICATION = "doedensonline.core.wsgi.application"
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "HOST": os.environ["DDO_DATABASE_HOST"],
-        "USER": os.environ["DDO_DATABASE_USER"],
-        "PASSWORD": os.environ["DDO_DATABASE_PASSWORD"],
-        "NAME": os.environ["DDO_DATABASE_NAME"],
-    }
+    # dj_database_url expects the DATABASE_URL environment variable, as done by
+    # Heroku.
+    "default": dj_database_url.config(conn_max_age=600)
 }
 
 
