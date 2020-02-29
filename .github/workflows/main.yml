@@ -1,7 +1,7 @@
 name: Build
 on: [push]
 jobs:
-    build:
+    python:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
@@ -21,3 +21,19 @@ jobs:
             - name: Run checks
               working-directory: ./src
               run: ./check.sh
+
+    terraform:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Install Terraform
+              run: sudo snap install terraform
+            - name: Verify Terraform manifests formatting
+              working-directory: ./terraform
+              run: terraform fmt -check
+            - name: Init Terraform project
+              working-directory: ./terraform
+              run: terraform init
+            - name: Validate Terraform manifests
+              working-directory: ./terraform
+              run: terraform validate
