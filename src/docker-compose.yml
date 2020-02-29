@@ -33,6 +33,8 @@ services:
             DDO_DEBUG: 'true'
             DDO_SECRET_KEY: thisissecret
             DDO_ALLOWED_HOSTS: "*"
+            DDO_STATIC_ROOT: /doesntmatter
+            DDO_STATIC_URL: /static/doesntmatter/
             DATABASE_URL: postgres://postgres:postgres@postgres/postgres
             DJANGO_SUPERUSER_USERNAME: admin
             DJANGO_SUPERUSER_PASSWORD: admin
