@@ -38,3 +38,13 @@ jobs:
             - name: Validate Terraform manifests
               working-directory: ./terraform
               run: terraform validate
+              #            - name: Download Terraform state
+              #              uses: actions/download-artifact@v1
+              #              with:
+              #                name: terraform.tfstate
+            - name: Run Terraform refresh
+              working-directory: ./terraform
+              run: terraform refresh
+            - name: Run Terraform plan
+              working-directory: ./terraform
+              run: terraform plan
