@@ -31,7 +31,7 @@ jobs:
               run: sudo snap install terraform
             - name: Verify Terraform manifests formatting
               working-directory: ./terraform
-              run: terraform fmt -check
+              run: terraform fmt -check -diff
             - name: Init Terraform project
               working-directory: ./terraform
               run: terraform init
