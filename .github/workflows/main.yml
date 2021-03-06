@@ -1,4 +1,4 @@
-name: Default
+name: main
 
 on:
   - pull_request
