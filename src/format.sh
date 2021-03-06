@@ -1,4 +1,4 @@
 set -euxo pipefail
 
-pipenv run isort --apply
-pipenv run black .
+poetry run isort --apply
+poetry run black .
