@@ -1,14 +1,14 @@
 provider "heroku" {}
 
-variable ddo_secret_key {}
-variable ddo_debug {}
-variable ddo_allowed_hosts {}
-variable ddo_static_url {}
-variable ddo_static_root {}
+variable "ddo_secret_key" {}
+variable "ddo_debug" {}
+variable "ddo_allowed_hosts" {}
+variable "ddo_static_url" {}
+variable "ddo_static_root" {}
 
-variable django_superuser_username {}
-variable django_superuser_password {}
-variable django_superuser_email {}
+variable "django_superuser_username" {}
+variable "django_superuser_password" {}
+variable "django_superuser_email" {}
 
 resource "heroku_app" "doedensonline" {
   name   = "doedensonline"
