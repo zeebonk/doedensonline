@@ -11,9 +11,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="comment", options={"ordering": ["-created_at"]},
+            name="comment",
+            options={"ordering": ["-created_at"]},
         ),
         migrations.AlterModelOptions(
-            name="post", options={"ordering": ["-created_at"]},
+            name="post",
+            options={"ordering": ["-created_at"]},
         ),
     ]

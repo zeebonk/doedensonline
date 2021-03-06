@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "doedensonline"
+version = "0.1.0"
+description = ""
+authors = ["Gijs van der Voort <vandervoort.gijs@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Django = "^3.1.7"
+django-crispy-forms = "^1.11.1"
+dj-database-url = "^0.5.0"
+uWSGI = "^2.0.19"
+psycopg2-binary = "^2.8.6"
+
+[tool.poetry.dev-dependencies]
+black = "^20.8b1"
+isort = "^5.7.0"
+flake8 = "^3.8.4"
+
+[tool.poetry.scripts]
+manage = 'manage:main'
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+multi_line_output=3
+include_trailing_comma="True"
+force_grid_wrap=0
+use_parentheses="True"
+line_length=88
+lines_after_imports=2
