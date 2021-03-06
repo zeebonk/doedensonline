@@ -30,7 +30,9 @@ class LoginView(BaseMixin, LoginView):
     login_required = False
 
     form_layout = Layout(
-        Field("username"), Field("password"), ButtonGroup(PrimarySubmit("Inloggen")),
+        Field("username"),
+        Field("password"),
+        ButtonGroup(PrimarySubmit("Inloggen")),
     )
 
 
