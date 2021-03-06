@@ -36,7 +36,10 @@ class PostCreateView(BaseMixin, CreateView):
 
     form_layout = Layout(
         Field("message"),
-        ButtonGroup(PrimarySubmit("Toevoegen"), SecondayLink("Terug", "posts:list"),),
+        ButtonGroup(
+            PrimarySubmit("Toevoegen"),
+            SecondayLink("Terug", "posts:list"),
+        ),
     )
 
     def form_valid(self, form):
@@ -53,7 +56,8 @@ class PostUpdateView(BaseMixin, UpdateView):
     form_layout = Layout(
         Field("message"),
         ButtonGroup(
-            PrimarySubmit("Wijzingen opslaan"), SecondayLink("Terug", "posts:list"),
+            PrimarySubmit("Wijzingen opslaan"),
+            SecondayLink("Terug", "posts:list"),
         ),
     )
 
@@ -81,7 +85,8 @@ class PostDeleteView(BaseMixin, UpdateView):
             """
         ),
         ButtonGroup(
-            PrimarySubmit("Ja, verwijder"), SecondayLink("Nee, ga terug", "posts:list"),
+            PrimarySubmit("Ja, verwijder"),
+            SecondayLink("Nee, ga terug", "posts:list"),
         ),
     )
 
@@ -106,7 +111,8 @@ class CommentCreateView(BaseMixin, CreateView):
     form_layout = Layout(
         Field("message"),
         ButtonGroup(
-            PrimarySubmit("Plaatsen"), SecondayLink("Terug", "posts:detail", "post_pk"),
+            PrimarySubmit("Plaatsen"),
+            SecondayLink("Terug", "posts:detail", "post_pk"),
         ),
     )
 
