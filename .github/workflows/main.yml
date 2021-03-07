@@ -33,4 +33,4 @@ jobs:
               run: docker-compose up --build -d
             - name: Run checks
               working-directory: ./src
-              run: ./check.sh
+              run: poetry run task check
