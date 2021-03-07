@@ -1,19 +1,23 @@
 FROM python:3.9-slim
 
-WORKDIR /app
+ARG PROJECT=doedensonline
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+
+RUN groupadd -r $PROJECT \
+    && useradd -m --no-log-init -r -g $PROJECT $PROJECT
+WORKDIR /$PROJECT
+RUN chown -R $PROJECT:$PROJECT /$PROJECT
 
 RUN apt-get update -yqq && apt-get install -yqq \
-    # Used by Heroku in the release phase for capturing logs
-    curl \
-    # For building uWSGI
-    build-essential
+        # Used by Heroku in the release phase for capturing logs
+        curl \
+        # For building uWSGI
+        build-essential \
+    && pip install poetry
 
-RUN pip install poetry
+USER $PROJECT
 
-# Install packages in system as Heroku runs container with different user which
-# will have a different place for storing virtualenvs
-COPY pyproject.toml poetry.lock ./
+COPY manage.py pyproject.toml poetry.lock ./
 RUN poetry install --no-dev
 
-COPY manage.py ./
-COPY doedensonline ./doedensonline
+COPY $PROJECT ./$PROJECT
