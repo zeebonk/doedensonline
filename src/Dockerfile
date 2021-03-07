@@ -17,7 +17,7 @@ RUN apt-get update -yqq && apt-get install -yqq \
 
 USER $PROJECT
 
-COPY manage.py pyproject.toml poetry.lock ./
+COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-dev
 
 COPY $PROJECT ./$PROJECT
