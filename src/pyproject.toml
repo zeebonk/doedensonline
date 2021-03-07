@@ -19,7 +19,7 @@ flake8 = "^3.8.4"
 taskipy = "^1.6.0"
 
 [tool.poetry.scripts]
-manage = 'manage:main'
+manage = 'doedensonline.core.manage:main'
 
 [tool.taskipy.tasks]
 format = """true \
