@@ -1,19 +1,26 @@
-name: main
+name: pr
 
 on:
   - pull_request
 
 jobs:
 
-    tf:
+    terraform:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
             - uses: hashicorp/setup-terraform@v1
               with:
                 terraform_version: 0.14.7
-            - name: Terraform fmt
+            - name: fmt
               run: terraform fmt -check
+              working-directory: ./terraform
+            - name: init
+              run: terraform init -backend=false
+              working-directory: ./terraform
+            - name: validate
+              run: terraform validate
+              working-directory: ./terraform
 
     app:
         runs-on: ubuntu-latest
