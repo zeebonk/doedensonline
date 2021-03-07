@@ -17,9 +17,9 @@ run:
         --static-map $DDO_STATIC_URL=$DDO_STATIC_ROOT
         --vacuum
 release:
+    image: web
     command:
         # Even though command is an array, it can't execute multiple commands,
         # hence the && chaining.
         - poetry run manage migrate --no-input &&
           poetry run manage createsuperuser --no-input || true
-    image: web
