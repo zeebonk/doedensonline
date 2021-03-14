@@ -14,7 +14,11 @@ services:
             retries: 10
 
     app:
-        build: .
+        build:
+            context: .
+            args:
+                # Make sure dev dependencies are installed
+                - POETRY_INSTALL_ARGS=
         ports:
             - "8000:8000"
         command:
@@ -23,22 +27,30 @@ services:
             - |
                 poetry run manage migrate --no-input \
                 && poetry run manage createsuperuser --no-input || true \
-                && poetry run python manage.py runserver 0.0.0.0:8000
+                && poetry run uwsgi \
+                    --http :8000 \
+                    --module doedensonline.core.wsgi \
+                    --py-auto-reload 1 \
+                    --master \
+                    --lazy-apps \
+                    --enable-threads \
+                    --need-app \
+                    --processes=1
         depends_on:
             postgres:
                 condition: service_healthy
-        volumes:
-            - ./:/app
         environment:
-            DDO_DEBUG: 'true'
-            DDO_SECRET_KEY: thisissecret
-            DDO_ALLOWED_HOSTS: "*"
-            DDO_STATIC_ROOT: /doesntmatter
-            DDO_STATIC_URL: /static/doesntmatter/
-            DATABASE_URL: postgres://postgres:postgres@postgres/postgres
-            DJANGO_SUPERUSER_USERNAME: admin
-            DJANGO_SUPERUSER_PASSWORD: admin
-            DJANGO_SUPERUSER_EMAIL: admin@test.com
+            - DDO_DEBUG='true'
+            - DDO_SECRET_KEY=thisissecret
+            - DDO_ALLOWED_HOSTS="*"
+            - DDO_STATIC_ROOT=/doesntmatter
+            - DDO_STATIC_URL=/static/
+            - DATABASE_URL=postgres://postgres:postgres@postgres/postgres
+            - DJANGO_SUPERUSER_USERNAME=admin
+            - DJANGO_SUPERUSER_PASSWORD=admin
+            - DJANGO_SUPERUSER_EMAIL=admin@test.com
+        volumes:
+            - ./doedensonline:/doedensonline/doedensonline
 
 volumes:
     pgdata: {}

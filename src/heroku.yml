@@ -5,17 +5,18 @@ run:
     web: >
         poetry run manage collectstatic --no-input &&
         poetry run uwsgi
-        --module=doedensonline.core.wsgi:application
-        --http=:$PORT
-        --master
-        --lazy-apps
-        --post-buffering
-        --enable-threads
-        --processes=5
-        --harakiri=20
-        --max-requests=5000
-        --static-map $DDO_STATIC_URL=$DDO_STATIC_ROOT
-        --vacuum
+            --module=doedensonline.core.wsgi:application
+            --http=:$PORT
+            --master
+            --lazy-apps
+            --post-buffering
+            --enable-threads
+            --processes=5
+            --harakiri=20
+            --max-requests=5000
+            --static-map $DDO_STATIC_URL=$DDO_STATIC_ROOT
+            --need-app
+            --vacuum
 release:
     image: web
     command:
