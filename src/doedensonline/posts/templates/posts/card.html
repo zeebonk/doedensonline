@@ -1,43 +1,45 @@
-<div class="row mb-5 {% if flip %}justify-content-end{% endif %}">
-    <div class="col-lg-{{ size|default:9 }}">
-        <div class="card {% if highlight %}bg-light border-dark{% endif %}">
-            <div class="card-body">
+<div class="row justify-content-center">
+    <div class="{{ shadow }} rounded {{ col }}">
 
-                <div class="row">
-                    <div class="col-lg-5 col-xl-4 {% if flip %}order-lg-2 text-lg-right{% endif %}">
-                        <h5 class="card-title">
-                            {{ item.author.get_full_name }}
-                        </h5>
-                        <p class="card-subtitle text-muted mb-2">
-                            {{ item.created_at }}
-                        </p>
-                    </div>
-                    <div class="col-lg-7 col-xl-8 {% if flip %}order-lg-1{% endif %}">
-                        <p class="card-text">{{ item.message }}</p>
-                    </div>
-                </div>
+        <div class="row text-center mb-4">
+            <div class="col">
+                <p class="text-muted">
+                    {{ item.created_at }}
+                </p>
+                <{{ header }}>
+                    {{ item.author.get_full_name }}
+                </{{ header }}>
+            </div>
+        </div>
 
-                {% if show_tools %}
-                <hr>
-                <div class="button-group mb-0 {% if flip %}text-lg-right{% endif %}">
+        <div class="row">
+            <div class="col">
+                <p style="line-height: 2em">{{ item.message }}</p>
+            </div>
+        </div>
+
+        {% if show_tools %}
+        <div class="row text-center mt-4">
+            <div class="col">
+                <div class="btn-group">
                     {% if detail_view %}
-                    <a href="{% url detail_view item.id %}" class="btn btn-link py-0 px-1">
-                        Bekijk/plaats reacties ({{ item.comments.live.count }})
+                    <a href="{% url detail_view item.id %}" class="btn btn-outline-primary">
+                        Reacties ({{ item.comments.live.count }})
                     </a>
                     {% endif %}
                     {% if update_view %}
-                    <a href="{% url update_view item.id %}" class="btn btn-link py-0 px-1">
+                    <a href="{% url update_view item.id %}" class="btn btn-outline-secondary">
                         Aanpassen
                     </a>
                     {% endif %}
                     {% if delete_view %}
-                    <a href="{% url delete_view item.id %}" class="btn btn-link py-0 px-1">
+                    <button data-toggle="modal" data-url="{% url delete_view item.id %}" data-target="#delete-confirm-modal" data-title="{{ delete_title }}" data-message="{{ delete_message }}" class="btn btn-outline-secondary">
                         Verwijderen
-                    </a>
+                    </button>
                     {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
+        {% endif %}
     </div>
 </div>

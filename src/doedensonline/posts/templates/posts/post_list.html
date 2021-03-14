@@ -2,19 +2,17 @@
 
 {% load cards %}
 
+{% block actions %}
+    <a class="btn btn-primary pull-right" href="{% url 'posts:create' %}">Nieuwtje toevoegen</a>
+{% endblock %}
+
 {% block content %}
-    <div class="row">
-        <div class="col mb-4">
-            <a class="btn btn-primary pull-right" href="{% url 'posts:create' %}">Nieuwtje toevoegen</a>
-        </div>
-    </div>
 
     {% for post in posts %}
-        {% cycle False True as flip silent %}
-        {% post_card post request.user details_link=True flip=flip %}
+        {% post_card post request.user details_link=True %}
     {% endfor %}
 
-    <div class="row">
+    <div class="row my-5">
         <div class="col">
             <nav>
                 <ul class="pagination justify-content-center">
@@ -49,4 +47,5 @@
             </nav>
         </div>
     </div>
+
 {% endblock %}

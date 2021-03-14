@@ -7,19 +7,16 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/litera/bootstrap.min.css" crossorigin="anonymous">
 
-        <title>{{ page_title }} - Doedensonline.nl</title>
+        <title>{{ page_title }} - DoedensOnline.nl</title>
     </head>
     <body>
-        <nav class="navbar sticky-top sticky-top navbar-expand-md  navbar-dark bg-primary ">
-            <a class="navbar-brand mb-0 h1" href="#">Doedensonline.nl</a>
+        <nav class="navbar sticky-top sticky-top navbar-expand-md navbar-light bg-light ">
+            <a class="navbar-brand mb-0 h1" href="{% url 'home:index' %}">DoedensOnline.nl</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-content">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbar-content">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item {% if app_name == 'home' %}active{% endif %}">
-                        <a class="nav-link" href="{% url 'home:index' %}">Home</a>
-                    </li>
                     <li class="nav-item {% if app_name == 'posts' %}active{% endif %}">
                         <a class="nav-link" href="{% url 'posts:list' %}">Nieuwtjes</a>
                     </li>
@@ -36,17 +33,63 @@
             </div>
         </nav>
 
+        <div class="modal fade" id="delete-confirm-modal" tabindex="-1" role="dialog" aria-labelledby="delete-confirm-modal" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form method="post" action="TEMPLATE">
+                    {% csrf_token %}
+              <div class="modal-header">
+                <h5 class="modal-title" id="delete-confirm-modal-title">TEMPLATE</h5>
+              </div>
+              <div class="modal-body">
+                  TEMPLATE
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Nee</button>
+                <button type="submit" class="btn btn-primary">Ja, verwijderen</button>
+              </div>
+                </form>
+            </div>
+          </div>
+        </div>
+
         <div class="container">
             <div class="row mb-4 pt-4">
                 <div class="col">
-                    <h2>{{ page_title }}</h1>
+                    <h2 class="display-4">{{ page_title }}</h1>
+                </div>
+                <div class="col-auto align-self-center">
+                    {% block actions %} {% endblock %}
                 </div>
             </div>
+            {% if messages %}
+            <div class="row justify-content-center">
+            {% for message in messages %}
+            <div class="col col-md-6 mt-4 alert alert-{{ message.tags }}">
+                {{ message }}
+                </div>
+            {% endfor %}
+            </div>
+            {% endif %}
             {% block content %} {% endblock %}
         </div>
 
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+        <script type="text/javascript">
+            $('#delete-confirm-modal').on('show.bs.modal', function (event) {
+              var button = $(event.relatedTarget);
+              var url = button.data('url');
+              var title = button.data('title');
+              var message = button.data('message');
+              var modal = $(this);
+              modal.find('form').attr('action', url);
+              modal.find('.modal-title').text(title);
+              modal.find('.modal-body').text(message);
+            })
+        </script>
+
     </body>
 </html>

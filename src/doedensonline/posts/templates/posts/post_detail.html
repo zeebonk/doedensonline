@@ -2,16 +2,14 @@
 
 {% load cards %}
 
-{% block content %}
-    <div class="row">
-        <div class="col mb-4">
-            <a class="btn btn-primary" href="{% url 'posts:add_comment' post.id %}">Reactie plaatsen</a>
-        </div>
-    </div>
+{% block actions %}
+    <a class="btn btn-primary" href="{% url 'posts:add_comment' post.id %}">Reactie plaatsen</a>
+{% endblock %}
 
+{% block content %}
     {% post_card post request.user %}
 
     {% for comment in post.comments.live %}
-        {% comment_card comment request.user flip=True %}
+        {% comment_card comment request.user tools=True %}
     {% endfor %}
 {% endblock %}

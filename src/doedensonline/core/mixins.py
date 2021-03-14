@@ -1,8 +1,9 @@
 from crispy_forms.helper import FormHelper
 from django.contrib.auth.mixins import AccessMixin
+from django.contrib.messages.views import SuccessMessageMixin
 
 
-class BaseMixin(AccessMixin):
+class BaseMixin(AccessMixin, SuccessMessageMixin):
     form_layout = None
     login_required = True
 
