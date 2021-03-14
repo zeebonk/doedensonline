@@ -33,6 +33,7 @@ class PostCreateView(BaseMixin, CreateView):
     model = Post
     fields = ["message"]
     success_url = reverse_lazy("posts:list")
+    success_message = "Uw nieuwtje is successvol geplaatst."
 
     form_layout = Layout(
         Field("message"),
@@ -52,6 +53,7 @@ class PostUpdateView(BaseMixin, UpdateView):
     model = Post
     fields = ["message"]
     success_url = reverse_lazy("posts:list")
+    success_message = "Uw nieuwtje is succesvol aangepast."
 
     form_layout = Layout(
         Field("message"),
@@ -75,20 +77,7 @@ class PostDeleteView(BaseMixin, UpdateView):
     model = Post
     fields = []
     success_url = reverse_lazy("posts:list")
-
-    form_layout = Layout(
-        HTML(
-            """
-            {% load cards %}
-            {% post_card post request.user size=12 tools=False %}
-            <p>Weet je zeker dat je bovenstaande nieuwtje wilt verwijderen?</p>
-            """
-        ),
-        ButtonGroup(
-            PrimarySubmit("Ja, verwijder"),
-            SecondayLink("Nee, ga terug", "posts:list"),
-        ),
-    )
+    success_message = "Uw nieuwtje is succesvol verwijderd."
 
     def get_queryset(self, *args, **kwargs):
         return (
@@ -107,6 +96,7 @@ class CommentCreateView(BaseMixin, CreateView):
     page_title = "Reactie plaatsen"
     model = Comment
     fields = ["message"]
+    success_message = "Uw reactie is successvol geplaatst."
 
     form_layout = Layout(
         Field("message"),
@@ -134,6 +124,7 @@ class CommentUpdateView(BaseMixin, UpdateView):
     page_title = "Reactie aanpassen"
     model = Comment
     fields = ["message"]
+    success_message = "Uw reactie is successvol aangepast."
 
     form_layout = Layout(
         Field("message"),
@@ -159,20 +150,7 @@ class CommentDeleteView(BaseMixin, UpdateView):
     page_title = "Reactie verwijderen"
     model = Comment
     fields = []
-
-    form_layout = Layout(
-        HTML(
-            """
-            {% load cards %}
-            {% comment_card comment request.user size=12 tools=False %}
-            <p>Weet je zeker dat je bovenstaande reactie wilt verwijderen?</p>
-        """
-        ),
-        ButtonGroup(
-            PrimarySubmit("Ja, verwijder"),
-            SecondayLink("Nee, ga gerug", "posts:detail", "comment.post.id"),
-        ),
-    )
+    success_message = "Uw reactie is successvol verwijderd."
 
     def get_queryset(self, *args, **kwargs):
         return (
