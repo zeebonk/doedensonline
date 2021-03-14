@@ -140,8 +140,8 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 # Messages
 
 MESSAGE_TAGS = {
-    messages.INFO: 'primary',
-    messages.SUCCESS: 'success',
-    messages.WARNING: 'warning',
-    messages.ERROR: 'danger',
+    messages.INFO: "primary",
+    messages.SUCCESS: "success",
+    messages.WARNING: "warning",
+    messages.ERROR: "danger",
 }

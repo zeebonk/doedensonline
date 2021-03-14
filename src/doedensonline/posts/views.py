@@ -2,7 +2,6 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from doedensonline.core.layout import (
-    HTML,
     ButtonGroup,
     Field,
     Layout,
