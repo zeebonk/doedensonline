@@ -40,9 +40,9 @@ services:
             postgres:
                 condition: service_healthy
         environment:
-            - DDO_DEBUG='true'
+            - DDO_DEBUG=true
             - DDO_SECRET_KEY=thisissecret
-            - DDO_ALLOWED_HOSTS="*"
+            - DDO_ALLOWED_HOSTS=*
             - DDO_STATIC_ROOT=/doesntmatter
             - DDO_STATIC_URL=/static/
             - DATABASE_URL=postgres://postgres:postgres@postgres/postgres
