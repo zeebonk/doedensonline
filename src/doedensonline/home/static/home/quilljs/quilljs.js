@@ -1,9 +1,9 @@
 function enableQuill(targetId) {
     var toolbarOptions = [
-        ['bold', 'italic', 'underline', 'strike', 'code'],
-        ['blockquote', 'code-block'],
+        ['bold', 'italic', 'underline', 'strike'],
         [{ 'list': 'ordered'}, { 'list': 'bullet' }],
         [{ 'script': 'sub'}, { 'script': 'super' }],
+        ['link'],
         ['clean']
     ];
     var target = $("#" + targetId);

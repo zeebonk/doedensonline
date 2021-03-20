@@ -1,3 +1,5 @@
+{% load bleach %}
+
 <div class="row justify-content-center">
     <div class="{{ shadow }} rounded {{ col }}">
 
@@ -14,7 +16,7 @@
 
         <div class="row">
             <div class="col" style="line-height: 2em">
-                {{ item.message|safe }}
+                {{ item.message|bleach }}
             </div>
         </div>
 
