@@ -49,6 +49,7 @@ services:
             - DJANGO_SUPERUSER_USERNAME=admin
             - DJANGO_SUPERUSER_PASSWORD=admin
             - DJANGO_SUPERUSER_EMAIL=admin@test.com
+            - NEW_RELIC_ENVIRONMENT=development
         volumes:
             - ./doedensonline:/doedensonline/doedensonline
 
