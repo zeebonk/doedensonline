@@ -10,6 +10,9 @@ variable "django_superuser_username" {}
 variable "django_superuser_password" {}
 variable "django_superuser_email" {}
 
+variable "nr_environment" {}
+variable "nr_license_key" {}
+
 resource "heroku_app" "doedensonline" {
   name   = "doedensonline"
   region = "eu"
@@ -27,6 +30,8 @@ resource "heroku_app" "doedensonline" {
     DJANGO_SUPERUSER_USERNAME = var.django_superuser_username
     DJANGO_SUPERUSER_PASSWORD = var.django_superuser_password
     DJANGO_SUPERUSER_EMAIL    = var.django_superuser_email
+    NEW_RELIC_ENVIRONMENT     = var.nr_environment
+    NEW_RELIC_LICENSE_KEY     = var.nr_license_key
   }
 }
 
