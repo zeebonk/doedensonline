@@ -22,6 +22,23 @@ def post_card(item, user, details_link=False, tools=True):
 
 
 @register.inclusion_tag("posts/card.html")
+def post_card_form(form, object):
+    return {
+        "item": object,
+        "form": form,
+        "show_tools": False,
+        "detail_view": False,
+        "update_view": False,
+        "delete_view": False,
+        "delete_title": "n/a",
+        "delete_message": "n/a",
+        "header": "h3",
+        "shadow": "shadow",
+        "col": "col m-5 p-5",
+    }
+
+
+@register.inclusion_tag("posts/card.html")
 def comment_card(item, user, tools=True):
     user_is_author = item.author == user
     return {
@@ -32,6 +49,23 @@ def comment_card(item, user, tools=True):
         "delete_view": "posts:delete_comment" if tools and user_is_author else None,
         "delete_title": "Reactie verwijderen",
         "delete_message": "U staat op het punt uw reactie te verwijderen. Weet u het zeker?",
+        "header": "h5",
+        "shadow": "shadow-sm",
+        "col": "col-sm-8 m-4 p-5",
+    }
+
+
+@register.inclusion_tag("posts/card.html")
+def comment_card_form(form, object):
+    return {
+        "item": object,
+        "form": form,
+        "show_tools": False,
+        "detail_view": False,
+        "update_view": False,
+        "delete_view": False,
+        "delete_title": "n/a",
+        "delete_message": "n/a",
         "header": "h5",
         "shadow": "shadow-sm",
         "col": "col-sm-8 m-4 p-5",

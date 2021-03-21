@@ -8,7 +8,7 @@ function enableQuill(targetId) {
     ];
     var target = $("#" + targetId);
     var targetShadowId = targetId + "_quill_shadow";
-    var targetShadow = $("<div id='" + targetShadowId + "' style='min-height: 200px; line-height: 2em'></div>");
+    var targetShadow = $("<div id='" + targetShadowId + "'></div>");
     targetShadow.insertAfter(target);
     target.hide();
     var quill = new Quill("#" + targetShadowId, {

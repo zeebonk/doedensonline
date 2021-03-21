@@ -14,4 +14,4 @@ def SecondayLink(text, route, *args):
 
 
 def ButtonGroup(*buttons):
-    return Div(*buttons, css_class="btn-group col")
+    return Div(*buttons, css_class="btn-group")
