@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from crispy_forms.layout import Div
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
@@ -34,16 +37,27 @@ class PostCreateView(BaseMixin, CreateView):
     success_url = reverse_lazy("posts:list")
     success_message = "Uw nieuwtje is successvol geplaatst."
 
+    form_show_labels = False
     form_layout = Layout(
         Field("message"),
-        ButtonGroup(
-            PrimarySubmit("Toevoegen"),
-            SecondayLink("Terug", "posts:list"),
+        Div(
+            ButtonGroup(
+                PrimarySubmit("Toevoegen"),
+                SecondayLink("Terug", "posts:list"),
+            ),
+            css_class="text-center mt-4",
         ),
     )
 
+    def get_context_data(self, *args, **kwargs):
+        self.object = self.model()
+        self.object.author = self.request.user
+        self.object.created_at = datetime.utcnow()
+        return super().get_context_data(*args, **kwargs)
+
     def form_valid(self, form):
         form.instance.author = self.request.user
+        self.object.created_at = None
         return super().form_valid(form)
 
 
@@ -54,11 +68,15 @@ class PostUpdateView(BaseMixin, UpdateView):
     success_url = reverse_lazy("posts:list")
     success_message = "Uw nieuwtje is succesvol aangepast."
 
+    form_show_labels = False
     form_layout = Layout(
         Field("message"),
-        ButtonGroup(
-            PrimarySubmit("Wijzingen opslaan"),
-            SecondayLink("Terug", "posts:list"),
+        Div(
+            ButtonGroup(
+                PrimarySubmit("Wijzingen opslaan"),
+                SecondayLink("Terug", "posts:list"),
+            ),
+            css_class="text-center mt-4",
         ),
     )
 
@@ -97,11 +115,15 @@ class CommentCreateView(BaseMixin, CreateView):
     fields = ["message"]
     success_message = "Uw reactie is successvol geplaatst."
 
+    form_show_labels = False
     form_layout = Layout(
         Field("message"),
-        ButtonGroup(
-            PrimarySubmit("Plaatsen"),
-            SecondayLink("Terug", "posts:detail", "post_pk"),
+        Div(
+            ButtonGroup(
+                PrimarySubmit("Plaatsen"),
+                SecondayLink("Terug", "posts:detail", "item.post.id"),
+            ),
+            css_class="text-center mt-4",
         ),
     )
 
@@ -109,13 +131,16 @@ class CommentCreateView(BaseMixin, CreateView):
         return reverse_lazy("posts:detail", kwargs={"pk": self.kwargs["post_pk"]})
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["post_pk"] = self.kwargs["post_pk"]
-        return context
+        self.object = self.model()
+        self.object.post = Post.objects.get(id=self.kwargs["post_pk"])
+        self.object.author = self.request.user
+        self.object.created_at = datetime.utcnow()
+        return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.instance.post = Post.objects.get(id=self.kwargs["post_pk"])
+        form.instance.created_at = None
         return super().form_valid(form)
 
 
@@ -125,11 +150,15 @@ class CommentUpdateView(BaseMixin, UpdateView):
     fields = ["message"]
     success_message = "Uw reactie is successvol aangepast."
 
+    form_show_labels = False
     form_layout = Layout(
         Field("message"),
-        ButtonGroup(
-            PrimarySubmit("Wijzingen opslaan"),
-            SecondayLink("Terug", "posts:detail", "comment.post.id"),
+        Div(
+            ButtonGroup(
+                PrimarySubmit("Wijzingen opslaan"),
+                SecondayLink("Terug", "posts:detail", "item.post.id"),
+            ),
+            css_class="text-center mt-4",
         ),
     )
 

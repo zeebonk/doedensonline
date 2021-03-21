@@ -1,11 +1,11 @@
 {% extends 'home/base.html' %}
 
-{% load crispy_forms_tags %}
+{% load cards %}
 
 {% block content %}
     <div class="row">
         <div class="col">
-            {% crispy form %}
+            {% post_card_form form object %}
         </div>
     </div>
 {% endblock %}

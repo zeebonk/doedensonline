@@ -5,6 +5,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 
 class BaseMixin(AccessMixin, SuccessMessageMixin):
     form_layout = None
+    form_show_labels = True
     login_required = True
 
     def get_context_data(self, **kwargs):
@@ -25,4 +26,5 @@ class BaseMixin(AccessMixin, SuccessMessageMixin):
             form.helper = FormHelper()
             form.helper.attrs = {"novalidate": "novalidate"}
             form.helper.layout = self.form_layout
+            form.helper.form_show_labels = self.form_show_labels
         return form
