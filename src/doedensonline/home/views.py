@@ -1,7 +1,10 @@
 from django.contrib.auth import logout
+from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.forms import Form
+from django.http import JsonResponse
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import FormView, ListView
 
 from doedensonline.core.layout import (
@@ -49,3 +52,18 @@ class LogoutView(BaseMixin, FormView):
     def post(self, request, *args, **kwargs):
         logout(request)
         return super().post(request, *args, **kwargs)
+
+
+class HealthView(BaseMixin, View):
+    login_required = False
+
+    def get(self, request, *args, **kwargs):
+        state = {"view": "ok"}
+
+        try:
+            User.objects.exists()
+            state["postgresql"] = "ok"
+        except:  # noqa: E722
+            state["postgresql"] = "error"
+
+        return JsonResponse(state)
