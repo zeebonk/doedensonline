@@ -49,15 +49,26 @@ class PostCreateView(BaseMixin, CreateView):
         ),
     )
 
+    def get_draft(self):
+        draft, _ = self.model.objects.get_or_create(
+            status=self.model.Status.DRAFT,
+            author=self.request.user
+        )
+        return draft
+
     def get_context_data(self, *args, **kwargs):
-        self.object = self.model()
-        self.object.author = self.request.user
+        self.object = self.get_draft()
+        # Make sure created_at looks recent in the UI
         self.object.created_at = datetime.utcnow()
         return super().get_context_data(*args, **kwargs)
 
     def form_valid(self, form):
+        form.instance.pk = self.get_draft().pk
+        form.instance.status = self.model.Status.LIVE
+        # Prevent author from being spoofed
         form.instance.author = self.request.user
-        self.object.created_at = None
+        # Make sure created at resembles "go live" date
+        form.instance.created_at = datetime.utcnow()
         return super().form_valid(form)
 
 

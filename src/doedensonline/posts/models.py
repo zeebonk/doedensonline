@@ -11,11 +11,12 @@ class PostQuerySet(models.QuerySet):
 
 class Post(BaseModel):
     class Status(models.TextChoices):
+        DRAFT = ("draft", "Draft")
         LIVE = ("live", "Live")
         DELETED = ("deleted", "Deleted")
 
     status = models.CharField(
-        max_length=10, choices=Status.choices, default=Status.LIVE
+        max_length=10, choices=Status.choices, default=Status.DRAFT
     )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts"
