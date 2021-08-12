@@ -31,7 +31,17 @@
                         <a class="nav-link" href="#">Instelling</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home:logout' %}">Uitloggen</a>
+                         <a
+                            href="#"
+                            data-toggle="modal"
+                            data-url="{% url 'home:logout' %}"
+                            data-target="#delete-confirm-modal"
+                            data-title="Uitloggen"
+                            data-message="Weet u zeker dat u wilt uitloggen?"
+                            class="nav-link"
+                        >
+                            Uitloggen
+                        </a>
                     </li>
                 </ul>
             </div>
