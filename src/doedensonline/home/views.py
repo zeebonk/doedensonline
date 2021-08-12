@@ -1,19 +1,12 @@
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
-from django.forms import Form
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import FormView, ListView
+from django.views.generic import ListView
 
-from doedensonline.core.layout import (
-    ButtonGroup,
-    Field,
-    Layout,
-    PrimarySubmit,
-    SecondayLink,
-)
+from doedensonline.core.layout import ButtonGroup, Field, Layout, PrimarySubmit
 from doedensonline.core.mixins import BaseMixin
 from doedensonline.posts.models import Post
 
