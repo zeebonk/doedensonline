@@ -132,6 +132,14 @@ STATIC_ROOT = os.environ["DDO_STATIC_ROOT"]
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
 
+# Media files (user uploaded content)
+# https://docs.djangoproject.com/en/3.2/topics/files/
+
+MEDIA_URL = os.environ["DDO_MEDIA_URL"]
+
+MEDIA_ROOT = os.environ["DDO_MEDIA_ROOT"]
+
+
 # Crispy forms
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"

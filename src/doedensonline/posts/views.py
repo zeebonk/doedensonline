@@ -12,7 +12,25 @@ from doedensonline.core.layout import (
     SecondayLink,
 )
 from doedensonline.core.mixins import BaseMixin
-from doedensonline.posts.models import Comment, Post
+from doedensonline.posts.models import Comment, Post, Image
+from django.http import HttpResponse, JsonResponse
+
+
+def upload_file(request, post_pk):
+    print(post_pk)
+    post = Post.objects.get(pk=post_pk)
+    urls = []
+    print(request.FILES)
+    for name in request.FILES.keys():
+        files = request.FILES.getlist(name)
+        print(name, files)
+        for file in files:
+            image = Image()
+            image.post = post
+            image.image = file
+            image.save()
+            urls.append(image.image.url)
+    return JsonResponse(data={"urls": urls}, status=200)
 
 
 class PostListView(BaseMixin, ListView):

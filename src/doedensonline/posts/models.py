@@ -44,3 +44,9 @@ class Comment(BaseModel):
     message = models.TextField()
 
     objects = models.Manager.from_queryset(CommentQuerySet)()
+
+
+class Image(BaseModel):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to='posts')
+

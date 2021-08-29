@@ -25,4 +25,5 @@ urlpatterns = [
         views.CommentDeleteView.as_view(),
         name="delete_comment",
     ),
+    path("<int:post_pk>/upload_file", views.upload_file, name="upload_file"),
 ]
