@@ -25,4 +25,5 @@ urlpatterns = [
         views.CommentDeleteView.as_view(),
         name="delete_comment",
     ),
+    path("<int:post_pk>/add_images", views.add_images, name="add_images"),
 ]

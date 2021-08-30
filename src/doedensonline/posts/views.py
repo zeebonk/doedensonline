@@ -3,6 +3,9 @@ from datetime import datetime
 from crispy_forms.layout import Div
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect
+
 
 from doedensonline.core.layout import (
     ButtonGroup,
@@ -12,7 +15,7 @@ from doedensonline.core.layout import (
     SecondayLink,
 )
 from doedensonline.core.mixins import BaseMixin
-from doedensonline.posts.models import Comment, Post
+from doedensonline.posts.models import Comment, Post, Image
 
 
 class PostListView(BaseMixin, ListView):
@@ -60,7 +63,9 @@ class PostCreateView(BaseMixin, CreateView):
         self.object = self.get_draft()
         # Make sure created_at looks recent in the UI
         self.object.created_at = datetime.utcnow()
-        return super().get_context_data(*args, **kwargs)
+        data = super().get_context_data(*args, **kwargs)
+        data["lol"] = "3"
+        return data
 
     def form_valid(self, form):
         form.instance.pk = self.get_draft().pk
@@ -205,3 +210,13 @@ class CommentDeleteView(BaseMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy("posts:detail", kwargs={"pk": self.object.post.id})
+
+
+def add_images(request, post_pk):
+    post = Post.objects.get(pk=post_pk)
+    for file in request.FILES.getlist("images"):
+        image = Image()
+        image.post = post
+        image.image = file
+        image.save()
+    return redirect("posts:create")

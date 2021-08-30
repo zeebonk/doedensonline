@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from stdimage import StdImageField
 
 from doedensonline.core.models import BaseModel
 
@@ -45,3 +46,15 @@ class Comment(BaseModel):
     message = models.TextField()
 
     objects = models.Manager.from_queryset(CommentQuerySet)()
+
+
+class Image(BaseModel):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="images")
+    image = StdImageField(
+        upload_to='images/posts/',
+        delete_orphans=True,
+        variations={
+            'large': (1920, 1080),
+            'thumbnail': (200, 200),
+        }
+    )

@@ -35,13 +35,17 @@ ALLOWED_HOSTS = [h.strip() for h in os.environ["DDO_ALLOWED_HOSTS"].split(",")]
 # Application definition
 
 INSTALLED_APPS = [
+    # Django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # 3rd part
     "crispy_forms",
+    "stdimage",
+    # Doedensonline
     "doedensonline.home",
     "doedensonline.posts",
     "doedensonline.albums",
@@ -130,6 +134,16 @@ STATIC_URL = os.environ["DDO_STATIC_URL"]
 STATIC_ROOT = os.environ["DDO_STATIC_ROOT"]
 
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+
+
+# Media files (user uploaded content)
+# https://docs.djangoproject.com/en/3.2/topics/files/
+
+MEDIA_URL = os.environ["DDO_MEDIA_URL"]
+
+MEDIA_ROOT = os.environ["DDO_MEDIA_ROOT"]
+
+FILE_UPLOAD_HANDLERS = ["django.core.files.uploadhandler.TemporaryFileUploadHandler"]
 
 
 # Crispy forms
