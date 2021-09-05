@@ -15,9 +15,6 @@ jobs:
             - name: fmt
               run: terraform fmt -check
               working-directory: ./terraform
-            - name: validate
-              run: terraform validate
-              working-directory: ./terraform
 
     app:
         runs-on: ubuntu-latest
