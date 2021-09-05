@@ -48,7 +48,7 @@ resource "heroku_app" "doedensonline" {
 
 resource "heroku_build" "doedensonline" {
   app = heroku_app.doedensonline.id
-  source = {
+  source {
     path = "../src"
   }
 }
