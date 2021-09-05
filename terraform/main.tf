@@ -1,5 +1,3 @@
-provider "heroku" {}
-
 variable "ddo_secret_key" {}
 variable "ddo_debug" {}
 variable "ddo_allowed_hosts" {}
@@ -12,6 +10,19 @@ variable "django_superuser_email" {}
 
 variable "nr_environment" {}
 variable "nr_license_key" {}
+
+terraform {
+  backend "remote" {
+    hostname     = "app.terraform.io"
+    organization = "zeebonk"
+
+    workspaces {
+      name = "doedensonline"
+    }
+  }
+}
+
+provider "heroku" {}
 
 resource "heroku_app" "doedensonline" {
   name   = "doedensonline"
