@@ -1,0 +1,59 @@
+<p class="intro">
+	Op deze pagina kunt u foto's toevoegen en verwijderen aan een fotoalbum. Toevoegen doet u door foto's te selecteren 
+	met de bestand selecteer velden en vervolgens op de Geselecteerde foto's uploaden knop te drukken. Het verwijderen
+	van foto's doet u door foto's te selecteren door ze aan te vinken en vervolgens op de knop Geselecteerde foto's 
+	verwijderen te drukken.
+</p>
+
+<div id="edit-form"> 
+	<% form_tag('/photo_albums/add_picture', :multipart => true) do %>
+		<p>
+			<label>Foto's toevoegen:</label>
+		<p>
+			<%= file_field_tag 'file[]' %>
+			<%= file_field_tag 'file[]' %>
+			<%= file_field_tag 'file[]' %>
+			
+			<%= file_field_tag 'file[]' %>
+			<%= file_field_tag 'file[]' %>
+			<%= file_field_tag 'file[]' %>
+			
+			<%= file_field_tag 'file[]' %>
+			<%= file_field_tag 'file[]' %>
+			<%= file_field_tag 'file[]' %>
+		</p>
+		<p>
+			<%= hidden_field_tag 'album_id', @photo_album.id %>
+			<%= submit_tag "Geselecteerde foto's uploaden" %>
+		</p>
+	<% end %>
+	
+	<% if @photo_album.photo_album_pictures.count > 0 %>
+	<% form_tag('/photo_albums/destroy_many_pictures') do %>  
+		<p>
+			<label>Foto's verwijderen:</label>
+		</p>
+		<p>
+			<div id="pictures-wrapper">
+			<ul>
+			<% for picture in @photo_album.photo_album_pictures -%>
+				<li>
+				<a href="#">
+				<%= image_tag "small/#{picture.filename} " %>
+				</a>
+				<%= check_box_tag 'selected[]', picture.id, false, :class => 'checkbox' %>
+				</li>
+			<% end -%>
+			</ul>
+			</div>
+			<br class="clear">
+			<%= hidden_field_tag 'album_id', @photo_album.id %>
+		</p>
+		<p>
+			<%= submit_tag "Geselecteerde foto's verwijderen" %>
+		</p>
+	<% end %>
+	<%end%>
+</div>
+
+<%= link_to '&laquo; Terug naar het overzicht', photo_albums_path, :class=>'back' %>

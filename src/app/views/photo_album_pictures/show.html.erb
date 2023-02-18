@@ -1,0 +1,26 @@
+<h3>
+  <%=h @photo_album.title %>
+</h3>
+
+<div id="pictures-list">
+  <%= render(:partial => 'pictures_list', :locals => {:album_id => @photo_album.id, :pictures => @photo_album.photo_album_pictures}) %>
+</div>
+
+<% form_for(@photo_album_picture, :html => { :multipart => true }) do |f| %>
+  <%= f.error_messages %>
+  <p>
+    <%= f.label :filename %><br />
+    <%= f.file_field :filename , :class=>"flash"%>
+    <span id="spanButtonPlaceHolder"></span> 
+    <div id="fsUploadProgress"></div>
+    <%= f.hidden_field :photo_album_id%>
+  </p>
+  <p>
+    <%= f.submit 'Create' %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', photo_album_pictures_path %>
+
+
+<%= link_to 'Terug naar het overzicht', photo_albums_path %>

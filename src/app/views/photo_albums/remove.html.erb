@@ -1,0 +1,10 @@
+<p class="intro"><strong>Weet u zeker dat u deze foto album inclusief foto's wilt verwijderen?</strong></p>
+
+<% form_tag('/photo_albums/destroy', :method => :post) do %>
+  <p>
+    <%= hidden_field_tag 'id', @photo_album.id %>
+  </p>
+  <p>
+    <%= submit_tag "Ja, verwijderen" %><%= submit_tag "Nee, niet verwijderen" %>
+  </p>
+<% end %>

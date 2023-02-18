@@ -1,0 +1,17 @@
+<p class="intro">Op deze pagina kunt u een nieuwe reactie aanmaken. Typ uw reactie in het tekstvak hieronder en druk op "Reactie plaatsen". Uw reactie zal bovenaan de lijst met reacties worden geplaatst.</p>
+
+<div id="edit-form">
+  <% form_for @news_comment, :url => {:action => 'create_comment'} do |f| %>
+    <p>
+      <%= f.hidden_field :news_item_id %>
+    </p>
+    <p>
+      <%= f.text_area :message, :rows => 18, :value=> 'Hier uw reactie' %>
+    </p>
+    <p>
+      <%= f.submit "Reactie plaatsen" %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to '&laquo; Terug naar het nieuwtje', {:action => 'view', :id => @news_comment.news_item_id}, :class=>'back', :title=>'Keer terug naar het nieuwtje waarop u wilde reageren' %>

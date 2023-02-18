@@ -1,0 +1,13 @@
+<% form_remote_tag( :url => { :action => 'destroy_many'}) do -%>
+  <% if @photo_album.photo_album_pictures.count > 0 -%>
+  
+    <% for picture in pictures -%>
+      <%= image_tag "small/#{picture.filename} " %>
+      <%= check_box_tag "delete[]", picture.id %>
+    <% end -%>
+
+    <%= hidden_field_tag 'album', album_id %>
+    <%= submit_tag 'Remove selected' %>
+
+  <% end -%>
+<% end -%>

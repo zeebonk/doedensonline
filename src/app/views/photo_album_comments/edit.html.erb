@@ -1,0 +1,17 @@
+<p class="intro">Op deze pagina kunt u een door u geplaatste reactie aanpassen. Verander uw reactie en druk op "Aanpassen". Uw aanpassingen worden direct doorgevoerd."</p>
+
+<div id="edit-form">
+  <% form_for(@photo_album_comment) do |f| %>
+    <p>
+      <%= f.hidden_field :id %>
+    </p>
+    <p>
+      <%= f.text_area :message, :rows => 18 %>
+    </p>
+    <p>
+      <%= f.submit "Aanpassen" %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to '&laquo; Terug naar de fotoalbum', {:controller => 'photo_albums', :action => 'show', :id => @photo_album_comment.photo_album_id}, :class=>'back', :title=>'Keer terug naar het nieuwtje waarop u wilde reageren' %>

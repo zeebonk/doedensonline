@@ -1,0 +1,32 @@
+a.read-on
+{
+  width: 140px;
+}
+
+#main-menu
+{
+  margin-bottom: -22px;
+}
+
+#main-menu ul li
+{
+  width: 120px;
+  height: 63px;
+}
+
+div.preview-balloon
+{
+  margin-left: 14px;
+  margin-right: 14px;
+  padding-bottom: 30px;
+}
+
+div.preview-balloon-content
+{
+  padding-top: 20px;
+}
+
+div.sign-in
+{
+  padding-top: 0px;
+}

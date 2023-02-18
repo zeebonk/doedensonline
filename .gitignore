@@ -1,0 +1,9 @@
+.terraform
+inventory.yaml
+designs/
+src/public/images/large/
+src/public/images/medium/
+src/public/images/small/
+src/db/
+src/log/
+src/tmp/

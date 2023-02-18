@@ -1,0 +1,78 @@
+<p class="intro">
+  Op deze pagina bekijkt u een fotoalbum, inclusief alle bijhorende reacties. om een reactie 
+  te plaatsen klikt u op "Reactie plaatsen".   Wanneer u weer terug wilt keren naar het 
+  fotoalbums overzicht kunt u dit doen door op "Terug naar het overzicht" te klikken.
+</p> 
+ 
+<div class="news-index-actions">
+	<%= link_to '&laquo; Terug naar het overzicht', photo_albums_path %>
+	<%= link_to "Reactie plaatsen &raquo;", {:controller => 'photo_album_comments', :action => 'new', :id => @photo_album.id}, :title=> 'Plaats een reactie bij dit album', :class=>'next' %>
+</div> 
+
+<div class="balloon-wrapper even">
+  <div class="poster-wrapper">
+    <h3>
+      <%= @photo_album.user.first_name %> <%= @photo_album.user.last_name %>
+    </h3>
+  </div>
+  <div class="balloon-top">    
+    <div class="balloon-bottom">      
+      
+      <div class="date-container">
+        <% Time::DATE_FORMATS[:article_date] = "<span class='day'>%d</span><span class='month-year'>%B<br/>%Y</span>" %>
+        <%= @photo_album.created_at.to_s(:article_date) %>
+      </div>
+      
+      <%= @photo_album.description %>
+      
+      <% if @photo_album.user_id == @current_user.id %>
+        <div class="balloon-actions"> 
+					<%= link_to 'Verwijderen  &raquo;', {:action => 'remove', :id => @photo_album.id }, :class => "edit" %>
+          <%= link_to "Foto's beheren  &raquo;", {:action => 'manage_pictures', :id => @photo_album.id }, :class => "edit" %>
+          <%= link_to 'Aanpassen  &raquo;', edit_photo_album_path(@photo_album), :class => "edit" %>
+          <br class="clear"/> 
+        </div> 
+      <% end %>
+      
+    </div>
+  </div>
+</div>
+
+<div id="pictures-wrapper">
+	<ul>
+		<% for picture in @photo_album.photo_album_pictures %>
+			<li>
+        <%= link_to image_tag("/images/small/#{picture.filename}"), "/images/large/#{picture.filename}", :rel => 'album' %>
+			</li>
+		<% end %>
+	</ul>
+	<br class="clear"/>
+</div>
+
+
+<div id="reactions">
+<% for photo_album_comment in @photo_album_comments %>
+<div class="balloon-wrapper odd reaction">
+  <div class="poster-wrapper">
+    <h3>
+      <%= photo_album_comment.user.first_name %> <%= photo_album_comment.user.last_name %>
+    </h3>
+  </div>
+  <div class="balloon-top">    
+    <div class="balloon-bottom">      
+      <%= photo_album_comment.message %>
+      <% if photo_album_comment.user.id == @current_user.id %>
+      <div class="balloon-actions">
+                  
+          <%= link_to "Verwijderen &raquo;", {:controller => 'photo_album_comments', :action => 'remove', :id => photo_album_comment.id}, :class=>'edit', :title=>'Verwijder deze reactie' %>
+          <%= link_to "Aanpassen &raquo;", {:controller => 'photo_album_comments', :action => 'edit', :id => photo_album_comment.id}, :class=>'edit', :title=>'Pas deze reactie aan' %>
+        
+        <br class="clear"/>
+      </div>
+      <% end %>
+    </div>
+  </div>
+  <br class="clear"/>
+</div>
+<% end %>
+</div>

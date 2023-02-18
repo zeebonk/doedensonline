@@ -1,0 +1,20 @@
+<p class="intro">	
+	Bij het fotoalbums overzicht kunt u door alle geplaatste fotoalbums bladeren. Net als de nieuwtjes zijn ook de fotoalbums gesorteerd
+	op datum en zult u van boven naar beneden steeds oudere fotoalbums tegenkomen. Wilt u zelf een fotoalbum toevoegen klik dan op de link:
+	"Fotoalbum toevoegen".
+</p>
+
+<div class="news-index-actions"><%= page_navigation %><%= link_to 'Fotoalbum toevoegen &raquo;', new_photo_album_path, :class=>'add' %></div>
+
+<div id="photo-albums-wrapper">
+
+  <% for photo_album in @photo_albums %>
+    <div class="photo-album">
+  	  <%= link_to image_tag("medium/#{photo_album.preview_picture}"), photo_album %>  	  
+  	  <h3><%=h photo_album.title %></h3>
+    </div>
+  <% end %>
+  
+  <br class="clear"/>  
+  
+</div>

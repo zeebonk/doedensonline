@@ -1,0 +1,10 @@
+<p class="intro"><strong>Weet u zeker dat u deze reactie wilt verwijderen?</strong></p>
+
+<% form_tag :action => 'destroy_comment' do %>
+  <p>
+    <%= hidden_field_tag "id", @news_comment.id %>
+  </p>
+  <p>
+    <%= submit_tag "Ja, verwijderen" %><%= submit_tag "Nee, niet verwijderen" %>
+  </p>
+<% end %>

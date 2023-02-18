@@ -1,0 +1,46 @@
+<p class="intro">Bij het nieuwtjes overzicht kunt u door alle geplaatste nieuwtjes bladeren. De nieuwtjes zijn gesorteerd op datum, waarbij de nieuwste berichten altijd bovenaan staan. Via de pagina navigatie (rechts onder deze tekst) kunt u ook oudere berichten terug zien. Via de link "Nieuwtje toevoegen" (links onder deze tekst), kunt u naar het scherm gaan om een nieuw bericht te plaatsen.</p>
+
+<div class="news-index-actions"><%= page_navigation %><%= link_to "Nieuwtje toevoegen &raquo;", {:action => 'add'}, :title => 'Plaats een nieuw nieuwtje', :class=>'add' %></div>
+
+<% @news_items.each_with_index do |news_item, index| %>
+  
+  <% if (index % 2) == 0 %>
+    <div class="balloon-wrapper even">
+  <% else %>
+    <div class="balloon-wrapper odd">
+  <% end %>
+  
+    <div class="poster-wrapper">
+      <h3>
+        <%= news_item.user.first_name %> <%= news_item.user.last_name %>
+      </h3>
+    </div>
+    
+    <div class="balloon-top">    
+      <div class="balloon-bottom">
+        
+        <div class="date-container">
+        <% Time::DATE_FORMATS[:article_date] = "<span class='day'>%d</span><span class='month-year'>%B<br/>%Y</span>" %>
+        <%= news_item.created_at.to_s(:article_date) %>
+        </div>
+        <%= news_item.message %>
+        <div class="balloon-actions">
+          <%= link_to "Bekijk/plaats reacties (#{news_item.news_comments.size}) &raquo;", {:action => 'view', :id => news_item.id}, :title=>'Bekijk het hele bericht en lees/schrijf reacties' %>
+          <% if news_item.user_id == @current_user.id %>
+            <%= link_to "Verwijderen &raquo; ", {:action => 'remove', :id => news_item.id}, :class=>'edit', :title=>'Verwijder dit complete bericht' %>
+            <%= link_to "Aanpassen &raquo; ", {:action => 'edit', :id => news_item.id}, :class=>'edit', :title=>'Pas dit bericht aan' %>
+          <% end %>
+          <br class="clear"/>
+        </div>
+      </div>
+    </div>
+    
+    <br class="clear"/>
+  </div>
+  <br class="clear"/>
+<% end %>
+
+<div class="news-index-actions bottom">
+  <%= page_navigation %>
+  <%= link_to "Nieuwtje toevoegen &raquo;", {:action => 'add'}, :title => 'Plaats een nieuw nieuwtje', :class=>'add' %>
+</div>

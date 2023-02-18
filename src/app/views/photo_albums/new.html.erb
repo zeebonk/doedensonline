@@ -1,0 +1,37 @@
+<p class="intro">
+	Op deze pagina kunt u een nieuw fotoalbum aanmaken. Vul eerst een titel en beschrijving in. Vervolgens kiest u onder Voorbeeld 
+	afbeelding een foto bestand die op de voorkant van de album moet komen. Klik vervolgens op "Maak album aan", deze knop stuur u 
+	naar de foto beheer pagina voor de nu door u aangemaakte fotoalbum. Op deze pagina kunt u uw album vervolgens vullen met uw foto's.
+</p>
+
+<div id="edit-form"> 
+	<% form_for(@photo_album,:html => { :multipart => true }) do |f| %>
+		<p>
+			<%= f.label :title, "Titel:" %>
+			<% if (@title_error) %>
+				<span class="error-message"> er moet een titel worden ingevuld.</span>
+			<% end %>
+			<%= f.text_field :title, :class => 'text-box' %>
+		</p>
+		<p>
+			<%= f.label :description, "Beschrijving:" %>
+			<% if (@description_error) %>
+				<span class="error-message"> er moet een beschrijving worden ingevuld.</span><br />
+			<% end %>
+			<%= f.text_area :description, :rows => 12 %>
+		</p>
+		<p>
+			<%= f.label :preview_picture, "Voorbeeld afbeelding:" %>
+			<% if (@preview_picture_error) %>
+				<span class="error-message"> er moet een geldige voorbeeld afbeelding worden geselecteerd.</span>
+			<% end %>
+			<br>
+			<%= f.file_field :preview_picture %>
+		</p>
+		<p>
+			<%= f.submit "Maak album aan" %>
+		</p>
+	<% end %>
+</div>
+
+<%= link_to '&laquo; Terug naar het overzicht', photo_albums_path, :class => 'back' %>

@@ -1,0 +1,7 @@
+<p class="intro">Bent u weer helemaal op de hoogte van de familie en is het weer tijd om wat anders te gaan doen? Log dan eerst uit! Met het uitloggen zorgt u er voor dat wanneer de website weer word geopend op uw computer, er eerst weer moet worden ingelogd om verder de site op te kunnen!</p>
+<p class="intro"><strong>Weet u zeker dat u wilt uitloggen?</strong></p>
+<% form_tag :action => 'destroy_session' do %>
+  <p>
+    <%= submit_tag "Ja, log mij uit!" %> <%= submit_tag "Nee, ik blijf nog even!" %>
+  </p>
+<% end %>

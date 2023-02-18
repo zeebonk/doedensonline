@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  
+  <title><% @page_title.each do |page| %><%= (page + " - ") %><% end %>Doedensonline.nl</title>
+  
+  <%= stylesheet_link_tag 'main' %>
+  <%= stylesheet_link_tag controller.controller_name %>
+  
+  <!--[if lte IE 7]><%= stylesheet_link_tag 'ie7' %><![endif]-->
+  <!--[if lte IE 6]><%= stylesheet_link_tag 'ie6' %><![endif]-->
+  
+  <% if controller.action_name == 'add'            || controller.action_name == 'edit'           || controller.action_name == 'update' || 
+        controller.action_name == 'add_comment'    || controller.action_name == 'edit_comment'   || controller.action_name == 'create' || 
+        controller.action_name == 'create_comment' || controller.action_name == 'update_comment' || controller.action_name == 'new'    %>
+    <%= javascript_include_tag 'tiny_mce/tiny_mce' %>
+    <%= javascript_include_tag 'load-tiny-mce' %>
+  <% end %>  
+  
+  <% if controller.controller_name == 'photo_albums' && controller.action_name == 'show' %>
+    <%= stylesheet_link_tag 'colorbox' %>
+    <%= javascript_include_tag 'jquery-1.4.2.min' %>
+    <%= javascript_include_tag 'colorbox/jquery.colorbox-min' %>
+    <script>
+      $(document).ready(function(){ $("a[rel='album']").colorbox({maxWidth:"85%", maxHeight:"85%"}); });
+    </script>
+  <% end %>
+  
+	<% if controller.controller_name == 'photo_albums' && (controller.action_name == 'manage_pictures' || controller.action_name == 'add_picture') %>
+		<%= javascript_include_tag 'jquery-1.4.2.min' %>
+		<%= javascript_include_tag 'test' %>
+	<% end %>
+	
+  <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+  </script>
+
+  <script type="text/javascript">
+    var pageTracker = _gat._getTracker("UA-17389162-1");
+    pageTracker._trackPageview();
+  </script>
+  
+</head>
+<body>
+
+<div id="main-menu">
+  <ul>
+    <li>
+      <% if controller.controller_name == 'home' && controller.action_name != 'sign_out' %>
+        <%= link_to "Home", { :controller => 'home' }, :class => 'active', :title => 'De begin pagina' %> 
+      <% else %>
+        <%= link_to "Home", {:controller => 'home'}, :title => 'Naar de begin pagina' %> 
+      <% end %>
+    </li>
+    <li>
+      <% if controller.controller_name == 'news' %>
+        <%= link_to "Nieuwtjes", {:controller => 'news'}, :class => 'active', :title => 'Het nieuwtjes overzicht' %>
+      <% else %>
+        <%= link_to "Nieuwtjes", {:controller => 'news'}, :title => 'Het nieuwtjes overzicht' %>
+      <% end %>
+    </li>
+    <li>
+      <% if controller.controller_name == 'photo_albums' %>
+        <%= link_to "Fotoalbums", {:controller => 'photo_albums'}, :class => 'active', :title => 'Het fotoalbums overzicht' %>
+      <% else %>
+        <%= link_to "Fotoalbums", {:controller => 'photo_albums'}, :title => 'Het fotoalbums overzicht' %>
+      <% end %>
+    </li>
+    <li>
+      <% if controller.controller_name == 'settings' %>
+        <%= link_to "Instellingen", {:controller => 'settings'}, :class => 'active', :title => 'Uw persoonlijke instellingen' %>
+      <% else %>
+        <%= link_to "Instellingen", {:controller => 'settings'}, :title => 'Uw persoonlijke instellingen' %>
+      <% end %>
+    </li>
+    <li>
+      <% if controller.action_name == 'sign_out' %>
+        <%= link_to "Uitloggen", {:controller => 'home', :action => 'sign_out'}, :class => 'active', :title => 'De uitlog pagina' %>
+      <% else %>
+        <%= link_to "Uitloggen", {:controller => 'home', :action => 'sign_out'}, :title => 'De uitlog pagina' %>
+      <% end %>
+    </li>
+  </ul>
+</div> 
+
+<div id="wrapper">
+<div id="content-wrapper">
+
+<div id="header">
+  <div id="header-content">
+    <h1>
+      <%= link_to image_tag("header.png", :alt => "Doedens Online"), {:controller => 'home', :action => 'index'}, :title => 'Doedens Online' %>
+    </h1>
+    <p class="sub-title">
+      Ditjes en datjes van oma Doed
+    </p>
+  </div>
+  <div id="notices">
+    <p class="notice"><%= flash[:notice] %></p>
+    <p class="error"><%= flash[:error] %></p>
+  </div>
+</div>
+
+<div id="content">
+  <h2>
+    <%= @page_title[0] %>
+  </h2>
+  <%= yield  %>
+</div>
+
+</div>
+</div>
+
+<div id="footer"></div>
+
+</body>
+</html>

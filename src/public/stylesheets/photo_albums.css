@@ -1,0 +1,73 @@
+#photo-albums-wrapper
+{
+	margin-top: 20px;
+}
+
+.photo-album
+{
+	width: 268px;
+	height: 210px;
+	background: url("../images/album.png") no-repeat;
+	margin-left: 25px;
+	margin-right: 25px;
+	float : left;
+	margin-bottom: 50px;
+}
+
+.photo-album img
+{
+	margin-left: 37px;
+	margin-top: 37px;
+}
+
+.photo-album h3
+{	
+	margin: 0;
+	padding: 0;
+	text-align: center;	
+	padding-top: 15px;
+	margin-bottom: 20px;
+	color: #202020;
+	font-family: verdana;
+	font-size: 15px;
+	font-weight: bold;
+}
+
+#pictures-wrapper ul
+{
+  clear: both;
+	margin:0;
+	padding:0;
+	list-style: none;
+  padding-left: 5px;
+  padding-top: 30px;
+}
+
+#pictures-wrapper li
+{
+  background: url("../images/thumb.gif") no-repeat;
+  display: block;
+  width: 124px; 
+  height: 124px; 
+	margin: 6px;
+	padding: 0;
+	float :left;
+}
+
+#pictures-wrapper a
+{
+  display: block;
+  width: 108px;
+  height: 108px;
+  position: relative;
+  left: 8px;
+  top: 8px;
+  
+}
+
+#pictures-wrapper li img
+{
+  position: relative;
+  top: 9px;
+  left: 9px;
+}

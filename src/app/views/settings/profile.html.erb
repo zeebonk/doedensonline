@@ -1,0 +1,29 @@
+<div id="settings">
+
+  <%= render :partial => 'settings_menu' %>
+
+  <p class="intro">Op deze pagina kunt u uw profiel instellingen aanpassen, zoals uw naam en email adres.</p>
+
+  <p style="color: green"><%= flash[:settings] %></p>
+
+  <% form_for @user, :url => { :action => "update_profile" } do |f| %>
+    <%= f.error_messages %>
+
+    <p>
+      <%= f.label :first_name, "Voornaam:" %><br />
+      <%= f.text_field :first_name %>
+    </p>
+    <p>
+      <%= f.label :last_name, "Achternaam:" %><br />
+      <%= f.text_field :last_name %>
+    </p>
+    <p>
+      <%= f.label :email, "E-mail adres:" %><br />
+      <%= f.text_field :email %>
+    </p>
+    <p>
+      <%= f.submit "Opslaan" %>
+    </p>
+  <% end %>
+
+  </div>

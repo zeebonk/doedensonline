@@ -1,0 +1,23 @@
+<ul>
+  <li>
+    <% if controller.action_name == 'profile' %>
+      <%= link_to "Profiel", {:action => 'profile'}, :class => 'active' %> 
+    <% else %>
+      <%= link_to "Profiel", :action => 'profile' %> 
+    <% end %>
+  </li>
+  <li>
+    <% if controller.action_name == 'notifications' %>
+      <%= link_to "Notificaties", {:action => 'notifications'}, :class => 'active' %> 
+    <% else %>
+      <%= link_to "Notificaties", :action => 'notifications' %> 
+    <% end %>
+  </li>
+  <li>
+    <% if controller.action_name == 'password' %>
+      <%= link_to "Wachtwoord", {:action => 'password'}, :class => 'active' %>
+    <% else %>
+      <%= link_to "Wachtwoord", :action => 'password' %>
+    <% end %>
+  </li>
+</ul>

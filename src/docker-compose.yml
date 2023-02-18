@@ -1,0 +1,11 @@
+version: '3.9'
+services:
+    app:
+        build: .
+        image: 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:${TAG:-latest}
+        environment:
+            - RAILS_ENV=development
+        ports:
+            - "127.0.0.1:8080:8080"
+        volumes:
+            - .:/app

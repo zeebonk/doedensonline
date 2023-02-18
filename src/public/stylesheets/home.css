@@ -1,0 +1,89 @@
+/* ######################### INDEX ######################### */
+
+#balloons-wrapper 
+{
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+img.zandvaart
+{
+display: block;
+margin: 0 auto;
+margin-top: 25px;
+margin-bottom: 20px;
+}
+
+div.preview-balloon
+{
+  background: url("../images/preview-balloon.gif") no-repeat;
+  width: 280px;
+  height: 205px;
+  float: left;
+  margin-left: 20px;
+  margin-right: 20px;
+  position: relative;
+}
+
+div.preview-balloon-content
+{
+  height: 156px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 5px;
+  font-family: georgia;
+  color:white;
+  font-size: 16px;
+  text-align: justify;
+}
+
+div.preview-balloon-content a.read-on
+{
+  position: absolute;
+  top: 130px;
+  left: 183px;
+  text-decoration: none;
+  font-size: 11px;
+  font-family: verdana;
+  color: #202020;
+}
+
+div.preview-balloon-poster { padding-top: 21px; }
+
+div.preview-balloon-poster p
+{
+  margin:0;
+  padding:0;
+  text-align: center;
+  font-size: 16px;
+  padding-top: 5px;
+  font-weight: bold;
+}
+
+/* ######################### SIGN IN ######################### */
+
+#sign-in-form
+{
+  
+  margin: 0 auto;
+  margin-top: 50px;
+  height: 250px;
+  width: 280px;
+}
+
+div.sign-in
+{
+  padding-top: 0px;
+  padding-left: 14px;
+  text-align: center;
+}
+
+div.sign-in a.read-on { left: 130px; }
+
+#sign-in-form input.text-box { width: 200px; }
+
+#sign-in-form input.submit
+{
+  width: 110px;
+  margin-left: -8px;
+}

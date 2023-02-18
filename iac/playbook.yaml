@@ -1,0 +1,76 @@
+- name: Ensure webservers are configured
+  hosts: webservers
+  tasks:
+
+   - name: Ensure dependencies are installed
+     ansible.builtin.package:
+       name:
+        - htop
+        - vim
+        - docker
+        - amazon-ecr-credential-helper
+       state: latest
+
+   - name: Ensure /dev/sdf is xfs
+     community.general.filesystem:
+       fstype: xfs
+       dev: /dev/sdf
+
+   - name: Ensure EBS volume is mounted
+     ansible.posix.mount:
+       path: /app-state
+       src: /dev/sdf
+       fstype: xfs
+       opts: defaults,nofail
+       state: mounted
+
+   - name: Ensure /app-state has the right permissions
+     ansible.builtin.file:
+       path: /app-state
+       owner: root
+       group: root
+       state: directory
+       mode: '777'  # TODO: better permissions
+       recurse: true
+
+   - name: Ensure Docker is running
+     ansible.builtin.service:
+       enabled: true
+       name: docker
+       state: started
+
+   - name: Ensure ~/.docker/ exists
+     file:
+       path: ~/.docker/
+       state: directory
+
+   - name: Ensure Docker is configured to login in ECR
+     ansible.builtin.template:
+       src: ./docker-config.json
+       dest: ~/.docker/config.json
+       owner: root
+       group: root
+       mode: '0777'  # TODO: better permissions
+
+   - name: Ensure requests is installed  # Required by the Docker module
+     ansible.builtin.pip:
+       name: requests
+
+   - name: Ensure the webserver is running
+     community.docker.docker_container:
+       name: doedensonline
+       image: 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline
+       restart_policy: always
+       published_ports:
+        - 0.0.0.0:80:8080
+       env:
+         RAILS_ENV: production
+         DO_SMTP_HOST: "{{ smtp_host }}"
+         DO_SMTP_USERNAME: "{{ smtp_username }}"
+         DO_SMTP_PASSWORD: "{{ smtp_password }}"
+       volumes:
+        - /app-state/db/development.sqlite3:/app/db/development.sqlite3:rw
+        - /app-state/db/production.sqlite3:/app/db/production.sqlite3:rw
+        - /app-state/small/:/app/public/images/small/
+        - /app-state/medium/:/app/public/images/medium/
+        - /app-state/large/:/app/public/images/large/

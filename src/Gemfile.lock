@@ -1,0 +1,36 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    actionmailer (2.3.8)
+      actionpack (= 2.3.8)
+    actionpack (2.3.8)
+      activesupport (= 2.3.8)
+      rack (~> 1.1.0)
+    activerecord (2.3.8)
+      activesupport (= 2.3.8)
+    activeresource (2.3.8)
+      activesupport (= 2.3.8)
+    activesupport (2.3.8)
+    daemon_controller (1.2.0)
+    passenger (4.0.45)
+      daemon_controller (>= 1.2.0)
+      rack
+      rake (>= 0.8.1)
+    rack (1.1.6)
+    rails (2.3.8)
+      actionmailer (= 2.3.8)
+      actionpack (= 2.3.8)
+      activerecord (= 2.3.8)
+      activeresource (= 2.3.8)
+      activesupport (= 2.3.8)
+      rake (>= 0.8.3)
+    rake (10.1.1)
+    sqlite3-ruby (1.2.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  passenger (= 4.0.45)
+  rails (= 2.3.8)
+  sqlite3-ruby (= 1.2.1)

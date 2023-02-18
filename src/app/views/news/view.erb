@@ -1,0 +1,59 @@
+<p class="intro">Op deze pagina bekijkt u een nieuwtje, inclusief alle bijhorende reacties. Hier kunt u zelf ook reacties plaatsen bij een nieuwtje, dit doet u door op "Reactie plaatsen" te klikken. Wanneer u weer terug wilt keren naar het nieuwtjes overzicht kunt u dit doen door op "Terug naar het overzicht" te klikken of in het hoofd menu "Nieuwtjes" aan te klikken.</p>
+
+<div class="news-index-actions">
+  <%= link_to '&laquo; Terug naar het overzicht', {:action => 'index'}, :title => 'Keer terug naar het nieuwtjes overzicht' %>
+  <%= link_to "Reactie plaatsen &raquo;", {:action => 'add_comment', :id => @news_item.id}, :title=> 'Plaats een reactie op dit bericht', :class=>'next' %>
+</div>
+
+<div class="balloon-wrapper even">
+  <div class="poster-wrapper">
+    <h3>
+      <%= @news_item.user.first_name %> <%= @news_item.user.last_name %>
+    </h3>
+  </div>
+  <div class="balloon-top">    
+    <div class="balloon-bottom">      
+      <div class="date-container">
+      <% Time::DATE_FORMATS[:article_date] = "<span class='day'>%d</span><span class='month-year'>%B<br/>%Y</span>" %>
+      <%= @news_item.created_at.to_s(:article_date) %>
+      </div>
+      <%= @news_item.message %>
+      <% if @news_item.user_id == @current_user.id %>
+      <div class="balloon-actions">
+        
+          <%= link_to "Verwijderen &raquo; ", {:action => 'remove', :id => @news_item.id}, :class=>'edit', :title=>'Verwijder dit complete bericht' %>
+          <%= link_to "Aanpassen &raquo; ", {:action => 'edit', :id => @news_item.id}, :class=>'edit', :title=>'Pas dit bericht aan' %>
+        
+        <br class="clear"/>
+      </div>
+      <% end %>
+    </div>
+  </div>
+  
+</div>
+<div id="reactions">
+<% for news_comment in @news_comments %>
+<div class="balloon-wrapper odd reaction">
+  <div class="poster-wrapper">
+    <h3>
+      <%= news_comment.user.first_name %> <%= news_comment.user.last_name %>
+    </h3>
+  </div>
+  <div class="balloon-top">    
+    <div class="balloon-bottom">      
+      <%= news_comment.message %>
+      <% if news_comment.user.id == @current_user.id %>
+      <div class="balloon-actions">
+                  
+          <%= link_to "Verwijderen &raquo;", {:action => 'remove_comment', :id => news_comment.id}, :class=>'edit', :title=>'Verwijder deze reactie' %>
+          <%= link_to "Aanpassen &raquo;", {:action => 'edit_comment', :id => news_comment.id}, :class=>'edit', :title=>'Pas deze reactie aan' %>
+        
+        <br class="clear"/>
+      </div>
+      <% end %>
+    </div>
+  </div>
+  <br class="clear"/>
+</div>
+<% end %>
+</div>

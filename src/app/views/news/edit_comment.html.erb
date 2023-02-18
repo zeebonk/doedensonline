@@ -1,0 +1,17 @@
+<p class="intro">Op deze pagina kunt u een door u geplaatste reactie aanpassen. Verander uw reactie en druk op "Aanpassen". Uw aanpassingen worden direct doorgevoerd."</p>
+
+<div id="edit-form">
+  <% form_for @news_comment, :url => {:action => 'update_comment'} do |f| %>
+    <p>
+      <%= f.hidden_field :id %>
+    </p>
+    <p>
+      <%= f.text_area :message, :rows => 18 %>
+    </p>
+    <p>
+      <%= f.submit "Aanpassen" %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to '&laquo; Terug naar het nieuwtje', {:action => 'view', :id => @news_comment.news_item.id}, :class=>'back', :title=>'Keer terug naar het nieuwtje waar u deze reactie bij heeft geplaatst' %>

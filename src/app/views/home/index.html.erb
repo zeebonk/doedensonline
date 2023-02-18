@@ -1,0 +1,21 @@
+<p class="intro">Dit is de homepage van Doedens Online. Hieronder vind u de drie laatst geplaatste nieuws berichtjes. U kunt via het hoofd menu boven aan de pagina naar de andere onderdelen van de site, of u kunt via een "lees verder" link bij een nieuws berichtje direct het hele bericht bekijken. Wilt u meer informatie over hoe de website te gebruiken? Bekijk dan de <a href="/media/handleiding.doc" title="Gebruikers handleiding (.doc)">handleiding</a>.</p>
+<div id="balloons-wrapper">
+<% for news_item in @news_items %>
+  <div class="preview-balloon">
+    <div class="preview-balloon-content">
+      <%= link_to "Lees verder &raquo;", {:controller => 'news', :action => 'view', :id => news_item.id}, :title => 'Lees de rest van dit bericht', :class => 'read-on' %>
+      <p>
+        <%= news_item.preview 140 %>
+      </p>
+    </div>
+    <div class="preview-balloon-poster">
+      <p>
+        <%= news_item.user.first_name %>
+        <%= news_item.user.last_name %>
+      </p>
+    </div>
+  </div> 
+<% end %>
+<br class="clear" />
+</div>
+<img class="zandvaart" src="images/zandvaart.jpg" alt="Zandvaart 7" />

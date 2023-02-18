@@ -1,0 +1,28 @@
+- name: Ensure local state is synced upstream
+  hosts: webservers
+  tasks:
+
+   - name: Copy all images
+     ansible.posix.synchronize:
+       src: "../src/public/images/{{ item }}/"
+       dest: "/app-state/{{ item }}/"
+       owner: false
+       perms: false
+     with_items:
+      - small
+      - medium
+      - large
+
+   - name: Copy all DBs
+     ansible.posix.synchronize:
+       src: "../src/db/"
+       dest: "/app-state/db/"
+
+   - name: Ensure /app-state has the right permissions
+     ansible.builtin.file:
+       path: /app-state
+       owner: root
+       group: root
+       state: directory
+       mode: '777'  # TODO: better permissions
+       recurse: true
