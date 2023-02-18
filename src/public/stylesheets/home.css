@@ -1,17 +1,16 @@
 /* ######################### INDEX ######################### */
 
-#balloons-wrapper 
+#balloons-wrapper
 {
-  margin-top: 40px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  overflow: auto;
 }
 
 img.zandvaart
 {
-display: block;
-margin: 0 auto;
-margin-top: 25px;
-margin-bottom: 20px;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 40px;
 }
 
 div.preview-balloon
@@ -27,7 +26,7 @@ div.preview-balloon
 
 div.preview-balloon-content
 {
-  height: 156px;
+  height: 150px;
   padding-left: 20px;
   padding-right: 20px;
   padding-top: 5px;
@@ -64,9 +63,8 @@ div.preview-balloon-poster p
 
 #sign-in-form
 {
-  
+
   margin: 0 auto;
-  margin-top: 50px;
   height: 250px;
   width: 280px;
 }

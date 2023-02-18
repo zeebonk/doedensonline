@@ -1,4 +1,4 @@
-body 
+body
 {
   background: #d9ceb2;
   margin: 0;
@@ -16,7 +16,9 @@ br.clear {clear:both;}
 p.intro
 {
   font-size: 12px;
-  line-height: 18px;
+  line-height: 1.5em;
+  padding-bottom: 40px;
+  margin: 0;
 }
 
 p.intro a
@@ -40,7 +42,7 @@ p.intro a
   margin: 0 auto;
   display: block;
   padding: 0px;
-  
+
   font-family: arial;
   font-size: 16px;
   font-weight: bold;
@@ -53,10 +55,10 @@ p.intro a
 {
   margin: 0px;
   padding: 0px;
-    
+
   display: block;
   float: left;
-  
+
   height: 63px;
   width: 190px;
 }
@@ -77,10 +79,10 @@ p.intro a
 
 div.news-index-actions
 {
-  padding-top: 20px;
   font-family: verdana;
   font-size: 12px;
-  height: 20px;
+  overflow: auto;
+  margin-bottom: 40px;
 }
 
 div.news-index-actions a
@@ -93,7 +95,7 @@ a.add
   float: right;
 }
 
-ul.page-navigation 
+ul.page-navigation
 {
   display: block;
   list-style: none;
@@ -110,17 +112,17 @@ ul.page-navigation li
   padding-right: 5px;
 }
 
-#wrapper 
-{ 
+#wrapper
+{
   min-width: 960px;
-  background: #ffffff; 
+  background: #ffffff;
 }
 
 #content-wrapper
 {
   width: 960px;
   margin: 0 auto;
-  padding-bottom: 20px;
+  padding-bottom: 40px;
 }
 
 #header
@@ -186,7 +188,7 @@ p.error { color: red; }
   font-size: 18px;
   color: #7a6a53;
   font-weight: normal;
-  margin-bottom: 22px;
+  margin-bottom: 40px;
 }
 
 #footer
@@ -195,12 +197,9 @@ p.error { color: red; }
   height: 50px;
 }
 
-
-
-
-div.even div.poster-wrapper 
-{ 
-  float: left; 
+div.even div.poster-wrapper
+{
+  float: left;
   background: url("../images/big-balloon-arrow-left.gif") top right no-repeat;
   padding-right: 41px;
 }
@@ -230,8 +229,8 @@ div.date-container
   float: right;
   color: #202020;
   font-family: verdana;
-  
-  margin-left: 20px;
+  margin-left: 26px;
+  margin-bottom: 15px;
 }
 
 span.day
@@ -258,6 +257,10 @@ div.balloon-top
   text-align: justify;
 }
 
+div.balloon-top p {
+  line-height: 1.5em;
+}
+
 div.balloon-bottom
 {
   background: url("../images/big-balloon-bottom.gif") no-repeat bottom;
@@ -269,7 +272,8 @@ div.even div.balloon-top { float: right; }
 
 div.balloon-wrapper
 {
-  margin-top: 30px;
+  margin-bottom: 40px;
+  overflow: auto;
 }
 
 div.balloon-actions
@@ -307,7 +311,7 @@ div.balloon-actions a.edit { float: right; margin-left: 15px; }
 	width: 100%;
 }
 
-#edit-form 
+#edit-form
 {
   padding-top: 8px;
   padding-bottom: 13px;
@@ -342,7 +346,6 @@ a.back
   font-size: 12px;
   color: #7a6a53;
 }
-div.bottom { margin-top: 15px; margin-bottom: 10px; }
 
 
 
@@ -351,10 +354,10 @@ div.bottom { margin-top: 15px; margin-bottom: 10px; }
 
 
 div.odd div.balloon-top { float: left; }
-div.odd div.poster-wrapper 
-{ 
-  float: right; 
-  background: url("../images/big-balloon-arrow-right.gif") top left no-repeat; 
+div.odd div.poster-wrapper
+{
+  float: right;
+  background: url("../images/big-balloon-arrow-right.gif") top left no-repeat;
   padding-left: 41px;
 }
 /* ######################### VIEW ######################### */
@@ -366,7 +369,6 @@ div.news-index-actions a.next
 div.reaction div.balloon-top
 {
   background: url("../images/big-balloon-top-reaction.gif") no-repeat top #7a6a53;
-  margin-bottom: 20px;
 }
 
 div.reaction div.balloon-bottom
@@ -375,9 +377,9 @@ div.reaction div.balloon-bottom
   padding-bottom: 3px;
 }
 
-div.reaction div.poster-wrapper 
-{ 
-  background: url("../images/big-balloon-arrow-right-reaction.gif") 0px -17px no-repeat; 
+div.reaction div.poster-wrapper
+{
+  background: url("../images/big-balloon-arrow-right-reaction.gif") 0px -17px no-repeat;
 }
 
 div.reaction div.balloon-bottom
@@ -399,9 +401,4 @@ div.reaction div.balloon-actions
 #reactions
 {
   clear: both;
-  padding-top: 18px;
-  margin-bottom: 30px;
 }
-
-
-

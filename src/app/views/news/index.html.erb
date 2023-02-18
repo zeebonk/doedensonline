@@ -3,22 +3,22 @@
 <div class="news-index-actions"><%= page_navigation %><%= link_to "Nieuwtje toevoegen &raquo;", {:action => 'add'}, :title => 'Plaats een nieuw nieuwtje', :class=>'add' %></div>
 
 <% @news_items.each_with_index do |news_item, index| %>
-  
+
   <% if (index % 2) == 0 %>
     <div class="balloon-wrapper even">
   <% else %>
     <div class="balloon-wrapper odd">
   <% end %>
-  
+
     <div class="poster-wrapper">
       <h3>
         <%= news_item.user.first_name %> <%= news_item.user.last_name %>
       </h3>
     </div>
-    
-    <div class="balloon-top">    
+
+    <div class="balloon-top">
       <div class="balloon-bottom">
-        
+
         <div class="date-container">
         <% Time::DATE_FORMATS[:article_date] = "<span class='day'>%d</span><span class='month-year'>%B<br/>%Y</span>" %>
         <%= news_item.created_at.to_s(:article_date) %>
@@ -34,10 +34,9 @@
         </div>
       </div>
     </div>
-    
+
     <br class="clear"/>
   </div>
-  <br class="clear"/>
 <% end %>
 
 <div class="news-index-actions bottom">
