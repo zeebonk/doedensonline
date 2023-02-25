@@ -54,6 +54,9 @@ resource "aws_ebs_volume" "persistent" {
   size              = 1
   encrypted         = true
   kms_key_id        = aws_kms_key.doedensonline.arn
+  tags = {
+    Snapshot = "true"
+  }
 }
 
 data "aws_iam_policy_document" "ecr_read_only_policy_document" {
@@ -121,6 +124,13 @@ module "ec2_instance_doedensonline" {
       kms_key_id  = aws_kms_key.doedensonline.arn
     },
   ]
+
+  tags = {
+    Snapshot = "true"
+  }
+  volume_tags = {
+    Snapshot = "true"
+  }
 }
 
 resource "aws_volume_attachment" "persistent" {
@@ -229,6 +239,82 @@ resource "aws_route53_record" "doedensonline" {
   type    = "A"
   ttl     = 60
   records = [aws_eip.doedensonline.public_ip]
+}
+
+# Backup
+#
+data "aws_iam_policy_document" "dlm_lifecycle" {
+  statement {
+    actions = [
+      "ec2:CreateSnapshot",
+      "ec2:CreateSnapshots",
+      "ec2:DeleteSnapshot",
+      "ec2:DescribeInstances",
+      "ec2:DescribeVolumes",
+      "ec2:DescribeSnapshots",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
+       "ec2:CreateTags",
+    ]
+    resources = ["arn:aws:ec2:*::snapshot/*"]
+  }
+}
+
+module "iam_policy_dlm_lifecycle" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-policy"
+
+  name = "DLMLifecycle"
+  path = "/"
+
+  policy = data.aws_iam_policy_document.dlm_lifecycle.json
+}
+
+module "iam_assumable_role_dlm_lifecycle" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+
+  role_name         = "dlm-lifecycle"
+  create_role       = true
+  role_requires_mfa = false
+
+  trusted_role_services = [
+    "dlm.amazonaws.com"
+  ]
+
+  custom_role_policy_arns = [module.iam_policy_dlm_lifecycle.arn]
+}
+
+resource "aws_dlm_lifecycle_policy" "doedensonline" {
+  description        = "Doedensonline"
+  execution_role_arn = module.iam_assumable_role_dlm_lifecycle.iam_role_arn
+  state              = "ENABLED"
+
+  policy_details {
+    resource_types = ["VOLUME"]
+
+    schedule {
+      name = "3 months of daily snapshots"
+
+      create_rule {
+        interval = "24"
+        interval_unit = "HOURS"
+      }
+
+      retain_rule {
+        interval = "3"
+        interval_unit = "MONTHS"
+      }
+
+      copy_tags = false
+    }
+
+    target_tags = {
+      Snapshot = "true"
+    }
+  }
 }
 
 # Outputs
