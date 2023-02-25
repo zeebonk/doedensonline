@@ -7,3 +7,4 @@ src/public/images/small/
 src/db/
 src/log/
 src/tmp/
+.DS_Store
