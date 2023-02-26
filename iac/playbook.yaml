@@ -106,13 +106,13 @@
        hour: "2"
        minute: "0"
        job: >
-         docker stop proxy
-         && docker run -it --rm --name certbot
+         docker stop proxy;
+         docker run -it --rm --name certbot
          -v "/etc/letsencrypt:/etc/letsencrypt"
          -v "/var/lib/letsencrypt:/var/lib/letsencrypt"
          -p 80:80
-         certbot/certbot certonly -d doedensonline.nl,www.doedensonline.nl --standalone -n
-         && docker start proxy
+         certbot/certbot certonly -d doedensonline.nl,www.doedensonline.nl --standalone -n;
+         docker start proxy
 
   handlers:
     - name: Restart proxy
