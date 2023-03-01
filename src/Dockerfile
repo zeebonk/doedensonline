@@ -8,4 +8,4 @@ COPY Gemfile Gemfile.lock .
 RUN bundle install
 
 COPY en.yml /usr/local/bundle/gems/activesupport-2.3.8/lib/active_support/locale
-COPY * .
+COPY . .
