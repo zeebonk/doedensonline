@@ -16,7 +16,7 @@ GEM
       daemon_controller (>= 1.2.0)
       rack
       rake (>= 0.8.1)
-    rack (1.1.6)
+    rack (1.1.0)
     rails (2.3.8)
       actionmailer (= 2.3.8)
       actionpack (= 2.3.8)
@@ -25,7 +25,7 @@ GEM
       activesupport (= 2.3.8)
       rake (>= 0.8.3)
     rake (10.1.1)
-    sqlite3-ruby (1.2.1)
+    sqlite3-ruby (1.2.5)
 
 PLATFORMS
   ruby
@@ -33,4 +33,4 @@ PLATFORMS
 DEPENDENCIES
   passenger (= 4.0.45)
   rails (= 2.3.8)
-  sqlite3-ruby (= 1.2.1)
+  sqlite3-ruby (= 1.2.5)
