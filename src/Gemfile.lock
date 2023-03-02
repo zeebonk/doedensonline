@@ -12,6 +12,8 @@ GEM
       activesupport (= 2.3.8)
     activesupport (2.3.8)
     daemon_controller (1.2.0)
+    mini_magick (3.8.1)
+      subexec (~> 0.2.1)
     passenger (4.0.45)
       daemon_controller (>= 1.2.0)
       rack
@@ -26,11 +28,13 @@ GEM
       rake (>= 0.8.3)
     rake (10.1.1)
     sqlite3-ruby (1.2.5)
+    subexec (0.2.3)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  mini_magick (= 3.8.1)
   passenger (= 4.0.45)
   rails (= 2.3.8)
   sqlite3-ruby (= 1.2.5)
