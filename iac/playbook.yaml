@@ -103,16 +103,19 @@
    - name: Ensure certificate renewal is scheduled
      ansible.builtin.cron:
        name: "Renew certificates"
-       hour: "2"
-       minute: "0"
+       hour: 2
+       minute: 0
        job: >
+         bash -c '
          docker stop proxy;
          docker run -it --rm --name certbot
          -v "/etc/letsencrypt:/etc/letsencrypt"
          -v "/var/lib/letsencrypt:/var/lib/letsencrypt"
          -p 80:80
          certbot/certbot certonly -d doedensonline.nl,www.doedensonline.nl --standalone -n;
-         docker start proxy
+         docker start proxy;
+         ';
+
 
   handlers:
     - name: Restart proxy
