@@ -1,12 +1,10 @@
 # Setup
 
-## Create S3 Terraform state S3 bucket manually
-
-...
 
 ## Setup AWS infrastructure
 
 ```
+cd iac
 terraform apply
 ```
 
@@ -19,9 +17,12 @@ docker compose build app
 docker compuse push app
 ```
 
+
 ## Deploy application
 
 ```
-poetry run ansible-playbook -i inventory.yaml playbook.yaml
-poetry run ansible-playbook -i inventory.yaml sync.yaml
+cd iac
+pdm install
+pdm run ansible-playbook -i inventory.yaml playbook.yaml
+pdm run ansible-playbook -i inventory.yaml sync.yaml
 ```
