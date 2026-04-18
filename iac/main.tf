@@ -80,32 +80,45 @@ module "ecr_read_only_policy" {
   policy = data.aws_iam_policy_document.ecr_read_only_policy_document.json
 }
 
-module "iam_assumable_role_webserver" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+moved {
+  from = module.iam_assumable_role_webserver
+  to   = module.iam_role_webserver
+}
 
-  role_name         = "webserver"
-  create_role       = true
-  role_requires_mfa = false
+module "iam_role_webserver" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
 
-  trusted_role_arns = [
-    "313336455033"
-  ]
+  name = "webserver"
 
-  trusted_role_services = [
-    "ec2.amazonaws.com"
-  ]
+  trust_policy_permissions = {
+    AllowAssumeRole = {
+      actions = ["sts:AssumeRole"]
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["313336455033"]
+        },
+        {
+          type        = "Service"
+          identifiers = ["ec2.amazonaws.com"]
+        }
+      ]
+    }
+  }
 
-  custom_role_policy_arns = [module.ecr_read_only_policy.arn]
+  policies = {
+    ECRReadOnly = module.ecr_read_only_policy.arn
+  }
 }
 
 resource "aws_iam_instance_profile" "webserver" {
   name = "webserver"
-  role = module.iam_assumable_role_webserver.iam_role_name
+  role = module.iam_role_webserver.name
 }
 
 module "ec2_instance_doedensonline" {
   source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "~> 4.0"
+  version = "~> 6.0"
 
   name                   = "doedensonline"
   ami                    = "ami-0fe0b2cf0e1f25c8a" # Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
@@ -116,14 +129,12 @@ module "ec2_instance_doedensonline" {
   iam_instance_profile   = aws_iam_instance_profile.webserver.name
 
   ebs_optimized = true
-  root_block_device = [
-    {
-      volume_type = "gp3"
-      volume_size = 10
-      encrypted   = true
-      kms_key_id  = aws_kms_key.doedensonline.arn
-    },
-  ]
+  root_block_device = {
+    volume_type = "gp3"
+    volume_size = 10
+    encrypted   = true
+    kms_key_id  = aws_kms_key.doedensonline.arn
+  }
 
   tags = {
     Snapshot = "true"
@@ -163,8 +174,8 @@ resource "local_file" "inventory" {
           "ansible_host" : aws_eip.doedensonline.public_ip,
           "ansible_user" : "ec2-user",
           "smtp_host" : "email-smtp.${local.region}.amazonaws.com",
-          "smtp_username" : module.iam_user_doedensonline_ses.iam_access_key_id,
-          "smtp_password" : module.iam_user_doedensonline_ses.iam_access_key_ses_smtp_password_v4,
+          "smtp_username" : module.iam_user_doedensonline_ses.access_key_id,
+          "smtp_password" : module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4,
         }
       }
     }
@@ -183,13 +194,13 @@ module "iam_user_doedensonline_ses" {
   source = "terraform-aws-modules/iam/aws//modules/iam-user"
 
   name                          = "doedensonline-ses"
-  create_iam_user_login_profile = false # ?
+  create_login_profile = false
   password_reset_required       = false
 }
 
 resource "aws_iam_user_policy" "allow_ses_sending" {
   name = "AmazonSesSendingAccess"
-  user = module.iam_user_doedensonline_ses.iam_user_name
+  user = module.iam_user_doedensonline_ses.name
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -273,23 +284,36 @@ module "iam_policy_dlm_lifecycle" {
   policy = data.aws_iam_policy_document.dlm_lifecycle.json
 }
 
-module "iam_assumable_role_dlm_lifecycle" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+moved {
+  from = module.iam_assumable_role_dlm_lifecycle
+  to   = module.iam_role_dlm_lifecycle
+}
 
-  role_name         = "dlm-lifecycle"
-  create_role       = true
-  role_requires_mfa = false
+module "iam_role_dlm_lifecycle" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
 
-  trusted_role_services = [
-    "dlm.amazonaws.com"
-  ]
+  name = "dlm-lifecycle"
 
-  custom_role_policy_arns = [module.iam_policy_dlm_lifecycle.arn]
+  trust_policy_permissions = {
+    AllowAssumeRole = {
+      actions = ["sts:AssumeRole"]
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["dlm.amazonaws.com"]
+        }
+      ]
+    }
+  }
+
+  policies = {
+    DLMLifecycle = module.iam_policy_dlm_lifecycle.arn
+  }
 }
 
 resource "aws_dlm_lifecycle_policy" "doedensonline" {
   description        = "Doedensonline"
-  execution_role_arn = module.iam_assumable_role_dlm_lifecycle.iam_role_arn
+  execution_role_arn = module.iam_role_dlm_lifecycle.arn
   state              = "ENABLED"
 
   policy_details {
