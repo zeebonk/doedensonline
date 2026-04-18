@@ -53,11 +53,10 @@ private
   end
 
   def is_authorized
-    if request.path_parameters[:controller] == 'home'
-      action = request.path_parameters[:action]
-      return if action == 'sign_in'        || action == 'destroy_session'    ||
-                action == 'authenticate'   || action == 'password_forgotten' ||
-                action == 'reset_password'
+    if controller_name == 'home'
+      return if action_name == 'sign_in'        || action_name == 'destroy_session'    ||
+                action_name == 'authenticate'   || action_name == 'password_forgotten' ||
+                action_name == 'reset_password'
     end
 
     if !session[:user_id]
