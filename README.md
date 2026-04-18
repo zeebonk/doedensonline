@@ -15,6 +15,7 @@ The application will be available at http://127.0.0.1:8080.
 
 ```
 cd iac
+tofu init
 tofu apply
 ```
 
@@ -23,15 +24,9 @@ tofu apply
 
 ```
 cd src
-docker compose build app
-docker compose push app
-```
-
-To push with a custom tag:
-
-```
-TAG=mytag docker compose build app
-TAG=mytag docker compose push app
+docker buildx build --push \
+    -t 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:TAG \
+    --platform=linux/amd64 .
 ```
 
 
@@ -41,7 +36,6 @@ TAG=mytag docker compose push app
 cd iac
 pdm install
 pdm run ansible-playbook -i inventory.yaml playbook.yaml
-pdm run ansible-playbook -i inventory.yaml sync.yaml
 ```
 
 To dry-run and preview changes:

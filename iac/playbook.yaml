@@ -60,7 +60,7 @@
    - name: Ensure the webserver is running
      community.docker.docker_container:
        name: doedensonline
-       image: 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline
+       image: 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:1.0.1
        restart_policy: always
        published_ports:
         - 0.0.0.0:8080:8080
