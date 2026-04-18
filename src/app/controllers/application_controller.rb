@@ -4,6 +4,7 @@
 class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
 
+  before_filter :force_utf8_params
   before_filter :is_authorized
   # See ActionController::RequestForgeryProtection for details
   # Uncomment the :secret if you're not using the cookie session store
@@ -17,6 +18,21 @@ class ApplicationController < ActionController::Base
   layout 'default'
 
 private
+
+  def force_utf8_params
+    traverse = lambda do |object|
+      case object
+      when Hash
+        object.each_value { |v| traverse.call(v) }
+      when Array
+        object.each { |v| traverse.call(v) }
+      when String
+        object.force_encoding(Encoding::UTF_8) if object.respond_to?(:force_encoding)
+      end
+      object
+    end
+    traverse.call(params)
+  end
 
 	def root_src_img_tag(input)
     input = input.gsub('../../', '/')
