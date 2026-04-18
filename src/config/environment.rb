@@ -1,3 +1,6 @@
+Encoding.default_external = Encoding::UTF_8
+Encoding.default_internal = Encoding::UTF_8
+
 ENV['GEM_PATH'] = '/home/gijsvand/gems'
 # Be sure to restart your server when you modify this file
 
