@@ -1,15 +1,25 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  first_name: MyString
-  last_name: MyString
-  email: MyString
-  password: MyString
+admin:
+  first_name: Admin
+  last_name: McAdmin
+  email: admin@example.com
+  password: secret
   notify_news: false
+  isadmin: true
+
+one:
+  first_name: Alice
+  last_name: Anderson
+  email: alice@example.com
+  password: secret
+  notify_news: false
+  isadmin: false
 
 two:
-  first_name: MyString
-  last_name: MyString
-  email: MyString
-  password: MyString
+  first_name: Bob
+  last_name: Brown
+  email: bob@example.com
+  password: secret
   notify_news: false
+  isadmin: false

@@ -27,6 +27,7 @@ class SettingsController < ApplicationController
   
   # POST /settings/update_profile
   def update_profile
+    @page_title = ["Instellingen"]
     @user = current_user
 
     if @user.update_attributes(params[:user])
@@ -36,9 +37,10 @@ class SettingsController < ApplicationController
       render :action => "profile"
     end
   end
-  
+
   # POST /settings/update_profile
   def update_notifications
+    @page_title = ["Instellingen"]
     @user = current_user
 
     if @user.update_attributes(params[:user])
@@ -48,9 +50,10 @@ class SettingsController < ApplicationController
       render :action => "notifications"
     end
   end
-  
+
   # POST /settings/update_password
   def update_password
+    @page_title = ["Instellingen"]
     @user = current_user
     # Try to authenticate the username and old password
     if User.authenticate(@user.first_name, params[:old_password])
