@@ -16,7 +16,7 @@
   <% if controller.action_name == 'add'            || controller.action_name == 'edit'           || controller.action_name == 'update' || 
         controller.action_name == 'add_comment'    || controller.action_name == 'edit_comment'   || controller.action_name == 'create' || 
         controller.action_name == 'create_comment' || controller.action_name == 'update_comment' || controller.action_name == 'new'    %>
-    <%= javascript_include_tag 'tiny_mce/tiny_mce' %>
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js" referrerpolicy="origin"></script>
     <%= javascript_include_tag 'load-tiny-mce' %>
   <% end %>  
   
