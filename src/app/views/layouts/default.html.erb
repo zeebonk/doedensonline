@@ -8,7 +8,7 @@
   <title><% @page_title.each do |page| %><%= (page + " - ") %><% end %>Doedensonline.nl</title>
   
   <%= stylesheet_link_tag 'main' %>
-  <%= stylesheet_link_tag controller.controller_name %>
+  <%= controller_stylesheet_link_tag %>
   
   <!--[if lte IE 7]><%= stylesheet_link_tag 'ie7' %><![endif]-->
   <!--[if lte IE 6]><%= stylesheet_link_tag 'ie6' %><![endif]-->

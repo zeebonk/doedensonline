@@ -30,7 +30,7 @@ class HomeControllerTest < ActionController::TestCase
 
   test "index redirects to sign_in when not signed in" do
     get :index
-    assert_redirected_to :action => 'sign_in'
+    assert_redirected_to :controller => 'home', :action => 'sign_in'
   end
 
   test "index renders when signed in" do
@@ -52,7 +52,7 @@ class HomeControllerTest < ActionController::TestCase
   test "sign_in redirects to index when already signed in" do
     sign_in_as @user
     get :sign_in
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'home', :action => 'index'
   end
 
   # POST /home/authenticate
@@ -60,7 +60,7 @@ class HomeControllerTest < ActionController::TestCase
   test "authenticate signs in user with valid credentials" do
     post :authenticate, :first_name => 'Alice', :password => 'secret'
     assert_equal @user.id, session[:user_id]
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'home', :action => 'index'
     assert_equal 'U bent succesvol ingelogd!', flash[:notice]
   end
 
@@ -79,21 +79,21 @@ class HomeControllerTest < ActionController::TestCase
   test "authenticate rejects wrong password" do
     post :authenticate, :first_name => 'Alice', :password => 'wrong'
     assert_nil session[:user_id]
-    assert_redirected_to :action => 'sign_in'
+    assert_redirected_to :controller => 'home', :action => 'sign_in'
     assert_equal 'U heeft een ongeldige voornaam/wachtwoord combinatie ingevuld!', flash[:error]
   end
 
   test "authenticate rejects unknown first_name" do
     post :authenticate, :first_name => 'Nobody', :password => 'secret'
     assert_nil session[:user_id]
-    assert_redirected_to :action => 'sign_in'
+    assert_redirected_to :controller => 'home', :action => 'sign_in'
   end
 
   # GET /home/sign_out
 
   test "sign_out redirects to sign_in when not signed in" do
     get :sign_out
-    assert_redirected_to :action => 'sign_in'
+    assert_redirected_to :controller => 'home', :action => 'sign_in'
   end
 
   test "sign_out renders when signed in" do
@@ -109,7 +109,7 @@ class HomeControllerTest < ActionController::TestCase
     sign_in_as @user
     post :destroy_session, :commit => 'Ja, log mij uit!'
     assert_nil session[:user_id]
-    assert_redirected_to :action => 'sign_in'
+    assert_redirected_to :controller => 'home', :action => 'sign_in'
     assert_equal 'U bent succesvol uitgelogd!', flash[:notice]
   end
 
@@ -117,7 +117,7 @@ class HomeControllerTest < ActionController::TestCase
     sign_in_as @user
     post :destroy_session, :commit => 'Cancel'
     assert_equal @user.id, session[:user_id]
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'home', :action => 'index'
   end
 
   # GET /home/password_forgotten
@@ -131,7 +131,7 @@ class HomeControllerTest < ActionController::TestCase
   test "password_forgotten redirects to index when signed in" do
     sign_in_as @user
     get :password_forgotten
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'home', :action => 'index'
   end
 
   # POST /home/reset_password
@@ -140,7 +140,7 @@ class HomeControllerTest < ActionController::TestCase
     original_password = @user.password
     post :reset_password, :first_name => 'Alice', :email => 'alice@example.com'
 
-    assert_redirected_to :action => 'sign_in'
+    assert_redirected_to :controller => 'home', :action => 'sign_in'
     assert_not_equal original_password, @user.reload.password
     assert_equal 1, ActionMailer::Base.deliveries.size
     assert_equal ['alice@example.com'], ActionMailer::Base.deliveries.first.to
@@ -150,7 +150,7 @@ class HomeControllerTest < ActionController::TestCase
     original_password = @user.password
     post :reset_password, :first_name => 'Nobody', :email => 'nobody@example.com'
 
-    assert_redirected_to :action => 'password_forgotten'
+    assert_redirected_to :controller => 'home', :action => 'password_forgotten'
     assert_equal original_password, @user.reload.password
     assert_equal 0, ActionMailer::Base.deliveries.size
   end

@@ -148,7 +148,7 @@ class ApplicationControllerTest < ActionController::TestCase
 
     get :author_only, :id => news_item.id
 
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'application_controller_test_subject', :action => 'index'
     assert_equal 'U bent niet gemachtigd om opgegeven item te mogen wijzigen!', flash[:error]
   end
 

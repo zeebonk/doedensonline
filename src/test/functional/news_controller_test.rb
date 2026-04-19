@@ -81,7 +81,7 @@ class NewsControllerTest < ActionController::TestCase
       post :create, :news_item => { :message => 'Hello world' }
     end
 
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'news', :action => 'index'
     assert_equal 'Nieuwtje succesvol toegevoegd.', flash[:notice]
     assert_equal @user.id, assigns(:news_item).user_id
     assert_equal 1, ActionMailer::Base.deliveries.size
@@ -118,7 +118,7 @@ class NewsControllerTest < ActionController::TestCase
 
   test "edit redirects when news_item does not exist" do
     get :edit, :id => 999999
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'news', :action => 'index'
     assert_equal 'Op gegeven nieuwtje om aan te passen bestaat niet!', flash[:error]
   end
 
@@ -127,7 +127,7 @@ class NewsControllerTest < ActionController::TestCase
   test "update saves valid changes" do
     post :update, :news_item => { :id => @news_item.id, :message => 'Updated message' }
 
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'news', :action => 'index'
     assert_equal 'Het nieuwtje is succesvol aangepast.', flash[:notice]
     assert_equal 'Updated message', @news_item.reload.message
   end
@@ -143,7 +143,7 @@ class NewsControllerTest < ActionController::TestCase
   test "update redirects when news_item does not exist" do
     post :update, :news_item => { :id => 999999, :message => 'anything' }
 
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'news', :action => 'index'
     assert_equal 'Opgegeven nieuwtje om aan te passen is niet gevonden!', flash[:error]
   end
 
@@ -157,7 +157,7 @@ class NewsControllerTest < ActionController::TestCase
 
   test "remove redirects when news_item does not exist" do
     get :remove, :id => 999999
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'news', :action => 'index'
     assert_equal 'Op gegeven nieuwtje om aan te verwijderen bestaat niet!', flash[:error]
   end
 
@@ -172,7 +172,7 @@ class NewsControllerTest < ActionController::TestCase
       end
     end
 
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'news', :action => 'index'
     assert_equal 'Nieuwtje succesvol verwijderd.', flash[:notice]
   end
 
@@ -181,12 +181,12 @@ class NewsControllerTest < ActionController::TestCase
       post :destroy, :id => @news_item.id, :commit => 'Nee, niet verwijderen'
     end
 
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'news', :action => 'index'
   end
 
   test "destroy redirects when news_item does not exist" do
     post :destroy, :id => 999999, :commit => 'Ja, verwijderen'
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'news', :action => 'index'
     assert_equal 'Opgegeven nieuwtje om te verwijderen is niet gevonden!', flash[:error]
   end
 
@@ -204,7 +204,7 @@ class NewsControllerTest < ActionController::TestCase
 
   test "view redirects when news_item does not exist" do
     get :view, :id => 999999
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'news', :action => 'index'
     assert_equal 'Op gegeven nieuwtje om te bekijken bestaat niet!', flash[:error]
   end
 
@@ -224,7 +224,7 @@ class NewsControllerTest < ActionController::TestCase
       post :create_comment, :news_comment => { :message => 'Nice', :news_item_id => @news_item.id }
     end
 
-    assert_redirected_to :action => 'view', :id => @news_item.id
+    assert_redirected_to :controller => 'news', :action => 'view', :id => @news_item.id
     assert_equal 'Reactie is succesvol toegevoegd.', flash[:notice]
     assert_equal @user.id, assigns(:news_comment).user_id
   end
@@ -252,7 +252,7 @@ class NewsControllerTest < ActionController::TestCase
 
   test "edit_comment redirects when comment does not exist" do
     get :edit_comment, :id => 999999
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'news', :action => 'index'
     assert_equal 'Reactie om aan te passen is niet gevonden!', flash[:error]
   end
 
@@ -263,7 +263,7 @@ class NewsControllerTest < ActionController::TestCase
 
     post :update_comment, :news_comment => { :id => comment.id, :message => 'new' }
 
-    assert_redirected_to :action => 'view', :id => @news_item.id
+    assert_redirected_to :controller => 'news', :action => 'view', :id => @news_item.id
     assert_equal 'Uw reactie is succesvol aangepast.', flash[:notice]
     assert_equal 'new', comment.reload.message
   end
@@ -280,7 +280,7 @@ class NewsControllerTest < ActionController::TestCase
 
   test "update_comment redirects when comment does not exist" do
     post :update_comment, :news_comment => { :id => 999999, :message => 'x' }
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'news', :action => 'index'
     assert_equal 'Reactie om aan te passen is niet gevonden!', flash[:error]
   end
 
@@ -297,7 +297,7 @@ class NewsControllerTest < ActionController::TestCase
 
   test "remove_comment redirects when comment does not exist" do
     get :remove_comment, :id => 999999
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'news', :action => 'index'
     assert_equal 'Opgegeven reactie om te verwijderen bestaat niet', flash[:error]
   end
 
@@ -310,7 +310,7 @@ class NewsControllerTest < ActionController::TestCase
       post :destroy_comment, :id => comment.id, :commit => 'Ja, verwijderen'
     end
 
-    assert_redirected_to :action => 'view', :id => @news_item.id
+    assert_redirected_to :controller => 'news', :action => 'view', :id => @news_item.id
     assert_equal 'Uw reactie is succesvol verwijderd.', flash[:notice]
   end
 
@@ -321,12 +321,12 @@ class NewsControllerTest < ActionController::TestCase
       post :destroy_comment, :id => comment.id, :commit => 'Nee, niet verwijderen'
     end
 
-    assert_redirected_to :action => 'view', :id => @news_item.id
+    assert_redirected_to :controller => 'news', :action => 'view', :id => @news_item.id
   end
 
   test "destroy_comment redirects when comment does not exist" do
     post :destroy_comment, :id => 999999, :commit => 'Ja, verwijderen'
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'news', :action => 'index'
     assert_equal 'Opgegeven reactie om te verwijderen bestaat niet', flash[:error]
   end
 

@@ -8,3 +8,7 @@ src/db/
 src/log/
 src/tmp/
 .DS_Store
+src/passenger.*.pid
+src/passenger.*.pid.lock
+src/core
+src/core.*

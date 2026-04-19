@@ -138,7 +138,7 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
     assert_difference('PhotoAlbum.count', -1) do
       post :destroy, :id => @photo_album.id, :commit => 'Ja, verwijderen'
     end
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'photo_albums', :action => 'index'
     assert_equal 'Foto album succesvol verwijderd.', flash[:notice]
   end
 
@@ -146,12 +146,12 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
     assert_no_difference('PhotoAlbum.count') do
       post :destroy, :id => @photo_album.id, :commit => 'Nee, niet verwijderen'
     end
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'photo_albums', :action => 'index'
   end
 
   test "destroy redirects with error when album does not exist" do
     post :destroy, :id => 999999, :commit => 'Ja, verwijderen'
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'photo_albums', :action => 'index'
     assert_equal 'Opgegeven fotoalbum om te verwijderen is niet gevonden!', flash[:error]
   end
 
