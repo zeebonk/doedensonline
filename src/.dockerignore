@@ -3,3 +3,7 @@ public/images/medium/*
 public/images/large/*
 logs/
 db/*.sqlite3
+passenger.*.pid
+passenger.*.pid.lock
+core
+core.*

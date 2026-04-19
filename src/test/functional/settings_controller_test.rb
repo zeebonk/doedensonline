@@ -34,7 +34,7 @@ class SettingsControllerTest < ActionController::TestCase
 
   test "index redirects to profile" do
     get :index
-    assert_redirected_to :action => 'profile'
+    assert_redirected_to :controller => 'settings', :action => 'profile'
   end
 
   # GET /settings/profile
@@ -67,7 +67,7 @@ class SettingsControllerTest < ActionController::TestCase
   test "update_profile saves valid changes" do
     post :update_profile, :user => { :first_name => 'Alicia', :last_name => 'Anderson', :email => 'alicia@example.com' }
 
-    assert_redirected_to :action => 'profile'
+    assert_redirected_to :controller => 'settings', :action => 'profile'
     assert_equal 'Uw profiel is succesvol aangepast.', flash[:settings]
     @user.reload
     assert_equal 'Alicia', @user.first_name
@@ -88,7 +88,7 @@ class SettingsControllerTest < ActionController::TestCase
   test "update_notifications saves valid changes" do
     post :update_notifications, :user => { :notify_news => false }
 
-    assert_redirected_to :action => 'notifications'
+    assert_redirected_to :controller => 'settings', :action => 'notifications'
     assert_equal 'Uw notificatie instellingen zijn succesvol aangepast.', flash[:settings]
     assert_equal false, @user.reload.notify_news
   end
@@ -110,7 +110,7 @@ class SettingsControllerTest < ActionController::TestCase
       :password             => 'newpass',
       :password_confirmation => 'newpass'
 
-    assert_redirected_to :action => 'password'
+    assert_redirected_to :controller => 'settings', :action => 'password'
     assert_equal 'Uw wachtwoord is succesvol gewijzigd.', flash[:settings]
     assert_not_equal original_password, @user.reload.password
   end

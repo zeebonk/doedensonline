@@ -69,7 +69,7 @@ class PhotoAlbumPicturesControllerTest < ActionController::TestCase
       post :destroy_many, :album => @photo_album.id, :delete => [p1.id.to_s]
     end
 
-    assert_redirected_to :action => 'show', :id => @photo_album.id
+    assert_redirected_to :controller => 'photo_album_pictures', :action => 'show', :id => @photo_album.id
     assert_nil PhotoAlbumPicture.find_by_id(p1.id)
     assert_not_nil PhotoAlbumPicture.find_by_id(p2.id)
   end
@@ -81,6 +81,6 @@ class PhotoAlbumPicturesControllerTest < ActionController::TestCase
       post :destroy_many, :album => @photo_album.id
     end
 
-    assert_redirected_to :action => 'show', :id => @photo_album.id
+    assert_redirected_to :controller => 'photo_album_pictures', :action => 'show', :id => @photo_album.id
   end
 end

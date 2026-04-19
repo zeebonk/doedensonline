@@ -9,7 +9,7 @@ ENV['GEM_PATH'] = '/home/gijsvand/gems'
 # ENV['RAILS_ENV'] ||= 'production'
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '2.3.8' unless defined? RAILS_GEM_VERSION
+RAILS_GEM_VERSION = '2.3.18' unless defined? RAILS_GEM_VERSION
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
@@ -70,7 +70,7 @@ Rails::Initializer.run do |config|
   # Make sure the secret is at least 30 characters and all random,
   # no regular words or you'll be exposed to dictionary attacks.
   config.action_controller.session = {
-    :session_key => '_doedensonline_session',
+    :key         => '_doedensonline_session',
     :secret      => 'bf8c8ab44574438e07b659b876d3ee22dfb8ff1159dd1589a2c9839bb87cd97c13bc631cedee5137a19017a9b5b3bb36e668683b92d6da645728d2cac2e6d253'
   }
 
