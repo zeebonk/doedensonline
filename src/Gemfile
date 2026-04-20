@@ -5,6 +5,7 @@ gem 'sqlite3', '1.3.13'
 gem 'mini_magick', '4.9.5'
 gem 'passenger', '5.3.7'
 gem 'rake', '10.5.0'
+gem 'dynamic_form', '1.1.4'
 
 # Pin transitive dependencies that have since dropped Ruby 1.9 support.
 gem 'multi_json',     '1.15.0'

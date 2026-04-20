@@ -31,6 +31,7 @@ GEM
       multi_json (~> 1.0)
     arel (2.2.3)
     builder (3.0.4)
+    dynamic_form (1.1.4)
     erubis (2.7.0)
     hike (1.2.3)
     i18n (0.7.0)
@@ -89,6 +90,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  dynamic_form (= 1.1.4)
   i18n (= 0.7.0)
   json (= 1.8.6)
   mini_magick (= 4.9.5)

@@ -7,7 +7,7 @@
 </div>
 
 <%= form_for(@photo_album_picture, :html => { :multipart => true }) do |f| %>
-  <%= error_messages_for_record(f.object) %>
+  <%= f.error_messages %>
   <p>
     <%= f.label :filename %><br />
     <%= f.file_field :filename , :class=>"flash"%>

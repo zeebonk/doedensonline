@@ -3,3 +3,8 @@
 
 en:
   hello: "Hello world"
+  activerecord:
+    errors:
+      template:
+        header: "Er zijn problemen met de ingevoerde gegevens:"
+        body: ""

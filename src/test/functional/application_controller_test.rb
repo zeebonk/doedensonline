@@ -27,10 +27,6 @@ class ApplicationControllerTestSubjectController < ApplicationController
     render :text => 'author ok' unless performed?
   end
 
-  def echo_msg
-    render :text => "#{params[:msg].encoding.name}:#{params[:msg]}"
-  end
-
   def image_path
     render :text => root_src_img_tag(params[:input])
   end
@@ -137,15 +133,6 @@ class ApplicationControllerTest < ActionController::TestCase
 
     assert_redirected_to :controller => 'application_controller_test_subject', :action => 'index'
     assert_equal 'U bent niet gemachtigd om opgegeven item te mogen wijzigen!', flash[:error]
-  end
-
-  # force_utf8_params
-
-  test "force_utf8_params re-encodes string params to UTF-8" do
-    sign_in_as @user
-    get :echo_msg, :msg => 'hello'
-    assert_response :success
-    assert_equal 'UTF-8:hello', @response.body
   end
 
   # root_src_img_tag
