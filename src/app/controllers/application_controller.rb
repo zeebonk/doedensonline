@@ -44,9 +44,7 @@ private
       flash[:notice] = 'You are already signed in'
       params[:request] = request.fullpath
       redirect_to :controller => 'home', :action => 'index'
-      return true
     end
-    false
   end
 
   def current_user
