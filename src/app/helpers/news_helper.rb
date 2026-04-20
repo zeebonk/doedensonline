@@ -1,34 +1,35 @@
+# encoding: utf-8
 module NewsHelper
   def page_navigation
-    output = "<ul class='page-navigation'>".html_safe
+    output = "<ul class='page-navigation'>"
 
-    output << "<li>".html_safe
+    output << "<li>"
     if @page == 1
-      output << "&laquo; nieuwer".html_safe
+      output << "« nieuwer"
     else
-      output << link_to("&laquo; nieuwer".html_safe, {:action => 'page', :page_number => (@page - 1)}, :title => 'Ga een pagina verder')
+      output << link_to("« nieuwer", {:action => 'page', :page_number => (@page - 1)}, :title => 'Ga een pagina verder')
     end
-    output << "</li>".html_safe
+    output << "</li>"
 
     1.upto(@pages) { |i|
-      output << "<li>".html_safe
+      output << "<li>"
       if @page == i
         output << i.to_s
       else
         output << link_to(i, {:action => 'page', :page_number => i}, :title => "Ga naar pagina #{i}")
       end
-      output << "</li>".html_safe
+      output << "</li>"
     }
 
-    output << "<li>".html_safe
+    output << "<li>"
     if @page == @pages
-      output << "ouder &raquo;".html_safe
+      output << "ouder »"
     else
-      output << link_to("ouder &raquo;".html_safe, {:action => 'page', :page_number => (@page + 1)}, :title => 'Ga een pagina terug')
+      output << link_to("ouder »", {:action => 'page', :page_number => (@page + 1)}, :title => 'Ga een pagina terug')
     end
-    output << "</li>".html_safe
+    output << "</li>"
 
-    output << "</ul>".html_safe
-    output
+    output << "</ul>"
+    output.html_safe
   end
 end
