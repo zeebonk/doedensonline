@@ -1,5 +1,25 @@
 nl:
   activerecord:
+    attributes:
+      user:
+        first_name: "Voornaam"
+        last_name: "Achternaam"
+        email: "E-mail adres"
+        password: "Wachtwoord"
+        notify_news: "Mail bij nieuwe nieuwtjes"
+      news_item:
+        message: "Bericht"
+      news_comment:
+        message: "Reactie"
+      photo_album:
+        title: "Titel"
+        description: "Beschrijving"
+        preview_picture: "Voorbeeld afbeelding"
+      photo_album_comment:
+        message: "Reactie"
+      photo_album_picture:
+        filename: "Bestand"
+        photo_album_id: "Fotoalbum"
     errors:
       template:
         header: "Er zijn problemen met de ingevoerde gegevens:"
@@ -13,6 +33,18 @@ nl:
           attributes:
             email:
               invalid: "is ongeldig."
+            first_name:
+              too_short: "moet uit minimaal %{count} tekens bestaan"
+            last_name:
+              too_short: "moet uit minimaal %{count} tekens bestaan"
+            password:
+              too_short: "moet uit minimaal %{count} tekens bestaan"
+        photo_album_picture:
+          attributes:
+            filename:
+              blank: "moet worden ingevuld"
+            photo_album_id:
+              blank: "moet worden ingevuld"
 
   site:
     title_suffix: "Doedensonline.nl"
@@ -210,22 +242,16 @@ nl:
       edit_comment_title: "Pas deze reactie aan"
     new:
       intro: "Op deze pagina kunt u een nieuw fotoalbum aanmaken. Vul eerst een titel en beschrijving in. Vervolgens kiest u onder Voorbeeld afbeelding een foto bestand die op de voorkant van de album moet komen. Klik vervolgens op \"Maak album aan\", deze knop stuur u naar de foto beheer pagina voor de nu door u aangemaakte fotoalbum. Op deze pagina kunt u uw album vervolgens vullen met uw foto's."
-      title_label: "Titel:"
       title_error: " er moet een titel worden ingevuld."
-      description_label: "Beschrijving:"
       description_error: " er moet een beschrijving worden ingevuld."
-      preview_picture_label: "Voorbeeld afbeelding:"
       preview_picture_error: " er moet een geldige voorbeeld afbeelding worden geselecteerd."
       submit: "Maak album aan"
       back: "« Terug naar het overzicht"
     edit:
       intro: "Op deze pagina kunt u de gegevens van uw fotoalbum aanpassen."
-      title_label: "Titel:"
       title_error: " er moet een titel worden ingevuld."
-      description_label: "Beschrijving:"
       description_error: " er moet een beschrijving worden ingevuld."
       current_preview_picture: "Huidige voorbeeld afbeelding:"
-      new_preview_picture_label: "Nieuwe voorbeeld afbeelding kiezen:"
       preview_picture_error: " er moet een geldige voorbeeld afbeelding worden geselecteerd."
       submit: "Aanpassingen opslaan"
       back: "« Terug naar het overzicht"
@@ -273,13 +299,9 @@ nl:
       password: "Wachtwoord"
     profile:
       intro: "Op deze pagina kunt u uw profiel instellingen aanpassen, zoals uw naam en email adres."
-      first_name_label: "Voornaam:"
-      last_name_label: "Achternaam:"
-      email_label: "E-mail adres:"
       submit: "Opslaan"
     notifications:
       intro: "Deze pagina laat u instellen van welke gebeurtenissen u op de hoogte wilt worden gesteld. Een vinkje zetten betekend ontvangen van mail."
-      notify_news_label: "Mail bij nieuwe nieuwtjes"
       submit: "Opslaan"
     password:
       intro: "Als u uw wachtwoord wilt wijzigen kunt u dit hier doen. U moet uw huidge wachtwoord en twee maal het nieuwe wachtwoord invoeren."

@@ -9,7 +9,7 @@
 <%= form_for @user, :url => { :action => "update_notifications" } do |f| %>
   <%= f.error_messages %>
   <p>
-    <%= f.label :notify_news, t('.notify_news_label') %><br />
+    <%= f.label :notify_news %><br />
     <%= f.check_box :notify_news %>
   </p>
   <p>

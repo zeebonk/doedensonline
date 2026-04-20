@@ -5,14 +5,14 @@
 <div id="edit-form">
 	<%= form_for(@photo_album,:html => { :multipart => true }) do |f| %>
 		<p>
-			<%= f.label :title, t('.title_label') %>
+			<%= f.label :title %>
 			<% if (@title_error) %>
 				<span class="error-message"><%= t('.title_error') %></span>
 			<% end %>
 			<%= f.text_field :title, :class => 'text-box' %>
 		</p>
 		<p>
-			<%= f.label :description, t('.description_label') %>
+			<%= f.label :description %>
 			<% if (@description_error) %>
 				<span class="error-message"><%= t('.description_error') %></span><br />
 			<% end %>
@@ -23,7 +23,7 @@
 			<%= image_tag "small/" + @photo_album.preview_picture %>
 		</p>
 		<p>
-			<%= f.label :preview_picture, t('.new_preview_picture_label') %>
+			<%= f.label :preview_picture %>
 			<% if (@preview_picture_error) %>
 				<span class="error-message"><%= t('.preview_picture_error') %></span>
 			<% end %>
