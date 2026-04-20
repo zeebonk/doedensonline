@@ -9,7 +9,7 @@ end
 module DoedensOnline
   class Application < Rails::Application
     config.encoding = 'utf-8'
-    config.time_zone = 'UTC'
+    config.time_zone = 'Amsterdam'
 
     config.filter_parameters += [:password]
 
