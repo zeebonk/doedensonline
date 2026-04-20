@@ -17,14 +17,14 @@ class ApplicationControllerTestSubjectController < ApplicationController
   end
 
   def home_if_signed_in
-    redirect_to_home_if_signed_in
-    render :text => 'not signed in' unless performed?
+    return if redirect_to_home_if_signed_in
+    render :text => 'not signed in'
   end
 
   def author_only
     item = NewsItem.find(params[:id])
-    validate_author(item)
-    render :text => 'author ok' unless performed?
+    return unless user_is_author(item)
+    render :text => 'author ok'
   end
 
   def image_path
@@ -113,9 +113,9 @@ class ApplicationControllerTest < ActionController::TestCase
     assert_equal 'You are already signed in', flash[:notice]
   end
 
-  # validate_author
+  # user_is_author
 
-  test "validate_author lets the author continue" do
+  test "user_is_author lets the author continue" do
     sign_in_as @user
     news_item = NewsItem.create!(:message => 'hi', :user_id => @user.id)
 
@@ -125,7 +125,7 @@ class ApplicationControllerTest < ActionController::TestCase
     assert_equal 'author ok', @response.body
   end
 
-  test "validate_author redirects non-author with an error flash" do
+  test "user_is_author redirects non-author with an error flash" do
     sign_in_as @user
     news_item = NewsItem.create!(:message => 'hi', :user_id => @admin.id)
 

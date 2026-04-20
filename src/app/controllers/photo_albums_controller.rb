@@ -58,8 +58,8 @@ class PhotoAlbumsController < ApplicationController
   	flash[:notice] = "Alle foto's zijn succesvol toegevoegd."
   	
   	@photo_album = PhotoAlbum.find_by_id params[:album_id].to_i
-  	validate_author @photo_album
-  	
+  	return unless user_is_author @photo_album
+
   	if !params['file']
       flash[:error] = "U heeft geen foto's geselecteerd om toe te voegen."   	 
       flash[:notice] = nil
@@ -94,9 +94,9 @@ class PhotoAlbumsController < ApplicationController
   def destroy_many_pictures
  		
   	@photo_album = PhotoAlbum.find_by_id params[:album_id]
-  	
-  	validate_author @photo_album
-  	
+
+  	return unless user_is_author @photo_album
+
     if params[:selected]
 	  for picture_id in params[:selected]
 	    picture = PhotoAlbumPicture.find(picture_id)
@@ -150,8 +150,8 @@ class PhotoAlbumsController < ApplicationController
   # PUT /photo_albums/1
   def update
     @photo_album = PhotoAlbum.find(params[:id])
-		validate_author @photo_album
-	
+		return unless user_is_author @photo_album
+
 		if params["photo_album"]["preview_picture"] != nil
       begin
         @picture = UploadPicture.new params["photo_album"]["preview_picture"]
@@ -183,7 +183,7 @@ class PhotoAlbumsController < ApplicationController
 		@photo_album = PhotoAlbum.find_by_id params[:id]
     
 		if @photo_album
-			validate_author @photo_album
+			return unless user_is_author @photo_album
 			remove_images @photo_album.preview_picture
 			@photo_album.destroy
       flash[:notice] = 'Foto album succesvol verwijderd.'

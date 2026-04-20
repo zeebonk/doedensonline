@@ -50,16 +50,16 @@ class NewsController < ApplicationController
       flash[:error] = 'Op gegeven nieuwtje om aan te passen bestaat niet!'
       redirect_to :action => 'index'
     else
-      validate_author @news_item    
+      return unless user_is_author @news_item
     end
   end
-  
+
   # POST /news/update
   def update
     @news_item = news_item_by_id params[:news_item][:id]
     params[:news_item][:message] = root_src_img_tag(params[:news_item][:message])
-    if @news_item    
-      validate_author @news_item
+    if @news_item
+      return unless user_is_author @news_item
       if @news_item.update_attributes(params[:news_item])
         flash[:notice] = 'Het nieuwtje is succesvol aangepast.'
         redirect_to :action => "index"
@@ -82,8 +82,8 @@ class NewsController < ApplicationController
       flash[:error] = 'Op gegeven nieuwtje om aan te verwijderen bestaat niet!'
       redirect_to :action => 'index'
     else
-      validate_author @news_item
-    end  
+      return unless user_is_author @news_item
+    end
   end
   
   # POST /news/destroy
@@ -91,7 +91,7 @@ class NewsController < ApplicationController
     return redirect_to :action => 'index' if params[:commit] == "Nee, niet verwijderen"
     @news_item = news_item_by_id params[:id]
     if @news_item
-      validate_author @news_item
+      return unless user_is_author @news_item
       for news_comment in @news_item.news_comments
         news_comment.destroy
       end
@@ -148,19 +148,19 @@ class NewsController < ApplicationController
       flash[:error] = 'Reactie om aan te passen is niet gevonden!'
       redirect_to :action => 'index'
     else
-      validate_author @news_comment
+      return unless user_is_author @news_comment
     end
   end
-  
+
   # POST /news/update_comment
   def update_comment
     @news_comment = news_comment_by_id params[:news_comment][:id]
     params[:news_comment][:message] = root_src_img_tag(params[:news_comment][:message])
     if !@news_comment
       flash[:error] = 'Reactie om aan te passen is niet gevonden!'
-      redirect_to :action => 'index'    
+      redirect_to :action => 'index'
     else
-      validate_author @news_comment
+      return unless user_is_author @news_comment
       if @news_comment.update_attributes(params[:news_comment])
         flash[:notice] = 'Uw reactie is succesvol aangepast.'
         redirect_to :action => 'view', :id => @news_comment.news_item.id
@@ -178,9 +178,9 @@ class NewsController < ApplicationController
     @news_comment = news_comment_by_id params[:id]
     if !@news_comment
       flash[:error] = "Opgegeven reactie om te verwijderen bestaat niet"
-      redirect_to :action => 'index'    
+      redirect_to :action => 'index'
     else
-      validate_author @news_comment
+      return unless user_is_author @news_comment
     end
   end
   
@@ -190,8 +190,8 @@ class NewsController < ApplicationController
     if !@news_comment
       flash[:error] = "Opgegeven reactie om te verwijderen bestaat niet"
       redirect_to :action => 'index'
-    else      
-      validate_author @news_comment
+    else
+      return unless user_is_author @news_comment
       return redirect_to :action => 'view', :id => @news_comment.news_item.id if params[:commit] == "Nee, niet verwijderen"
       news_item_id = @news_comment.news_item.id
       @news_comment.destroy

@@ -9,13 +9,12 @@ class HomeController < ApplicationController
   # GET /home/sign_in
   def sign_in
     @page_title = ["Inloggen"]
-    redirect_to_home_if_signed_in
- 
+    return if redirect_to_home_if_signed_in
   end
 
   # POST /home/authenticate
   def authenticate
-    redirect_to_home_if_signed_in
+    return if redirect_to_home_if_signed_in
     @user = User.authenticate(params[:first_name], params[:password])
     if @user
       flash[:notice] = 'U bent succesvol ingelogd!'
@@ -52,12 +51,12 @@ class HomeController < ApplicationController
   # GET /home/password_forgotten
   def password_forgotten
     @page_title = ["Wachtwoord vergeten"]
-    redirect_to_home_if_signed_in
+    return if redirect_to_home_if_signed_in
   end
-  
+
   # POST /home/reset_password
   def reset_password
-    redirect_to_home_if_signed_in
+    return if redirect_to_home_if_signed_in
     user = User.where('first_name = ? AND email = ?', params[:first_name], params[:email]).first
     if user
       user.generate_new_password

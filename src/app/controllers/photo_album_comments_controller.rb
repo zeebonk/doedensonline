@@ -24,11 +24,11 @@ class PhotoAlbumCommentsController < ApplicationController
 			flash[:error] = 'Reactie om aan te passen is niet gevonden!'
       redirect_to :controller => 'photo_albums', :action => 'index'
 		else
-      validate_author @photo_album_comment
+      return unless user_is_author @photo_album_comment
     end
   end
 
-	
+
   # POST /photo_album_comments
   def create
     @photo_album_comment = PhotoAlbumComment.new(params[:photo_album_comment])
@@ -55,7 +55,7 @@ class PhotoAlbumCommentsController < ApplicationController
       flash[:error] = 'Reactie om aan te passen is niet gevonden!'
       redirect_to :controller => 'photo_albums', :action => 'index'    
     else
-      validate_author @photo_album_comment
+      return unless user_is_author @photo_album_comment
       if @photo_album_comment.update_attributes(params[:photo_album_comment])
         flash[:notice] = 'Uw reactie is succesvol aangepast.'
         redirect_to :controller => 'photo_albums', :action => 'show', :id => @photo_album_comment.photo_album.id
@@ -74,21 +74,21 @@ class PhotoAlbumCommentsController < ApplicationController
     @photo_album_comment = photo_album_comment_from_id params[:id]
     if !@photo_album_comment
       flash[:error] = "Opgegeven reactie om te verwijderen bestaat niet"
-      redirect_to :controller => 'photo_albums', :action => 'index'    
+      redirect_to :controller => 'photo_albums', :action => 'index'
     else
-      validate_author @photo_album_comment
+      return unless user_is_author @photo_album_comment
     end
   end
-	
-	
+
+
   # DELETE /photo_album_comments/1
   def destroy
 		@photo_album_comment = photo_album_comment_from_id params[:id]
     if !@photo_album_comment
       flash[:error] = "Opgegeven reactie om te verwijderen bestaat niet"
       redirect_to :controller => 'photo_albums', :action => 'index'
-    else      
-      validate_author @photo_album_comment
+    else
+      return unless user_is_author @photo_album_comment
       return redirect_to :controller => 'photo_albums', :action => 'show', :id => @photo_album_comment.photo_album_id if params[:commit] == "Nee, niet verwijderen"
       photo_album_id = @photo_album_comment.photo_album.id
       @photo_album_comment.destroy
