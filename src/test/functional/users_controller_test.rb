@@ -48,7 +48,7 @@ class UsersControllerTest < ActionController::TestCase
 
   test "sets the page title on index" do
     get :index
-    assert_equal ['Users'], assigns(:page_title)
+    assert_equal [I18n.t('page_titles.users')], assigns(:page_title)
   end
 
   # GET /users/:id
@@ -76,7 +76,7 @@ class UsersControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to user_path(assigns(:user))
-    assert_equal 'User was successfully created.', flash[:notice]
+    assert_equal I18n.t('flash.users.created'), flash[:notice]
   end
 
   test "does not create user with invalid attributes and re-renders new" do
@@ -112,7 +112,7 @@ class UsersControllerTest < ActionController::TestCase
     put :update, :id => @user.id, :user => { :first_name => 'Updated' }
 
     assert_redirected_to user_path(assigns(:user))
-    assert_equal 'User was successfully updated.', flash[:notice]
+    assert_equal I18n.t('flash.users.updated'), flash[:notice]
     assert_equal 'Updated', @user.reload.first_name
   end
 

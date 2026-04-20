@@ -74,7 +74,7 @@ nl:
     albums_remove: "Fotoalbum verwijderen"
     albums_manage_pictures: "Foto's beheren"
     settings: "Instellingen"
-    users: "Users"
+    users: "Gebruikers"
 
   menu:
     home: "Home"
@@ -117,7 +117,7 @@ nl:
       pictures_destroyed: "Geselecteerde foto(s) succesvol verwijderd."
       no_pictures_selected_destroy: "Geen foto's geselecteerd om te verwijderen."
       created: "Fotoalbum is succesvol toegevoegd."
-      updated: "PhotoAlbum was successfully updated."
+      updated: "Fotoalbum is succesvol aangepast."
       destroyed: "Foto album succesvol verwijderd."
       album_not_found: "Opgegeven fotoalbum is niet gevonden!"
     photo_album_comments:
@@ -135,8 +135,8 @@ nl:
       password_mismatch: "Nieuw wachtwoord en confirmatie zijn niet aan elkaar gelijk"
       current_password_incorrect: "Huidig wachtwoord in incorrect"
     users:
-      created: "User was successfully created."
-      updated: "User was successfully updated."
+      created: "Gebruiker is succesvol aangemaakt."
+      updated: "Gebruiker is succesvol aangepast."
     photo_albums_errors:
       unsupported_image: "Unsupported image selected"
 
@@ -312,40 +312,40 @@ nl:
 
   users:
     index:
-      heading: "Listing users"
-      first_name: "First name"
-      last_name: "Last name"
-      email: "Email"
-      password: "Password"
-      notify_news: "Notify news"
-      is_admin: "Is admin"
-      show: "Show"
-      edit: "Edit"
-      destroy: "Destroy"
-      confirm_destroy: "Are you sure?"
-      new_user: "New user"
+      heading: "Gebruikers overzicht"
+      first_name: "Voornaam"
+      last_name: "Achternaam"
+      email: "E-mail adres"
+      password: "Wachtwoord"
+      notify_news: "Notificaties"
+      is_admin: "Beheerder"
+      show: "Bekijken"
+      edit: "Aanpassen"
+      destroy: "Verwijderen"
+      confirm_destroy: "Weet u het zeker?"
+      new_user: "Gebruiker toevoegen"
     new:
-      heading: "New user"
-      submit: "Create"
-      back: "Back"
+      heading: "Gebruiker toevoegen"
+      submit: "Aanmaken"
+      back: "« Terug naar het overzicht"
     edit:
-      heading: "Editing user"
-      submit: "Update"
-      show: "Show"
-      back: "Back"
+      heading: "Gebruiker aanpassen"
+      submit: "Opslaan"
+      show: "Bekijken"
+      back: "« Terug naar het overzicht"
     show:
-      first_name: "First name:"
-      last_name: "Last name:"
-      email: "Email:"
-      password: "Password:"
-      notify_news: "Notify news:"
-      edit: "Edit"
-      back: "Back"
+      first_name: "Voornaam:"
+      last_name: "Achternaam:"
+      email: "E-mail adres:"
+      password: "Wachtwoord:"
+      notify_news: "Notificaties:"
+      edit: "Aanpassen"
+      back: "« Terug naar het overzicht"
     sign_in:
-      name_label: "Name:"
-      password_label: "Password:"
-      submit: "Login"
-      back: "Back"
+      name_label: "Voornaam:"
+      password_label: "Wachtwoord:"
+      submit: "Inloggen"
+      back: "« Terug"
 
   mailer:
     subjects:
