@@ -1,37 +1,34 @@
 <p class="intro">
-	Op deze pagina kunt u foto's toevoegen en verwijderen aan een fotoalbum. Toevoegen doet u door foto's te selecteren 
-	met de bestand selecteer velden en vervolgens op de Geselecteerde foto's uploaden knop te drukken. Het verwijderen
-	van foto's doet u door foto's te selecteren door ze aan te vinken en vervolgens op de knop Geselecteerde foto's 
-	verwijderen te drukken.
+	<%= t('.intro') %>
 </p>
 
-<div id="edit-form"> 
+<div id="edit-form">
 	<%= form_tag('/photo_albums/add_picture', :multipart => true) do %>
 		<p>
-			<label>Foto's toevoegen:</label>
+			<label><%= t('.add_pictures_label') %></label>
 		<p>
 			<%= file_field_tag 'file[]' %>
 			<%= file_field_tag 'file[]' %>
 			<%= file_field_tag 'file[]' %>
-			
+
 			<%= file_field_tag 'file[]' %>
 			<%= file_field_tag 'file[]' %>
 			<%= file_field_tag 'file[]' %>
-			
+
 			<%= file_field_tag 'file[]' %>
 			<%= file_field_tag 'file[]' %>
 			<%= file_field_tag 'file[]' %>
 		</p>
 		<p>
 			<%= hidden_field_tag 'album_id', @photo_album.id %>
-			<%= submit_tag "Geselecteerde foto's uploaden" %>
+			<%= submit_tag t('.upload_submit') %>
 		</p>
 	<% end %>
-	
+
 	<% if @photo_album.photo_album_pictures.count > 0 %>
-	<%= form_tag('/photo_albums/destroy_many_pictures') do %>  
+	<%= form_tag('/photo_albums/destroy_many_pictures') do %>
 		<p>
-			<label>Foto's verwijderen:</label>
+			<label><%= t('.remove_pictures_label') %></label>
 		</p>
 		<p>
 			<div id="pictures-wrapper">
@@ -50,10 +47,10 @@
 			<%= hidden_field_tag 'album_id', @photo_album.id %>
 		</p>
 		<p>
-			<%= submit_tag "Geselecteerde foto's verwijderen" %>
+			<%= submit_tag t('.remove_submit') %>
 		</p>
 	<% end %>
 	<%end%>
 </div>
 
-<%= link_to '« Terug naar het overzicht', photo_albums_path, :class=>'back' %>
+<%= link_to t('.back'), photo_albums_path, :class=>'back' %>

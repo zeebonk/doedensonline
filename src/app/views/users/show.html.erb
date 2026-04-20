@@ -1,28 +1,28 @@
 <p>
-  <b>First name:</b>
+  <b><%= t('.first_name') %></b>
   <%=h @user.first_name %>
 </p>
 
 <p>
-  <b>Last name:</b>
+  <b><%= t('.last_name') %></b>
   <%=h @user.last_name %>
 </p>
 
 <p>
-  <b>Email:</b>
+  <b><%= t('.email') %></b>
   <%=h @user.email %>
 </p>
 
 <p>
-  <b>Password:</b>
+  <b><%= t('.password') %></b>
   <%=h @user.password %>
 </p>
 
 <p>
-  <b>Notify news:</b>
+  <b><%= t('.notify_news') %></b>
   <%=h @user.notify_news %>
 </p>
 
 
-<%= link_to 'Edit', edit_user_path(@user) %> |
-<%= link_to 'Back', users_path %>
+<%= link_to t('.edit'), edit_user_path(@user) %> |
+<%= link_to t('.back'), users_path %>

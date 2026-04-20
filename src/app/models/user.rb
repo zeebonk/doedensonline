@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
   validates_length_of :password, :minimum => 4
   validates_length_of :first_name, :minimum => 3
   validates_length_of :last_name, :minimum => 3
-  validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i, :message => 'is ongeldig.'
+  validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
 
   # Password setter
   def password=pwd

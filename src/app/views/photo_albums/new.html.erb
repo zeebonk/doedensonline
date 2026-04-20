@@ -1,37 +1,35 @@
 <p class="intro">
-	Op deze pagina kunt u een nieuw fotoalbum aanmaken. Vul eerst een titel en beschrijving in. Vervolgens kiest u onder Voorbeeld 
-	afbeelding een foto bestand die op de voorkant van de album moet komen. Klik vervolgens op "Maak album aan", deze knop stuur u 
-	naar de foto beheer pagina voor de nu door u aangemaakte fotoalbum. Op deze pagina kunt u uw album vervolgens vullen met uw foto's.
+	<%= t('.intro') %>
 </p>
 
-<div id="edit-form"> 
+<div id="edit-form">
 	<%= form_for(@photo_album,:html => { :multipart => true }) do |f| %>
 		<p>
-			<%= f.label :title, "Titel:" %>
+			<%= f.label :title, t('.title_label') %>
 			<% if (@title_error) %>
-				<span class="error-message"> er moet een titel worden ingevuld.</span>
+				<span class="error-message"><%= t('.title_error') %></span>
 			<% end %>
 			<%= f.text_field :title, :class => 'text-box' %>
 		</p>
 		<p>
-			<%= f.label :description, "Beschrijving:" %>
+			<%= f.label :description, t('.description_label') %>
 			<% if (@description_error) %>
-				<span class="error-message"> er moet een beschrijving worden ingevuld.</span><br />
+				<span class="error-message"><%= t('.description_error') %></span><br />
 			<% end %>
 			<%= f.text_area :description, :rows => 12 %>
 		</p>
 		<p>
-			<%= f.label :preview_picture, "Voorbeeld afbeelding:" %>
+			<%= f.label :preview_picture, t('.preview_picture_label') %>
 			<% if (@preview_picture_error) %>
-				<span class="error-message"> er moet een geldige voorbeeld afbeelding worden geselecteerd.</span>
+				<span class="error-message"><%= t('.preview_picture_error') %></span>
 			<% end %>
 			<br>
 			<%= f.file_field :preview_picture %>
 		</p>
 		<p>
-			<%= f.submit "Maak album aan" %>
+			<%= f.submit t('.submit') %>
 		</p>
 	<% end %>
 </div>
 
-<%= link_to '« Terug naar het overzicht', photo_albums_path, :class => 'back' %>
+<%= link_to t('.back'), photo_albums_path, :class => 'back' %>

@@ -1,13 +1,11 @@
 <p class="intro">
-  Op deze pagina bekijkt u een fotoalbum, inclusief alle bijhorende reacties. om een reactie 
-  te plaatsen klikt u op "Reactie plaatsen".   Wanneer u weer terug wilt keren naar het 
-  fotoalbums overzicht kunt u dit doen door op "Terug naar het overzicht" te klikken.
-</p> 
- 
+  <%= t('.intro') %>
+</p>
+
 <div class="news-index-actions">
-	<%= link_to '« Terug naar het overzicht', photo_albums_path %>
-	<%= link_to "Reactie plaatsen »", {:controller => 'photo_album_comments', :action => 'new', :id => @photo_album.id}, :title=> 'Plaats een reactie bij dit album', :class=>'next' %>
-</div> 
+	<%= link_to t('.back'), photo_albums_path %>
+	<%= link_to t('.add_comment'), {:controller => 'photo_album_comments', :action => 'new', :id => @photo_album.id}, :title => t('.add_comment_title'), :class=>'next' %>
+</div>
 
 <div class="balloon-wrapper even">
   <div class="poster-wrapper">
@@ -15,25 +13,25 @@
       <%= @photo_album.user.first_name %> <%= @photo_album.user.last_name %>
     </h3>
   </div>
-  <div class="balloon-top">    
-    <div class="balloon-bottom">      
-      
+  <div class="balloon-top">
+    <div class="balloon-bottom">
+
       <div class="date-container">
         <% Time::DATE_FORMATS[:article_date] = "<span class='day'>%d</span><span class='month-year'>%B<br/>%Y</span>" %>
         <%= @photo_album.created_at.to_s(:article_date).html_safe %>
       </div>
 
       <%= @photo_album.description.html_safe %>
-      
+
       <% if @photo_album.user_id == @current_user.id %>
-        <div class="balloon-actions"> 
-					<%= link_to 'Verwijderen  »', {:action => 'remove', :id => @photo_album.id }, :class => "edit" %>
-          <%= link_to "Foto's beheren  »", {:action => 'manage_pictures', :id => @photo_album.id }, :class => "edit" %>
-          <%= link_to 'Aanpassen  »', edit_photo_album_path(@photo_album), :class => "edit" %>
-          <br class="clear"/> 
-        </div> 
+        <div class="balloon-actions">
+					<%= link_to t('.remove'), {:action => 'remove', :id => @photo_album.id }, :class => "edit" %>
+          <%= link_to t('.manage_pictures'), {:action => 'manage_pictures', :id => @photo_album.id }, :class => "edit" %>
+          <%= link_to t('.edit'), edit_photo_album_path(@photo_album), :class => "edit" %>
+          <br class="clear"/>
+        </div>
       <% end %>
-      
+
     </div>
   </div>
 </div>
@@ -58,15 +56,15 @@
       <%= photo_album_comment.user.first_name %> <%= photo_album_comment.user.last_name %>
     </h3>
   </div>
-  <div class="balloon-top">    
-    <div class="balloon-bottom">      
+  <div class="balloon-top">
+    <div class="balloon-bottom">
       <%= photo_album_comment.message.html_safe %>
       <% if photo_album_comment.user.id == @current_user.id %>
       <div class="balloon-actions">
-                  
-          <%= link_to "Verwijderen »", {:controller => 'photo_album_comments', :action => 'remove', :id => photo_album_comment.id}, :class=>'edit', :title=>'Verwijder deze reactie' %>
-          <%= link_to "Aanpassen »", {:controller => 'photo_album_comments', :action => 'edit', :id => photo_album_comment.id}, :class=>'edit', :title=>'Pas deze reactie aan' %>
-        
+
+          <%= link_to t('.remove_comment'), {:controller => 'photo_album_comments', :action => 'remove', :id => photo_album_comment.id}, :class=>'edit', :title => t('.remove_comment_title') %>
+          <%= link_to t('.edit_comment'), {:controller => 'photo_album_comments', :action => 'edit', :id => photo_album_comment.id}, :class=>'edit', :title => t('.edit_comment_title') %>
+
         <br class="clear"/>
       </div>
       <% end %>

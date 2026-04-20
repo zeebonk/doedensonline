@@ -5,7 +5,7 @@ class PhotoAlbumPicturesController < ApplicationController
 
   # GET /photo_album_pictures/1
   def show
-    @page_title = ["Foto's beheren", "Fotoalbums"]
+    @page_title = [t('page_titles.albums_manage_pictures'), t('page_titles.albums_section')]
   	@photo_album = PhotoAlbum.find(params[:id])
   	@photo_album_picture = PhotoAlbumPicture.new  	
   	@photo_album_picture.photo_album_id = @photo_album.id
@@ -23,14 +23,14 @@ class PhotoAlbumPicturesController < ApplicationController
         create_images picture
         @photo_album_picture.filename  = picture.filename
       rescue
-        @photo_album_picture.errors.add(:filename, "Unsupported image selected")
+        @photo_album_picture.errors.add(:filename, t('flash.photo_albums_errors.unsupported_image'))
       end
 	end
 	
 	if @photo_album_picture.errors.empty? && @photo_album_picture.save
       redirect_to :action => 'show', :id => @photo_album_picture.photo_album_id
     else
-      @page_title = ["Foto's beheren", "Fotoalbums"]	
+      @page_title = [t('page_titles.albums_manage_pictures'), t('page_titles.albums_section')]	
       @photo_album = @photo_album_picture.photo_album
       render :action => 'show', :id => @photo_album_picture.photo_album_id
     end

@@ -2,18 +2,18 @@
 
 <%= render :partial => 'settings_menu' %>
 
-<p class="intro">Deze pagina laat u instellen van welke gebeurtenissen u op de hoogte wilt worden gesteld. Een vinkje zetten betekend ontvangen van mail.</p>
+<p class="intro"><%= t('.intro') %></p>
 
 <p style="color: green"><%= flash[:settings] %></p>
 
 <%= form_for @user, :url => { :action => "update_notifications" } do |f| %>
   <%= f.error_messages %>
   <p>
-    <%= f.label :notify_news, "Mail bij nieuwe nieuwtjes" %><br />
+    <%= f.label :notify_news, t('.notify_news_label') %><br />
     <%= f.check_box :notify_news %>
   </p>
   <p>
-    <%= f.submit "Opslaan" %>
+    <%= f.submit t('.submit') %>
   </p>
 <% end %>
 

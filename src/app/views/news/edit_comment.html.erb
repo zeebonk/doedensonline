@@ -1,4 +1,4 @@
-<p class="intro">Op deze pagina kunt u een door u geplaatste reactie aanpassen. Verander uw reactie en druk op "Aanpassen". Uw aanpassingen worden direct doorgevoerd."</p>
+<p class="intro"><%= t('.intro') %></p>
 
 <div id="edit-form">
   <%= form_for @news_comment, :url => {:action => 'update_comment'} do |f| %>
@@ -9,9 +9,9 @@
       <%= f.text_area :message, :rows => 18 %>
     </p>
     <p>
-      <%= f.submit "Aanpassen" %>
+      <%= f.submit t('.submit') %>
     </p>
   <% end %>
 </div>
 
-<%= link_to '« Terug naar het nieuwtje', {:action => 'view', :id => @news_comment.news_item.id}, :class=>'back', :title=>'Keer terug naar het nieuwtje waar u deze reactie bij heeft geplaatst' %>
+<%= link_to t('.back'), {:action => 'view', :id => @news_comment.news_item.id}, :class=>'back', :title => t('.back_title') %>

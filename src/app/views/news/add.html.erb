@@ -1,13 +1,13 @@
-<p class="intro">Op deze pagina kunt u een nieuw nieuwtje aanmaken. Typ uw verhaal in het tekstvak hieronder en druk op "Plaats nieuwtje". Uw verhaal zal bovenaan de lijst met nieuwtjes worden geplaatst.</p>
+<p class="intro"><%= t('.intro') %></p>
 
 <div id="edit-form">
 <%= form_for @news_item, :url => { :action => "create" } do |f| %>
   <p>
-    <%= f.text_area :message, :rows => 18, :value => 'Hier uw tekst' %>
+    <%= f.text_area :message, :rows => 18, :value => t('.placeholder') %>
   </p>
   <p>
-    <%= f.submit "Plaats nieuwtje" %>
+    <%= f.submit t('.submit') %>
   </p>
 <% end %>
 </div>
-<%= link_to '« Terug naar het overzicht', {:action => 'index'}, :title => 'Keer terug naar het nieuwtjes overzicht', :class=>'back' %>
+<%= link_to t('.back'), {:action => 'index'}, :title => t('.back_title'), :class=>'back' %>

@@ -1,8 +1,8 @@
-<p class="intro">Op deze pagina bekijkt u een nieuwtje, inclusief alle bijhorende reacties. Hier kunt u zelf ook reacties plaatsen bij een nieuwtje, dit doet u door op "Reactie plaatsen" te klikken. Wanneer u weer terug wilt keren naar het nieuwtjes overzicht kunt u dit doen door op "Terug naar het overzicht" te klikken of in het hoofd menu "Nieuwtjes" aan te klikken.</p>
+<p class="intro"><%= t('.intro') %></p>
 
 <div class="news-index-actions">
-  <%= link_to '« Terug naar het overzicht', {:action => 'index'}, :title => 'Keer terug naar het nieuwtjes overzicht' %>
-  <%= link_to "Reactie plaatsen »", {:action => 'add_comment', :id => @news_item.id}, :title=> 'Plaats een reactie op dit bericht', :class=>'next' %>
+  <%= link_to t('.back'), {:action => 'index'}, :title => t('.back_title') %>
+  <%= link_to t('.add_comment'), {:action => 'add_comment', :id => @news_item.id}, :title => t('.add_comment_title'), :class=>'next' %>
 </div>
 
 <div class="balloon-wrapper even">
@@ -21,8 +21,8 @@
       <% if @news_item.user_id == @current_user.id %>
       <div class="balloon-actions">
 
-          <%= link_to "Verwijderen » ", {:action => 'remove', :id => @news_item.id}, :class=>'edit', :title=>'Verwijder dit complete bericht' %>
-          <%= link_to "Aanpassen » ", {:action => 'edit', :id => @news_item.id}, :class=>'edit', :title=>'Pas dit bericht aan' %>
+          <%= link_to t('.remove'), {:action => 'remove', :id => @news_item.id}, :class=>'edit', :title => t('.remove_title') %>
+          <%= link_to t('.edit'), {:action => 'edit', :id => @news_item.id}, :class=>'edit', :title => t('.edit_title') %>
 
         <br class="clear"/>
       </div>
@@ -45,8 +45,8 @@
       <% if news_comment.user.id == @current_user.id %>
       <div class="balloon-actions">
 
-          <%= link_to "Verwijderen »", {:action => 'remove_comment', :id => news_comment.id}, :class=>'edit', :title=>'Verwijder deze reactie' %>
-          <%= link_to "Aanpassen »", {:action => 'edit_comment', :id => news_comment.id}, :class=>'edit', :title=>'Pas deze reactie aan' %>
+          <%= link_to t('.remove_comment'), {:action => 'remove_comment', :id => news_comment.id}, :class=>'edit', :title => t('.remove_comment_title') %>
+          <%= link_to t('.edit_comment'), {:action => 'edit_comment', :id => news_comment.id}, :class=>'edit', :title => t('.edit_comment_title') %>
 
         <br class="clear"/>
       </div>
