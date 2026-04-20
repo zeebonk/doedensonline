@@ -2,12 +2,12 @@
 
 <table>
   <tr>
-    <th><%= t('.first_name') %></th>
-    <th><%= t('.last_name') %></th>
-    <th><%= t('.email') %></th>
-    <th><%= t('.password') %></th>
-    <th><%= t('.notify_news') %></th>
-    <th><%= t('.is_admin') %></th>
+    <th><%= label :user, :first_name %></th>
+    <th><%= label :user, :last_name %></th>
+    <th><%= label :user, :email %></th>
+    <th><%= label :user, :password %></th>
+    <th><%= label :user, :notify_news %></th>
+    <th><%= label :user, :isadmin %></th>
   </tr>
 
 <% for user in @users %>

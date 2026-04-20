@@ -7,6 +7,7 @@ nl:
         email: "E-mail adres"
         password: "Wachtwoord"
         notify_news: "Mail bij nieuwe nieuwtjes"
+        isadmin: "Beheerder"
       news_item:
         message: "Bericht"
       news_comment:
@@ -313,12 +314,6 @@ nl:
   users:
     index:
       heading: "Gebruikers overzicht"
-      first_name: "Voornaam"
-      last_name: "Achternaam"
-      email: "E-mail adres"
-      password: "Wachtwoord"
-      notify_news: "Notificaties"
-      is_admin: "Beheerder"
       show: "Bekijken"
       edit: "Aanpassen"
       destroy: "Verwijderen"
@@ -334,16 +329,9 @@ nl:
       show: "Bekijken"
       back: "« Terug naar het overzicht"
     show:
-      first_name: "Voornaam:"
-      last_name: "Achternaam:"
-      email: "E-mail adres:"
-      password: "Wachtwoord:"
-      notify_news: "Notificaties:"
       edit: "Aanpassen"
       back: "« Terug naar het overzicht"
     sign_in:
-      name_label: "Voornaam:"
-      password_label: "Wachtwoord:"
       submit: "Inloggen"
       back: "« Terug"
 
