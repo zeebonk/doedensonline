@@ -1,8 +1,8 @@
 <p class="intro">Op deze pagina bekijkt u een nieuwtje, inclusief alle bijhorende reacties. Hier kunt u zelf ook reacties plaatsen bij een nieuwtje, dit doet u door op "Reactie plaatsen" te klikken. Wanneer u weer terug wilt keren naar het nieuwtjes overzicht kunt u dit doen door op "Terug naar het overzicht" te klikken of in het hoofd menu "Nieuwtjes" aan te klikken.</p>
 
 <div class="news-index-actions">
-  <%= link_to '&laquo; Terug naar het overzicht'.html_safe, {:action => 'index'}, :title => 'Keer terug naar het nieuwtjes overzicht' %>
-  <%= link_to "Reactie plaatsen &raquo;".html_safe, {:action => 'add_comment', :id => @news_item.id}, :title=> 'Plaats een reactie op dit bericht', :class=>'next' %>
+  <%= link_to '« Terug naar het overzicht', {:action => 'index'}, :title => 'Keer terug naar het nieuwtjes overzicht' %>
+  <%= link_to "Reactie plaatsen »", {:action => 'add_comment', :id => @news_item.id}, :title=> 'Plaats een reactie op dit bericht', :class=>'next' %>
 </div>
 
 <div class="balloon-wrapper even">
@@ -21,8 +21,8 @@
       <% if @news_item.user_id == @current_user.id %>
       <div class="balloon-actions">
 
-          <%= link_to "Verwijderen &raquo; ".html_safe, {:action => 'remove', :id => @news_item.id}, :class=>'edit', :title=>'Verwijder dit complete bericht' %>
-          <%= link_to "Aanpassen &raquo; ".html_safe, {:action => 'edit', :id => @news_item.id}, :class=>'edit', :title=>'Pas dit bericht aan' %>
+          <%= link_to "Verwijderen » ", {:action => 'remove', :id => @news_item.id}, :class=>'edit', :title=>'Verwijder dit complete bericht' %>
+          <%= link_to "Aanpassen » ", {:action => 'edit', :id => @news_item.id}, :class=>'edit', :title=>'Pas dit bericht aan' %>
 
         <br class="clear"/>
       </div>
@@ -45,8 +45,8 @@
       <% if news_comment.user.id == @current_user.id %>
       <div class="balloon-actions">
 
-          <%= link_to "Verwijderen &raquo;".html_safe, {:action => 'remove_comment', :id => news_comment.id}, :class=>'edit', :title=>'Verwijder deze reactie' %>
-          <%= link_to "Aanpassen &raquo;".html_safe, {:action => 'edit_comment', :id => news_comment.id}, :class=>'edit', :title=>'Pas deze reactie aan' %>
+          <%= link_to "Verwijderen »", {:action => 'remove_comment', :id => news_comment.id}, :class=>'edit', :title=>'Verwijder deze reactie' %>
+          <%= link_to "Aanpassen »", {:action => 'edit_comment', :id => news_comment.id}, :class=>'edit', :title=>'Pas deze reactie aan' %>
 
         <br class="clear"/>
       </div>

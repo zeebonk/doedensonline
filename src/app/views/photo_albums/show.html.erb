@@ -5,8 +5,8 @@
 </p> 
  
 <div class="news-index-actions">
-	<%= link_to '&laquo; Terug naar het overzicht'.html_safe, photo_albums_path %>
-	<%= link_to "Reactie plaatsen &raquo;".html_safe, {:controller => 'photo_album_comments', :action => 'new', :id => @photo_album.id}, :title=> 'Plaats een reactie bij dit album', :class=>'next' %>
+	<%= link_to '« Terug naar het overzicht', photo_albums_path %>
+	<%= link_to "Reactie plaatsen »", {:controller => 'photo_album_comments', :action => 'new', :id => @photo_album.id}, :title=> 'Plaats een reactie bij dit album', :class=>'next' %>
 </div> 
 
 <div class="balloon-wrapper even">
@@ -27,9 +27,9 @@
       
       <% if @photo_album.user_id == @current_user.id %>
         <div class="balloon-actions"> 
-					<%= link_to 'Verwijderen  &raquo;'.html_safe, {:action => 'remove', :id => @photo_album.id }, :class => "edit" %>
-          <%= link_to "Foto's beheren  &raquo;".html_safe, {:action => 'manage_pictures', :id => @photo_album.id }, :class => "edit" %>
-          <%= link_to 'Aanpassen  &raquo;'.html_safe, edit_photo_album_path(@photo_album), :class => "edit" %>
+					<%= link_to 'Verwijderen  »', {:action => 'remove', :id => @photo_album.id }, :class => "edit" %>
+          <%= link_to "Foto's beheren  »", {:action => 'manage_pictures', :id => @photo_album.id }, :class => "edit" %>
+          <%= link_to 'Aanpassen  »', edit_photo_album_path(@photo_album), :class => "edit" %>
           <br class="clear"/> 
         </div> 
       <% end %>
@@ -64,8 +64,8 @@
       <% if photo_album_comment.user.id == @current_user.id %>
       <div class="balloon-actions">
                   
-          <%= link_to "Verwijderen &raquo;".html_safe, {:controller => 'photo_album_comments', :action => 'remove', :id => photo_album_comment.id}, :class=>'edit', :title=>'Verwijder deze reactie' %>
-          <%= link_to "Aanpassen &raquo;".html_safe, {:controller => 'photo_album_comments', :action => 'edit', :id => photo_album_comment.id}, :class=>'edit', :title=>'Pas deze reactie aan' %>
+          <%= link_to "Verwijderen »", {:controller => 'photo_album_comments', :action => 'remove', :id => photo_album_comment.id}, :class=>'edit', :title=>'Verwijder deze reactie' %>
+          <%= link_to "Aanpassen »", {:controller => 'photo_album_comments', :action => 'edit', :id => photo_album_comment.id}, :class=>'edit', :title=>'Pas deze reactie aan' %>
         
         <br class="clear"/>
       </div>
