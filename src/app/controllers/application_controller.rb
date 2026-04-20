@@ -58,11 +58,13 @@ private
     end
   end
 
-  def validate_author item
+  def user_is_author item
     if item.user != current_user
       flash[:error] = "U bent niet gemachtigd om opgegeven item te mogen wijzigen!"
-      return redirect_to :action => 'index'
+      redirect_to :action => 'index'
+      return false
     end
+    true
   end
 
 end

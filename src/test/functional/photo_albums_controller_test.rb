@@ -152,7 +152,7 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
   test "destroy redirects with error when album does not exist" do
     post :destroy, :id => 999999, :commit => 'Ja, verwijderen'
     assert_redirected_to :controller => 'photo_albums', :action => 'index'
-    assert_equal 'Opgegeven fotoalbum om te verwijderen is niet gevonden!', flash[:error]
+    assert_equal 'Opgegeven fotoalbum is niet gevonden!', flash[:error]
   end
 
   # POST /photo_albums/add_picture
