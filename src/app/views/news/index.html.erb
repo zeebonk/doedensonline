@@ -1,6 +1,6 @@
-<p class="intro">Bij het nieuwtjes overzicht kunt u door alle geplaatste nieuwtjes bladeren. De nieuwtjes zijn gesorteerd op datum, waarbij de nieuwste berichten altijd bovenaan staan. Via de pagina navigatie (rechts onder deze tekst) kunt u ook oudere berichten terug zien. Via de link "Nieuwtje toevoegen" (links onder deze tekst), kunt u naar het scherm gaan om een nieuw bericht te plaatsen.</p>
+<p class="intro"><%= t('.intro') %></p>
 
-<div class="news-index-actions"><%= page_navigation %><%= link_to "Nieuwtje toevoegen »", {:action => 'add'}, :title => 'Plaats een nieuw nieuwtje', :class=>'add' %></div>
+<div class="news-index-actions"><%= page_navigation %><%= link_to t('.add'), {:action => 'add'}, :title => t('.add_title'), :class=>'add' %></div>
 
 <% @news_items.each_with_index do |news_item, index| %>
 
@@ -25,10 +25,10 @@
         </div>
         <%= news_item.message.html_safe %>
         <div class="balloon-actions">
-          <%= link_to "Bekijk/plaats reacties (#{news_item.news_comments.size}) »", {:action => 'view', :id => news_item.id}, :title=>'Bekijk het hele bericht en lees/schrijf reacties' %>
+          <%= link_to t('.view_comments', :count => news_item.news_comments.size), {:action => 'view', :id => news_item.id}, :title => t('.view_comments_title') %>
           <% if news_item.user_id == @current_user.id %>
-            <%= link_to "Verwijderen » ", {:action => 'remove', :id => news_item.id}, :class=>'edit', :title=>'Verwijder dit complete bericht' %>
-            <%= link_to "Aanpassen » ", {:action => 'edit', :id => news_item.id}, :class=>'edit', :title=>'Pas dit bericht aan' %>
+            <%= link_to t('.remove'), {:action => 'remove', :id => news_item.id}, :class=>'edit', :title => t('.remove_title') %>
+            <%= link_to t('.edit'), {:action => 'edit', :id => news_item.id}, :class=>'edit', :title => t('.edit_title') %>
           <% end %>
           <br class="clear"/>
         </div>
@@ -41,5 +41,5 @@
 
 <div class="news-index-actions bottom">
   <%= page_navigation %>
-  <%= link_to "Nieuwtje toevoegen »", {:action => 'add'}, :title => 'Plaats een nieuw nieuwtje', :class=>'add' %>
+  <%= link_to t('.add'), {:action => 'add'}, :title => t('.add_title'), :class=>'add' %>
 </div>

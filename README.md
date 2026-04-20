@@ -57,4 +57,6 @@ pdm run ansible-playbook -i inventory.yaml playbook.yaml --check --diff
 
 - Adopt Rails 3.1 `has_secure_password` in the `User` model to replace the hand-rolled password hashing with bcrypt.
 - Enable the Rails 3.1 asset pipeline: move `public/stylesheets/*` and `public/javascripts/*` (incl. TinyMCE vendor tree) into `app/assets/` and drop `config.assets.enabled = false`.
-- Run the application with the `nl` locale (`config.i18n.default_locale = :nl`) and add a `nl.yml` translations file.
+- Setup automated formatting.
+- Standardize form label and error handling across views.
+- See if the page title can be set from the view template.

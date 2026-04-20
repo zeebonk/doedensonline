@@ -1,13 +1,13 @@
-<h2>Listing users</h2>
+<h2><%= t('.heading') %></h2>
 
 <table>
   <tr>
-    <th>First name</th>
-    <th>Last name</th>
-    <th>Email</th>
-    <th>Password</th>
-    <th>Notify news</th>
-    <th>Is admin</th>
+    <th><%= label :user, :first_name %></th>
+    <th><%= label :user, :last_name %></th>
+    <th><%= label :user, :email %></th>
+    <th><%= label :user, :password %></th>
+    <th><%= label :user, :notify_news %></th>
+    <th><%= label :user, :isadmin %></th>
   </tr>
 
 <% for user in @users %>
@@ -18,13 +18,13 @@
     <td><%=h user.password %></td>
     <td><%=h user.notify_news %></td>
     <td><%=h user.isadmin %></td>
-    <td><%= link_to 'Show', user %></td>
-    <td><%= link_to 'Edit', edit_user_path(user) %></td>
-    <td><%= link_to 'Destroy', user, :confirm => 'Are you sure?', :method => :delete %></td>
+    <td><%= link_to t('.show'), user %></td>
+    <td><%= link_to t('.edit'), edit_user_path(user) %></td>
+    <td><%= link_to t('.destroy'), user, :confirm => t('.confirm_destroy'), :method => :delete %></td>
   </tr>
 <% end %>
 </table>
 
 <br />
 
-<%= link_to 'New user', new_user_path %>
+<%= link_to t('.new_user'), new_user_path %>

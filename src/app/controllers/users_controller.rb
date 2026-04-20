@@ -30,7 +30,7 @@ class UsersController < ApplicationController
     @user = User.new(params[:user])
 
     if @user.save
-      flash[:notice] = 'User was successfully created.'
+      flash[:notice] = t('flash.users.created')
       redirect_to(@user)
     else
       render :action => "new"
@@ -42,7 +42,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
 
     if @user.update_attributes(params[:user])
-      flash[:notice] = 'User was successfully updated.'
+      flash[:notice] = t('flash.users.updated')
       redirect_to(@user)
     else
       render :action => "edit"
@@ -60,7 +60,7 @@ class UsersController < ApplicationController
 private
 
   def title
-    @page_title = ['Users']
+    @page_title = [t('page_titles.users')]
   end
 
 end

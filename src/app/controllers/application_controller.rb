@@ -41,7 +41,7 @@ private
 
   def redirect_to_home_if_signed_in
     if session[:user_id]
-      flash[:notice] = 'You are already signed in'
+      flash[:notice] = t('flash.application.already_signed_in')
       params[:request] = request.fullpath
       redirect_to :controller => 'home', :action => 'index'
     end
@@ -53,14 +53,14 @@ private
 
   def return_to_home_if_user_not_admin
     if !current_user.isadmin
-      flash[:notice] = 'Only admins allowed there'
+      flash[:notice] = t('flash.application.admins_only')
       redirect_to :controller => 'home', :action => 'index'
     end
   end
 
   def user_is_author item
     if item.user != current_user
-      flash[:error] = "U bent niet gemachtigd om opgegeven item te mogen wijzigen!"
+      flash[:error] = t('flash.application.not_authorized')
       redirect_to :action => 'index'
       return false
     end

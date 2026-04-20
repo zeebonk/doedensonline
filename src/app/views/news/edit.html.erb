@@ -1,4 +1,4 @@
-<p class="intro">Op deze pagina kunt u een reeds eerder aangemaakt nieuwtje aanpassen. Vergeet niet op de knop "Wijzigingen opslaan..." te klikken zodat uw wijzigen ook daadwerkelijk doorgevoerd worden.</p>
+<p class="intro"><%= t('.intro') %></p>
 
 <div id="edit-form">
 <%= form_for @news_item, :url => { :action => "update" } do |f| %>
@@ -7,8 +7,8 @@
     <%= f.text_area :message, :rows => 18 %>
   </p>
   <p>
-    <%= f.submit "Wijzigingen opslaan..." %>
+    <%= f.submit t('.submit') %>
   </p>
 <% end %>
 </div>
-<%= link_to '« Terug naar het overzicht', {:action => 'index'}, :title => 'Keer terug naar het nieuwtjes overzicht', :class=>'back' %>
+<%= link_to t('.back'), {:action => 'index'}, :title => t('.back_title'), :class=>'back' %>

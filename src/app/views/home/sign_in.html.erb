@@ -1,4 +1,4 @@
-<p class="intro">Welkom op DoedensOnline.nl. De website van de famillie Doedens. Om verder te gaan op deze website moet u eerst inloggen. Inloggen kunt u doen met het inlog formulier hieronder.</p>
+<p class="intro"><%= t('.intro') %></p>
 
 <%= form_tag :action => 'authenticate' do %>
 
@@ -8,26 +8,26 @@
 <div class="preview-balloon-content sign-in">
 
   <p>
-    <label for="first_name">Voornaam</label><br />
+    <label for="first_name"><%= t('.first_name') %></label><br />
     <%= text_field_tag :first_name, params[:first_name], :class => 'text-box' %>
   </p>
-  
+
   <p>
-    <label for="password">Wachtwoord</label><br />
+    <label for="password"><%= t('.password') %></label><br />
     <%= password_field_tag :password, params[:password], :class => 'text-box' %>
   </p>
-  
+
   <p>
-    <%= link_to 'Wachtwoord vergeten?', {:action => 'password_forgotten'}, :class=> 'read-on', :title => 'Vraag een nieuw wachtwoord aan' %>
+    <%= link_to t('.forgot_password'), {:action => 'password_forgotten'}, :class=> 'read-on', :title => t('.forgot_password_title') %>
   </p>
-  
+
 </div>
 <div class="preview-balloon-poster">
 
   <p>
-    <%= submit_tag "Log in...", :class=>'submit' %><br />
+    <%= submit_tag t('.submit'), :class=>'submit' %><br />
   </p>
-   
+
 </div>
 
 </div>

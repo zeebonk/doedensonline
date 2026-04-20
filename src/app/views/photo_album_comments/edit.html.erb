@@ -1,4 +1,4 @@
-<p class="intro">Op deze pagina kunt u een door u geplaatste reactie aanpassen. Verander uw reactie en druk op "Aanpassen". Uw aanpassingen worden direct doorgevoerd."</p>
+<p class="intro"><%= t('.intro') %></p>
 
 <div id="edit-form">
   <%= form_for(@photo_album_comment) do |f| %>
@@ -9,9 +9,9 @@
       <%= f.text_area :message, :rows => 18 %>
     </p>
     <p>
-      <%= f.submit "Aanpassen" %>
+      <%= f.submit t('.submit') %>
     </p>
   <% end %>
 </div>
 
-<%= link_to '« Terug naar de fotoalbum', {:controller => 'photo_albums', :action => 'show', :id => @photo_album_comment.photo_album_id}, :class=>'back', :title=>'Keer terug naar het nieuwtje waarop u wilde reageren' %>
+<%= link_to t('.back'), {:controller => 'photo_albums', :action => 'show', :id => @photo_album_comment.photo_album_id}, :class=>'back', :title => t('.back_title') %>

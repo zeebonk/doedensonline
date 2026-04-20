@@ -2,7 +2,7 @@
 
   <%= render :partial => 'settings_menu' %>
 
-  <p class="intro">Op deze pagina kunt u uw profiel instellingen aanpassen, zoals uw naam en email adres.</p>
+  <p class="intro"><%= t('.intro') %></p>
 
   <p style="color: green"><%= flash[:settings] %></p>
 
@@ -10,19 +10,19 @@
     <%= f.error_messages %>
 
     <p>
-      <%= f.label :first_name, "Voornaam:" %><br />
+      <%= f.label :first_name %><br />
       <%= f.text_field :first_name %>
     </p>
     <p>
-      <%= f.label :last_name, "Achternaam:" %><br />
+      <%= f.label :last_name %><br />
       <%= f.text_field :last_name %>
     </p>
     <p>
-      <%= f.label :email, "E-mail adres:" %><br />
+      <%= f.label :email %><br />
       <%= f.text_field :email %>
     </p>
     <p>
-      <%= f.submit "Opslaan" %>
+      <%= f.submit t('.submit') %>
     </p>
   <% end %>
 

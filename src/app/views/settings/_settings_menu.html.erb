@@ -1,23 +1,23 @@
 <ul>
   <li>
     <% if controller.action_name == 'profile' %>
-      <%= link_to "Profiel", {:action => 'profile'}, :class => 'active' %> 
+      <%= link_to t('.profile'), {:action => 'profile'}, :class => 'active' %>
     <% else %>
-      <%= link_to "Profiel", :action => 'profile' %> 
+      <%= link_to t('.profile'), :action => 'profile' %>
     <% end %>
   </li>
   <li>
     <% if controller.action_name == 'notifications' %>
-      <%= link_to "Notificaties", {:action => 'notifications'}, :class => 'active' %> 
+      <%= link_to t('.notifications'), {:action => 'notifications'}, :class => 'active' %>
     <% else %>
-      <%= link_to "Notificaties", :action => 'notifications' %> 
+      <%= link_to t('.notifications'), :action => 'notifications' %>
     <% end %>
   </li>
   <li>
     <% if controller.action_name == 'password' %>
-      <%= link_to "Wachtwoord", {:action => 'password'}, :class => 'active' %>
+      <%= link_to t('.password'), {:action => 'password'}, :class => 'active' %>
     <% else %>
-      <%= link_to "Wachtwoord", :action => 'password' %>
+      <%= link_to t('.password'), :action => 'password' %>
     <% end %>
   </li>
 </ul>

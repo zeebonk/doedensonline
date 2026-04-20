@@ -1,16 +1,16 @@
 <%= form_tag :action => 'authenticate' do %>
   <p>
-    <label for="first_name">Name:</label><br />
+    <%= label :user, :first_name, nil, :for => 'first_name' %>:<br />
     <%= text_field_tag :first_name, params[:first_name] %>
   </p>
   <p>
-    <label for="password">Password:</label><br />
+    <%= label :user, :password, nil, :for => 'password' %>:<br />
     <%= password_field_tag :password, params[:password] %>
   </p>
 
   <p>
-    <%= submit_tag "Login" %>
+    <%= submit_tag t('.submit') %>
   </p>
 <% end %>
 
-<%= link_to 'Back', users_path %>
+<%= link_to t('.back'), users_path %>

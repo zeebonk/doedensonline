@@ -1,10 +1,10 @@
-<p class="intro"><strong>Weet u zeker dat u dit nieuwtje wilt verwijderen?</strong></p>
+<p class="intro"><strong><%= t('.confirmation') %></strong></p>
 
 <%= form_tag :action => 'destroy' do %>
   <p>
     <%= hidden_field_tag 'id', @news_item.id %>
   </p>
   <p>
-    <%= submit_tag "Ja, verwijderen" %><%= submit_tag "Nee, niet verwijderen" %>
+    <%= submit_tag t('.confirm') %><%= submit_tag t('.cancel') %>
   </p>
 <% end %>

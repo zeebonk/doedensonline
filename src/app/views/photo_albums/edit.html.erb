@@ -1,39 +1,39 @@
 <p class="intro">
-	Op deze pagina kunt u de gegevens van uw fotoalbum aanpassen.
+	<%= t('.intro') %>
 </p>
 
-<div id="edit-form"> 
+<div id="edit-form">
 	<%= form_for(@photo_album,:html => { :multipart => true }) do |f| %>
 		<p>
-			<%= f.label :title, "Titel:" %>
+			<%= f.label :title %>
 			<% if (@title_error) %>
-				<span class="error-message"> er moet een titel worden ingevuld.</span>
+				<span class="error-message"><%= t('.title_error') %></span>
 			<% end %>
 			<%= f.text_field :title, :class => 'text-box' %>
 		</p>
 		<p>
-			<%= f.label :description, "Beschrijving:" %>
+			<%= f.label :description %>
 			<% if (@description_error) %>
-				<span class="error-message"> er moet een beschrijving worden ingevuld.</span><br />
+				<span class="error-message"><%= t('.description_error') %></span><br />
 			<% end %>
 			<%= f.text_area :description, :rows => 12 %>
 		</p>
 		<p>
-			<label>Huidige voorbeeld afbeelding:</label><br>
+			<label><%= t('.current_preview_picture') %></label><br>
 			<%= image_tag "small/" + @photo_album.preview_picture %>
 		</p>
 		<p>
-			<%= f.label :preview_picture, "Nieuwe voorbeeld afbeelding kiezen:" %>
+			<%= f.label :preview_picture %>
 			<% if (@preview_picture_error) %>
-				<span class="error-message"> er moet een geldige voorbeeld afbeelding worden geselecteerd.</span>
+				<span class="error-message"><%= t('.preview_picture_error') %></span>
 			<% end %>
 			<br>
 			<%= f.file_field :preview_picture %>
 		</p>
 		<p>
-			<%= f.submit "Aanpassingen opslaan" %>
+			<%= f.submit t('.submit') %>
 		</p>
 	<% end %>
 </div>
 
-<%= link_to '« Terug naar het overzicht', photo_albums_path, :class => 'back' %>
+<%= link_to t('.back'), photo_albums_path, :class => 'back' %>

@@ -6,13 +6,13 @@ class PhotoAlbumCommentsController < ApplicationController
 
   # GET /photo_album_comments/new/1
   def new
-		@page_title = ["Reactie plaatsen", "Fotoalbums"]
+		@page_title = [t('page_titles.comment_add'), t('page_titles.albums_section')]
     @photo_album_comment = PhotoAlbumComment.new
 
 		if (photo_album_from_id(params[:id]))
 			@photo_album_comment.photo_album_id = params[:id]
 		else
-			flash[:error] = "Fotoalbum om reactie bij te plaatsen bestaat niet."
+			flash[:error] = t('flash.photo_album_comments.album_not_found')
 			redirect_to :controller => 'photo_albums'
 		end
   end
@@ -20,7 +20,7 @@ class PhotoAlbumCommentsController < ApplicationController
 
   # GET /photo_album_comments/1/edit
   def edit
-		@page_title = ["Reactie aanpassen", "Fotoalbums"]
+		@page_title = [t('page_titles.comment_edit'), t('page_titles.albums_section')]
   end
 
 
@@ -31,11 +31,11 @@ class PhotoAlbumCommentsController < ApplicationController
 		@photo_album_comment.user_id = current_user.id
 
 		if @photo_album_comment.save
-			flash[:notice] = 'Reactie is succesvol toegevoegd.'
+			flash[:notice] = t('flash.photo_album_comments.created')
 			redirect_to :controller => 'photo_albums', :action => 'show', :id => @photo_album_comment.photo_album_id
 		else
-			@page_title = ["Reactie plaatsen", "Fotoalbums"]
-			flash[:error] = 'Een reactie moet wel tekst bevatten!'
+			@page_title = [t('page_titles.comment_add'), t('page_titles.albums_section')]
+			flash[:error] = t('flash.photo_album_comments.message_required')
 			render :action => "new"
 		end
   end
@@ -45,11 +45,11 @@ class PhotoAlbumCommentsController < ApplicationController
   def update
 		params[:photo_album_comment][:message] = root_src_img_tag(params[:photo_album_comment][:message])
     if @photo_album_comment.update_attributes(params[:photo_album_comment])
-      flash[:notice] = 'Uw reactie is succesvol aangepast.'
+      flash[:notice] = t('flash.photo_album_comments.updated')
       redirect_to :controller => 'photo_albums', :action => 'show', :id => @photo_album_comment.photo_album.id
     else
-      @page_title = ["Reactie aanpassen", "Fotoalbums"]
-      flash[:error] = 'Een reactie moet wel tekst bevatten!'
+      @page_title = [t('page_titles.comment_edit'), t('page_titles.albums_section')]
+      flash[:error] = t('flash.photo_album_comments.message_required')
       render :action => "edit"
     end
   end
@@ -57,16 +57,16 @@ class PhotoAlbumCommentsController < ApplicationController
 
 	# GET /photo_album_comments/remove/:id
   def remove
-    @page_title = ["Reactie verwijderen", "Fotoalbums"]
+    @page_title = [t('page_titles.comment_remove'), t('page_titles.albums_section')]
   end
 
 
   # DELETE /photo_album_comments/1
   def destroy
-    return redirect_to :controller => 'photo_albums', :action => 'show', :id => @photo_album_comment.photo_album_id if params[:commit] == "Nee, niet verwijderen"
+    return redirect_to :controller => 'photo_albums', :action => 'show', :id => @photo_album_comment.photo_album_id if params[:commit] == t('photo_album_comments.remove.cancel')
     photo_album_id = @photo_album_comment.photo_album.id
     @photo_album_comment.destroy
-    flash[:notice] = "Uw reactie is succesvol verwijderd."
+    flash[:notice] = t('flash.photo_album_comments.destroyed')
     redirect_to :controller => 'photo_albums', :action => 'show', :id => photo_album_id
   end
 
@@ -87,7 +87,7 @@ private
     id = params[:id] || (params[:photo_album_comment] && params[:photo_album_comment][:id])
     @photo_album_comment = PhotoAlbumComment.find_by_id(id)
     unless @photo_album_comment
-      flash[:error] = 'Opgegeven reactie is niet gevonden!'
+      flash[:error] = t('flash.photo_album_comments.comment_not_found')
       redirect_to :controller => 'photo_albums', :action => 'index'
     end
   end

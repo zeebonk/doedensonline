@@ -119,7 +119,7 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
       :photo_album => { :title => 'Updated', :description => 'New desc' }
 
     assert_redirected_to @photo_album
-    assert_equal 'PhotoAlbum was successfully updated.', flash[:notice]
+    assert_equal I18n.t('flash.photo_albums.updated'), flash[:notice]
     assert_equal 'Updated', @photo_album.reload.title
   end
 
