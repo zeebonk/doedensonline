@@ -119,7 +119,7 @@ class NewsControllerTest < ActionController::TestCase
   test "edit redirects when news_item does not exist" do
     get :edit, :id => 999999
     assert_redirected_to :controller => 'news', :action => 'index'
-    assert_equal 'Op gegeven nieuwtje om aan te passen bestaat niet!', flash[:error]
+    assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
 
   # POST /news/update
@@ -144,7 +144,7 @@ class NewsControllerTest < ActionController::TestCase
     post :update, :news_item => { :id => 999999, :message => 'anything' }
 
     assert_redirected_to :controller => 'news', :action => 'index'
-    assert_equal 'Opgegeven nieuwtje om aan te passen is niet gevonden!', flash[:error]
+    assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
 
   # GET /news/remove/:id
@@ -158,7 +158,7 @@ class NewsControllerTest < ActionController::TestCase
   test "remove redirects when news_item does not exist" do
     get :remove, :id => 999999
     assert_redirected_to :controller => 'news', :action => 'index'
-    assert_equal 'Op gegeven nieuwtje om aan te verwijderen bestaat niet!', flash[:error]
+    assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
 
   # POST /news/destroy
@@ -187,7 +187,7 @@ class NewsControllerTest < ActionController::TestCase
   test "destroy redirects when news_item does not exist" do
     post :destroy, :id => 999999, :commit => 'Ja, verwijderen'
     assert_redirected_to :controller => 'news', :action => 'index'
-    assert_equal 'Opgegeven nieuwtje om te verwijderen is niet gevonden!', flash[:error]
+    assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
 
   # GET /news/view/:id
@@ -205,7 +205,7 @@ class NewsControllerTest < ActionController::TestCase
   test "view redirects when news_item does not exist" do
     get :view, :id => 999999
     assert_redirected_to :controller => 'news', :action => 'index'
-    assert_equal 'Op gegeven nieuwtje om te bekijken bestaat niet!', flash[:error]
+    assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
 
   # GET /news/add_comment/:id
@@ -253,7 +253,7 @@ class NewsControllerTest < ActionController::TestCase
   test "edit_comment redirects when comment does not exist" do
     get :edit_comment, :id => 999999
     assert_redirected_to :controller => 'news', :action => 'index'
-    assert_equal 'Reactie om aan te passen is niet gevonden!', flash[:error]
+    assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
 
   # POST /news/update_comment
@@ -281,7 +281,7 @@ class NewsControllerTest < ActionController::TestCase
   test "update_comment redirects when comment does not exist" do
     post :update_comment, :news_comment => { :id => 999999, :message => 'x' }
     assert_redirected_to :controller => 'news', :action => 'index'
-    assert_equal 'Reactie om aan te passen is niet gevonden!', flash[:error]
+    assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
 
   # GET /news/remove_comment/:id
@@ -298,7 +298,7 @@ class NewsControllerTest < ActionController::TestCase
   test "remove_comment redirects when comment does not exist" do
     get :remove_comment, :id => 999999
     assert_redirected_to :controller => 'news', :action => 'index'
-    assert_equal 'Opgegeven reactie om te verwijderen bestaat niet', flash[:error]
+    assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
 
   # POST /news/destroy_comment
@@ -327,7 +327,7 @@ class NewsControllerTest < ActionController::TestCase
   test "destroy_comment redirects when comment does not exist" do
     post :destroy_comment, :id => 999999, :commit => 'Ja, verwijderen'
     assert_redirected_to :controller => 'news', :action => 'index'
-    assert_equal 'Opgegeven reactie om te verwijderen bestaat niet', flash[:error]
+    assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
 
 end

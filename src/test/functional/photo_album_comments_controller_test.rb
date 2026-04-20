@@ -69,7 +69,7 @@ class PhotoAlbumCommentsControllerTest < ActionController::TestCase
   test "edit redirects when comment does not exist" do
     get :edit, :id => 999999
     assert_redirected_to :controller => 'photo_albums', :action => 'index'
-    assert_equal 'Reactie om aan te passen is niet gevonden!', flash[:error]
+    assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
 
   # POST /photo_album_comments (create)
@@ -121,7 +121,7 @@ class PhotoAlbumCommentsControllerTest < ActionController::TestCase
     post :update, :photo_album_comment => { :id => 999999, :message => 'x' }
 
     assert_redirected_to :controller => 'photo_albums', :action => 'index'
-    assert_equal 'Reactie om aan te passen is niet gevonden!', flash[:error]
+    assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
 
   # GET /photo_album_comments/remove/:id
@@ -135,7 +135,7 @@ class PhotoAlbumCommentsControllerTest < ActionController::TestCase
   test "remove redirects when comment does not exist" do
     get :remove, :id => 999999
     assert_redirected_to :controller => 'photo_albums', :action => 'index'
-    assert_equal 'Opgegeven reactie om te verwijderen bestaat niet', flash[:error]
+    assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
 
   # DELETE /photo_album_comments (destroy)
@@ -161,6 +161,6 @@ class PhotoAlbumCommentsControllerTest < ActionController::TestCase
     post :destroy, :id => 999999, :commit => 'Ja, verwijderen'
 
     assert_redirected_to :controller => 'photo_albums', :action => 'index'
-    assert_equal 'Opgegeven reactie om te verwijderen bestaat niet', flash[:error]
+    assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
 end
