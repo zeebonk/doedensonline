@@ -1,19 +1,9 @@
-# Filters added to this controller apply to all controllers in the application.
-# Likewise, all the methods added will be available for all controllers.
-
 class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
 
   before_filter :force_utf8_params
   before_filter :is_authorized
-  # See ActionController::RequestForgeryProtection for details
-  # Uncomment the :secret if you're not using the cookie session store
-  protect_from_forgery # :secret => 'df582c3ae6fe8eb5445581a3e061317c'
-
-  # See ActionController::Base for details
-  # Uncomment this to filter the contents of submitted sensitive data parameters
-  # from your application log (in this case, all fields with names like "password").
-  # filter_parameter_logging :password
+  protect_from_forgery
 
   layout 'default'
 
@@ -34,22 +24,22 @@ private
     traverse.call(params)
   end
 
-	def root_src_img_tag(input)
+  def root_src_img_tag(input)
     input = input.gsub('../../', '/')
     input = input.gsub('../', '/')
     return input
   end
 
   def create_images image
-  	image.create_large_image
-  	image.create_medium_image
-  	image.create_small_image
+    image.create_large_image
+    image.create_medium_image
+    image.create_small_image
   end
 
   def remove_images filename
-  	FileUtils.remove_file  "#{RAILS_ROOT}/public/images/small/#{filename}", true
-  	FileUtils.remove_file  "#{RAILS_ROOT}/public/images/medium/#{filename}", true
-  	FileUtils.remove_file  "#{RAILS_ROOT}/public/images/large/#{filename}",  true
+    FileUtils.remove_file "#{Rails.root}/public/images/small/#{filename}", true
+    FileUtils.remove_file "#{Rails.root}/public/images/medium/#{filename}", true
+    FileUtils.remove_file "#{Rails.root}/public/images/large/#{filename}", true
   end
 
   def is_authorized
@@ -60,7 +50,7 @@ private
     end
 
     if !session[:user_id]
-      session[:request] = request.request_uri
+      session[:request] = request.fullpath
       redirect_to :controller => 'home', :action => 'sign_in'
     end
   end
@@ -68,7 +58,7 @@ private
   def redirect_to_home_if_signed_in
     if session[:user_id]
       flash[:notice] = 'You are already signed in'
-      params[:request] = request.request_uri
+      params[:request] = request.fullpath
       redirect_to :controller => 'home', :action => 'index'
     end
   end

@@ -6,8 +6,8 @@
   <%= render(:partial => 'pictures_list', :locals => {:album_id => @photo_album.id, :pictures => @photo_album.photo_album_pictures}) %>
 </div>
 
-<% form_for(@photo_album_picture, :html => { :multipart => true }) do |f| %>
-  <%= f.error_messages %>
+<%= form_for(@photo_album_picture, :html => { :multipart => true }) do |f| %>
+  <%= error_messages_for_record(f.object) %>
   <p>
     <%= f.label :filename %><br />
     <%= f.file_field :filename , :class=>"flash"%>

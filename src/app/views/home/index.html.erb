@@ -3,9 +3,9 @@
 <% for news_item in @news_items %>
   <div class="preview-balloon">
     <div class="preview-balloon-content">
-      <%= link_to "Lees verder &raquo;", {:controller => 'news', :action => 'view', :id => news_item.id}, :title => 'Lees de rest van dit bericht', :class => 'read-on' %>
+      <%= link_to "Lees verder &raquo;".html_safe, {:controller => 'news', :action => 'view', :id => news_item.id}, :title => 'Lees de rest van dit bericht', :class => 'read-on' %>
       <p>
-        <%= news_item.preview 140 %>
+        <%= news_item.preview(140).html_safe %>
       </p>
     </div>
     <div class="preview-balloon-poster">

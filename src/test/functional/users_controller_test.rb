@@ -86,7 +86,7 @@ class UsersControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_template 'new'
-    assert assigns(:user).errors.on(:email)
+    assert assigns(:user).errors[:email].present?
   end
 
   test "does not create user with blank password" do

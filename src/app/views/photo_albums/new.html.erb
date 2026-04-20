@@ -5,7 +5,7 @@
 </p>
 
 <div id="edit-form"> 
-	<% form_for(@photo_album,:html => { :multipart => true }) do |f| %>
+	<%= form_for(@photo_album,:html => { :multipart => true }) do |f| %>
 		<p>
 			<%= f.label :title, "Titel:" %>
 			<% if (@title_error) %>
@@ -34,4 +34,4 @@
 	<% end %>
 </div>
 
-<%= link_to '&laquo; Terug naar het overzicht', photo_albums_path, :class => 'back' %>
+<%= link_to '&laquo; Terug naar het overzicht'.html_safe, photo_albums_path, :class => 'back' %>

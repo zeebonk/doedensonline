@@ -6,8 +6,8 @@
 
   <p style="color: green"><%= flash[:settings] %></p>
 
-  <% form_for @user, :url => { :action => "update_profile" } do |f| %>
-    <%= f.error_messages %>
+  <%= form_for @user, :url => { :action => "update_profile" } do |f| %>
+    <%= error_messages_for_record(f.object) %>
 
     <p>
       <%= f.label :first_name, "Voornaam:" %><br />

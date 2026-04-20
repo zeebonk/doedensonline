@@ -1,7 +1,7 @@
 <h1>Editing user</h1>
 
-<% form_for(@user) do |f| %>
-  <%= f.error_messages %>
+<%= form_for(@user) do |f| %>
+  <%= error_messages_for_record(f.object) %>
 
   <p>
     <%= f.label :first_name %><br />

@@ -1,88 +1,40 @@
-ActionController::Routing::Routes.draw do |map|
-  map.resources :photo_album_comments
+DoedensOnline::Application.routes.draw do
+  resources :photo_album_comments
+  resources :photo_album_pictures
+  resources :photo_albums
+  resources :news_comments
+  resources :news_items
+  resources :users
 
-  map.resources :photo_album_pictures
+  match 'sign_in',  :to => 'home#sign_in'
+  match 'sign_out', :to => 'home#sign_out'
 
-  map.resources :photo_albums
+  match 'news',                          :to => 'news#index'
+  match 'news/page/:page_number',        :to => 'news#page'
 
-  map.resources :news_comments
+  match 'news/add',                      :to => 'news#add'
+  match 'news/create',                   :to => 'news#create'
+  match 'news/update',                   :to => 'news#update'
+  match 'news/destroy',                  :to => 'news#destroy'
 
-  map.resources :news_items
+  match 'news/create_comment',           :to => 'news#create_comment'
+  match 'news/update_comment',           :to => 'news#update_comment'
+  match 'news/destroy_comment',          :to => 'news#destroy_comment'
 
-  map.resources :users
+  match 'news/:id/remove',               :to => 'news#remove'
+  match 'news/:id/edit',                 :to => 'news#edit'
+  match 'news/:id/add_comment',          :to => 'news#add_comment'
 
-  # The priority is based upon order of creation: first created -> highest priority.
+  match 'news/edit_comment/:id',         :to => 'news#edit_comment'
+  match 'news/remove_comment/:id',       :to => 'news#remove_comment'
 
-  # Sample of regular route:
-  #   map.connect 'products/:id', :controller => 'catalog', :action => 'view'
-  # Keep in mind you can assign values other than :controller and :action
+  match 'news/:id',                      :to => 'news#view'
 
-  # Sample of named route:
-  #   map.purchase 'products/:id/purchase', :controller => 'catalog', :action => 'purchase'
-  # This route can be invoked with purchase_url(:id => product.id)
+  match 'photo_albums/:id/remove',           :to => 'photo_albums#remove'
+  match 'photo_albums/page/:page_number',    :to => 'photo_albums#page'
+  match 'photo_albums/:id/manage_pictures',  :to => 'photo_albums#manage_pictures'
 
-  # Sample resource route (maps HTTP verbs to controller actions automatically):
-  #   map.resources :products
+  root :to => 'home#index'
 
-  # Sample resource route with options:
-  #   map.resources :products, :member => { :short => :get, :toggle => :post }, :collection => { :sold => :get }
-
-  # Sample resource route with sub-resources:
-  #   map.resources :products, :has_many => [ :comments, :sales ], :has_one => :seller
-
-  # Sample resource route with more complex sub-resources
-  #   map.resources :products do |products|
-  #     products.resources :comments
-  #     products.resources :sales, :collection => { :recent => :get }
-  #   end
-
-  # Sample resource route within a namespace:
-  #   map.namespace :admin do |admin|
-  #     # Directs /admin/products/* to Admin::ProductsController (app/controllers/admin/products_controller.rb)
-  #     admin.resources :products
-  #   end
-
-  # You can have the root of your site routed with map.root -- just remember to delete public/index.html.
-  # map.root :controller => "welcome"
-
-  # See how all your routes lay out with "rake routes"
-
-  # Install the default routes as the lowest priority.
-  # Note: These default routes make all actions in every controller accessible via GET requests. You should
-  # consider removing the them or commenting them out if you're using named routes and resources.
-
-  map.connect 'news', :controller => 'news', :action => 'index'
-  map.connect 'news/page/:page_number', :controller => 'news', :action => 'page'
-
-  map.conncet 'news/add', :controller => 'news', :action => 'add'
-  map.conncet 'news/create', :controller => 'news', :action => 'create'
-  map.conncet 'news/update', :controller => 'news', :action => 'update'
-  map.conncet 'news/destroy', :controller => 'news', :action => 'destroy'
-
-  map.conncet 'news/create_comment', :controller => 'news', :action => 'create_comment'
-  map.conncet 'news/update_comment', :controller => 'news', :action => 'update_comment'
-  map.conncet 'news/destroy_comment', :controller => 'news', :action => 'destroy_comment'
-
-  map.conncet 'news/:id/remove', :controller => 'news', :action => 'remove'
-  map.conncet 'news/:id/edit', :controller => 'news', :action => 'edit'
-  map.conncet 'news/:id/add_comment', :controller => 'news', :action => 'add_comment'
-
-  map.conncet 'news/edit_comment/:id', :controller => 'news', :action => 'edit_comment'
-  map.conncet 'news/remove_comment/:id', :controller => 'news', :action => 'remove_comment'
-
-  map.connect 'news/:id', :controller => 'news', :action => 'view'
-
-
-  map.connect 'sign_in', :controller => 'home', :action => 'sign_in'
-  map.connect 'sign_out', :controller => 'home', :action => 'sign_out'
-
-	map.conncet 'photo_albums/:id/remove', :controller => 'photo_albums', :action => 'remove'
-  map.connect 'photo_albums/page/:page_number', :controller => 'photo_albums', :action => 'page'
-
-  map.connect 'photo_albums/:id/manage_pictures', :controller => 'photo_albums', :action => 'manage_pictures'
-
-  map.root :controller => 'home'
-
-  map.connect ':controller/:action/:id'
-  map.connect ':controller/:action/:id.:format'
+  match ':controller(/:action(/:id(.:format)))'
 end

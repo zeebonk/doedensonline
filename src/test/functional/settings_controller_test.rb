@@ -79,7 +79,7 @@ class SettingsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_template 'profile'
-    assert assigns(:user).errors.on(:email)
+    assert assigns(:user).errors[:email].present?
     assert_not_equal 'not-an-email', @user.reload.email
   end
 
@@ -98,7 +98,7 @@ class SettingsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_template 'notifications'
-    assert assigns(:user).errors.on(:email)
+    assert assigns(:user).errors[:email].present?
   end
 
   # POST /settings/update_password

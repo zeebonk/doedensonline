@@ -1,18 +1,5 @@
 require 'test_helper'
 
-# Rails 2.3's `default_helper_module!` rescues MissingSourceFile, but Ruby 1.9
-# raises a plain LoadError when a helper file is missing — the message format
-# changed, so ActiveSupport's wrapper no longer promotes it.
-ActionController::Base.class_eval do
-  class << self
-    def default_helper_module_with_loaderror_rescue!
-      default_helper_module_without_loaderror_rescue!
-    rescue LoadError
-    end
-    alias_method_chain :default_helper_module!, :loaderror_rescue
-  end
-end
-
 # Dummy controller that exposes ApplicationController's filters and private
 # helpers through trivial actions so they can be exercised in isolation.
 class ApplicationControllerTestSubjectController < ApplicationController

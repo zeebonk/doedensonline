@@ -6,7 +6,7 @@
 </p>
 
 <div id="edit-form"> 
-	<% form_tag('/photo_albums/add_picture', :multipart => true) do %>
+	<%= form_tag('/photo_albums/add_picture', :multipart => true) do %>
 		<p>
 			<label>Foto's toevoegen:</label>
 		<p>
@@ -29,7 +29,7 @@
 	<% end %>
 	
 	<% if @photo_album.photo_album_pictures.count > 0 %>
-	<% form_tag('/photo_albums/destroy_many_pictures') do %>  
+	<%= form_tag('/photo_albums/destroy_many_pictures') do %>  
 		<p>
 			<label>Foto's verwijderen:</label>
 		</p>
@@ -56,4 +56,4 @@
 	<%end%>
 </div>
 
-<%= link_to '&laquo; Terug naar het overzicht', photo_albums_path, :class=>'back' %>
+<%= link_to '&laquo; Terug naar het overzicht'.html_safe, photo_albums_path, :class=>'back' %>
