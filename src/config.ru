@@ -1,2 +1,2 @@
 require ::File.expand_path('../config/environment', __FILE__)
-run ActionController::Dispatcher.new
+run DoedensOnline::Application

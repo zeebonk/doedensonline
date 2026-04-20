@@ -58,7 +58,7 @@ class HomeController < ApplicationController
   # POST /home/reset_password
   def reset_password
     redirect_to_home_if_signed_in
-    user = User.find(:first, :conditions => ['first_name = ? AND email = ?', params[:first_name], params[:email]] )
+    user = User.where('first_name = ? AND email = ?', params[:first_name], params[:email]).first
     if user
       user.generate_new_password
       flash[:notice] = 'Een nieuw wachtwoord is naar het opgegeven emailadres verstuurd.'

@@ -56,4 +56,7 @@ pdm run ansible-playbook -i inventory.yaml playbook.yaml --check --diff
 # TODO
 
 - Fix `ApplicationController#validate_author`: its `return redirect_to` only exits the helper, so callers still mutate data and then double-render.
-- Delete `src/app/controllers/application.rb`: it is a stale Rails-1.x-era duplicate of `ApplicationController` shadowed by `application_controller.rb`.
+- Adopt Rails 3.1 `has_secure_password` in the `User` model to replace the hand-rolled password hashing with bcrypt.
+- Enable the Rails 3.1 asset pipeline: move `public/stylesheets/*` and `public/javascripts/*` (incl. TinyMCE vendor tree) into `app/assets/` and drop `config.assets.enabled = false`.
+- Run the application in the Amsterdam timezone (`config.time_zone = 'Amsterdam'`) instead of UTC.
+- Run the application with the `nl` locale (`config.i18n.default_locale = :nl`) and add a `nl.yml` translations file.

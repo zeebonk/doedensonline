@@ -31,7 +31,7 @@ class NewsController < ApplicationController
       flash[:notice] = 'Nieuwtje succesvol toegevoegd.'
       targets = User.find_all_by_notify_news(true)
       for target in targets
-      	Mailer.deliver_notify_new_news(target.email, @news_item, current_user) if target != current_user
+      	Mailer.notify_new_news(target.email, @news_item, current_user).deliver if target != current_user
       end
       redirect_to :action => 'index'
     else
@@ -112,7 +112,7 @@ class NewsController < ApplicationController
       flash[:error] = 'Op gegeven nieuwtje om te bekijken bestaat niet!'
       redirect_to :action => 'index'
     else
-      @news_comments = NewsComment.find :all, :conditions => ["news_item_id = ?", @news_item.id], :order => 'created_at ASC'
+      @news_comments = NewsComment.where("news_item_id = ?", @news_item.id).order('created_at ASC').all
     end
   end
  

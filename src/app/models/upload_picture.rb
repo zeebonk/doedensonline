@@ -39,7 +39,7 @@ private
   def draw_picture_in_canvas width, height
 
   	# Create a new image with the size of the box and a white background
-    canvas = MiniMagick::Image.open "#{RAILS_ROOT}/public/images/temp.bmp"
+    canvas = MiniMagick::Image.open "#{Rails.root}/public/images/temp.bmp"
     canvas.resize "#{width}x#{height}!"
 
     # Create thumb to fit the dimensions

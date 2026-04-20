@@ -7,7 +7,7 @@ class UsersController < ApplicationController
 
   # GET /users
   def index
-    @users = User.find(:all)
+    @users = User.all
   end
 
   # GET /users/1

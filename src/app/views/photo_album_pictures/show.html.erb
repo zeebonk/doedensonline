@@ -6,7 +6,7 @@
   <%= render(:partial => 'pictures_list', :locals => {:album_id => @photo_album.id, :pictures => @photo_album.photo_album_pictures}) %>
 </div>
 
-<% form_for(@photo_album_picture, :html => { :multipart => true }) do |f| %>
+<%= form_for(@photo_album_picture, :html => { :multipart => true }) do |f| %>
   <%= f.error_messages %>
   <p>
     <%= f.label :filename %><br />

@@ -6,7 +6,7 @@
 
 <p style="color: green"><%= flash[:settings] %></p>
 
-<% form_for @user, :url => { :action => "update_notifications" } do |f| %>
+<%= form_for @user, :url => { :action => "update_notifications" } do |f| %>
   <%= f.error_messages %>
   <p>
     <%= f.label :notify_news, "Mail bij nieuwe nieuwtjes" %><br />

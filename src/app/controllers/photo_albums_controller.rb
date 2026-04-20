@@ -21,7 +21,7 @@ class PhotoAlbumsController < ApplicationController
     @current_user = current_user;
   	@page_title = ["Fotoalbum bekijken", "Fotoalbums"]
     @photo_album = PhotoAlbum.find(params[:id])
-		@photo_album_comments = PhotoAlbumComment.find :all, :conditions => ["photo_album_id = ?", @photo_album.id], :order => 'created_at ASC'
+		@photo_album_comments = PhotoAlbumComment.where("photo_album_id = ?", @photo_album.id).order('created_at ASC').all
   end
 
 	

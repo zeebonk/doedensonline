@@ -402,3 +402,40 @@ div.reaction div.balloon-actions
 {
   clear: both;
 }
+
+.field_with_errors
+{
+  display: inline;
+}
+
+.field_with_errors label
+{
+  color: #c00;
+}
+
+#errorExplanation
+{
+  font-size: 12px;
+  color: #c00;
+  margin-bottom: 20px;
+}
+
+#errorExplanation h2
+{
+  font-size: 12px;
+  font-weight: bold;
+  color: #c00;
+  margin: 0 0 5px 0;
+}
+
+#content #errorExplanation ul
+{
+  list-style: disc;
+  padding-left: 20px;
+  margin: 0;
+}
+
+#content #errorExplanation ul li
+{
+  display: list-item;
+}

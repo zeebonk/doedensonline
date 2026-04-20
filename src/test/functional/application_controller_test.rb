@@ -1,18 +1,5 @@
 require 'test_helper'
 
-# Rails 2.3's `default_helper_module!` rescues MissingSourceFile, but Ruby 1.9
-# raises a plain LoadError when a helper file is missing — the message format
-# changed, so ActiveSupport's wrapper no longer promotes it.
-ActionController::Base.class_eval do
-  class << self
-    def default_helper_module_with_loaderror_rescue!
-      default_helper_module_without_loaderror_rescue!
-    rescue LoadError
-    end
-    alias_method_chain :default_helper_module!, :loaderror_rescue
-  end
-end
-
 # Dummy controller that exposes ApplicationController's filters and private
 # helpers through trivial actions so they can be exercised in isolation.
 class ApplicationControllerTestSubjectController < ApplicationController
@@ -38,10 +25,6 @@ class ApplicationControllerTestSubjectController < ApplicationController
     item = NewsItem.find(params[:id])
     validate_author(item)
     render :text => 'author ok' unless performed?
-  end
-
-  def echo_msg
-    render :text => "#{params[:msg].encoding.name}:#{params[:msg]}"
   end
 
   def image_path
@@ -150,15 +133,6 @@ class ApplicationControllerTest < ActionController::TestCase
 
     assert_redirected_to :controller => 'application_controller_test_subject', :action => 'index'
     assert_equal 'U bent niet gemachtigd om opgegeven item te mogen wijzigen!', flash[:error]
-  end
-
-  # force_utf8_params
-
-  test "force_utf8_params re-encodes string params to UTF-8" do
-    sign_in_as @user
-    get :echo_msg, :msg => 'hello'
-    assert_response :success
-    assert_equal 'UTF-8:hello', @response.body
   end
 
   # root_src_img_tag

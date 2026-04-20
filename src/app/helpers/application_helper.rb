@@ -1,4 +1,3 @@
-# Methods added to this helper will be available to all templates in the application.
 module ApplicationHelper
   def controller_stylesheet_link_tag
     name = controller.controller_name

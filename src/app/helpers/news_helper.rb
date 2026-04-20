@@ -1,15 +1,16 @@
+# encoding: utf-8
 module NewsHelper
   def page_navigation
     output = "<ul class='page-navigation'>"
-    
+
     output << "<li>"
     if @page == 1
-      output << "&laquo; nieuwer"
+      output << "« nieuwer"
     else
-      output << link_to("&laquo; nieuwer", {:action => 'page', :page_number => (@page - 1)}, :title => 'Ga een pagina verder')
+      output << link_to("« nieuwer", {:action => 'page', :page_number => (@page - 1)}, :title => 'Ga een pagina verder')
     end
     output << "</li>"
-    
+
     1.upto(@pages) { |i|
       output << "<li>"
       if @page == i
@@ -22,13 +23,13 @@ module NewsHelper
 
     output << "<li>"
     if @page == @pages
-      output << "ouder &raquo;"
+      output << "ouder »"
     else
-      output << link_to("ouder &raquo;", {:action => 'page', :page_number => (@page + 1)}, :title => 'Ga een pagina terug')
+      output << link_to("ouder »", {:action => 'page', :page_number => (@page + 1)}, :title => 'Ga een pagina terug')
     end
     output << "</li>"
-    
+
     output << "</ul>"
-    output
+    output.html_safe
   end
 end

@@ -58,10 +58,10 @@ class SettingsController < ApplicationController
     # Try to authenticate the username and old password
     if User.authenticate(@user.first_name, params[:old_password])
       if params[:password].to_s.size < 3
-        @user.errors.add_to_base "Nieuw wachtwoord moet uit minimaal 3 tekens bestaan"
+        @user.errors.add(:base, "Nieuw wachtwoord moet uit minimaal 3 tekens bestaan")
       end
       if params[:password] != params[:password_confirmation]
-        @user.errors.add_to_base "Nieuw wachtwoord en confirmatie zijn niet aan elkaar gelijk"
+        @user.errors.add(:base, "Nieuw wachtwoord en confirmatie zijn niet aan elkaar gelijk")
       end
       if @user.errors.size == 0 && @user.update_attribute(:password, params[:password])
         flash[:settings] = 'Uw wachtwoord is succesvol gewijzigd.'
@@ -71,7 +71,7 @@ class SettingsController < ApplicationController
       end
     else
       # Authentication failed fo the old password
-      @user.errors.add_to_base "Huidig wachtwoord in incorrect"
+      @user.errors.add(:base, "Huidig wachtwoord in incorrect")
       render :action => "password"      
     end
   end
