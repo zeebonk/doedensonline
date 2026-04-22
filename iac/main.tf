@@ -97,6 +97,19 @@ module "ecr_read_only_policy" {
   policy = data.aws_iam_policy_document.ecr_read_only_policy_document.json
 }
 
+resource "aws_iam_user" "doedensonline_dev" {
+  name = "doedensonline-dev"
+}
+
+resource "aws_iam_user_policy_attachment" "doedensonline_dev_ecr_read_only" {
+  user       = aws_iam_user.doedensonline_dev.name
+  policy_arn = module.ecr_read_only_policy.arn
+}
+
+resource "aws_iam_access_key" "doedensonline_dev" {
+  user = aws_iam_user.doedensonline_dev.name
+}
+
 moved {
   from = module.iam_assumable_role_webserver
   to   = module.iam_role_webserver
@@ -204,6 +217,8 @@ resource "local_file" "inventory" {
           "smtp_host" : "email-smtp.${local.region}.amazonaws.com",
           "smtp_username" : module.iam_user_doedensonline_ses.access_key_id,
           "smtp_password" : module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4,
+          "ecr_access_key_id" : aws_iam_access_key.doedensonline_dev.id,
+          "ecr_secret_access_key" : aws_iam_access_key.doedensonline_dev.secret,
         },
       }
     },
