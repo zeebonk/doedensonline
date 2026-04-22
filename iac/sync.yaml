@@ -1,5 +1,5 @@
 - name: Ensure local state is synced upstream
-  hosts: webservers
+  hosts: "{{ target | mandatory }}"
   tasks:
 
    - name: Copy all images

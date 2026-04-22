@@ -5,17 +5,34 @@ terraform {
     region  = "eu-west-1"
     profile = "doedensonline"
   }
+
+  required_providers {
+    hcloud = {
+      source  = "hetznercloud/hcloud"
+      version = "~> 1.60"
+    }
+  }
 }
 
 locals {
-  region            = "eu-west-1"
-  availability_zone = "eu-west-1a"
-  domain            = "doedensonline.nl"
+  region                  = "eu-west-1"
+  availability_zone       = "eu-west-1a"
+  domain                  = "doedensonline.nl"
+  gijs_macbook_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhQZ/xpYhLpKddmIe0X3Cpi2YXXze/PqVYxMBn0+zmd7mVwI5Ki9eS9pA7AVsEpdKQDg4SV941xoVcJ9Jpe+ua0aKlSEJjBfgxH6V0zRSV5cN776uA3c37BAwaL9KzweHL0O4u79+JkAB+ergrDHpDz2WNpVKPgTJe0FzH7r4NT02zrbHMJVDX9gZlQwUNKLdJLpHrbuks2kjFzOuF3nMAqpPqgMM4EtZWhMgJ++2i4/m6Kub4F+mJxJpB2r3kYHO7vkaxWMp4Uhb/S8Y50KXVThkoZftFTXYex4zFRCuT8GiROZuzy9CirRdWA/TWWTz0n47KPzwYzkVKrzWfYLEJ gijs@gbox.local"
 }
 
 provider "aws" {
   region  = local.region
   profile = "doedensonline"
+}
+
+variable "hcloud_token" {
+  type      = string
+  sensitive = true
+}
+
+provider "hcloud" {
+  token = var.hcloud_token
 }
 
 resource "aws_default_subnet" "doedensonline" {
@@ -45,7 +62,7 @@ module "key_pair_gijs_macbook" {
   source = "terraform-aws-modules/key-pair/aws"
 
   key_name   = "gijs-macbook"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhQZ/xpYhLpKddmIe0X3Cpi2YXXze/PqVYxMBn0+zmd7mVwI5Ki9eS9pA7AVsEpdKQDg4SV941xoVcJ9Jpe+ua0aKlSEJjBfgxH6V0zRSV5cN776uA3c37BAwaL9KzweHL0O4u79+JkAB+ergrDHpDz2WNpVKPgTJe0FzH7r4NT02zrbHMJVDX9gZlQwUNKLdJLpHrbuks2kjFzOuF3nMAqpPqgMM4EtZWhMgJ++2i4/m6Kub4F+mJxJpB2r3kYHO7vkaxWMp4Uhb/S8Y50KXVThkoZftFTXYex4zFRCuT8GiROZuzy9CirRdWA/TWWTz0n47KPzwYzkVKrzWfYLEJ gijs@gbox.local"
+  public_key = local.gijs_macbook_public_key
 }
 
 resource "aws_ebs_volume" "persistent" {
@@ -168,7 +185,7 @@ resource "aws_eip" "doedensonline" {
 
 resource "local_file" "inventory" {
   content = yamlencode({
-    "webservers" : {
+    "prod" : {
       "hosts" : {
         "main" : {
           "ansible_host" : aws_eip.doedensonline.public_ip,
@@ -176,11 +193,69 @@ resource "local_file" "inventory" {
           "smtp_host" : "email-smtp.${local.region}.amazonaws.com",
           "smtp_username" : module.iam_user_doedensonline_ses.access_key_id,
           "smtp_password" : module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4,
-        }
+        },
       }
-    }
+    },
+    "dev" : {
+      "hosts" : {
+        "main" : {
+          "ansible_host" : hcloud_server.doedensonline.ipv4_address,
+          "ansible_user" : "root",
+          "smtp_host" : "email-smtp.${local.region}.amazonaws.com",
+          "smtp_username" : module.iam_user_doedensonline_ses.access_key_id,
+          "smtp_password" : module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4,
+        },
+      }
+    },
   })
   filename = "${path.module}/inventory.yaml"
+}
+
+
+# Hetzner
+
+resource "hcloud_ssh_key" "gijs_macbook" {
+  name       = "gijs-macbook"
+  public_key = local.gijs_macbook_public_key
+}
+
+resource "hcloud_server" "doedensonline" {
+  name        = "doedensonline"
+  server_type = "cx23"
+  image       = "ubuntu-24.04"
+  location    = "fsn1"
+  backups     = true
+  ssh_keys    = [hcloud_ssh_key.gijs_macbook.id]
+}
+
+resource "hcloud_firewall" "doedensonline" {
+  name = "doedensonline"
+
+  rule {
+    direction  = "in"
+    protocol   = "tcp"
+    port       = "22"
+    source_ips = ["0.0.0.0/0"]
+  }
+
+  rule {
+    direction  = "in"
+    protocol   = "tcp"
+    port       = "80"
+    source_ips = ["0.0.0.0/0"]
+  }
+
+  rule {
+    direction  = "in"
+    protocol   = "tcp"
+    port       = "443"
+    source_ips = ["0.0.0.0/0"]
+  }
+}
+
+resource "hcloud_firewall_attachment" "doedensonline" {
+  firewall_id = hcloud_firewall.doedensonline.id
+  server_ids  = [hcloud_server.doedensonline.id]
 }
 
 
@@ -193,9 +268,9 @@ resource "aws_ses_domain_identity" "doedensonline" {
 module "iam_user_doedensonline_ses" {
   source = "terraform-aws-modules/iam/aws//modules/iam-user"
 
-  name                          = "doedensonline-ses"
-  create_login_profile = false
-  password_reset_required       = false
+  name                    = "doedensonline-ses"
+  create_login_profile    = false
+  password_reset_required = false
 }
 
 resource "aws_iam_user_policy" "allow_ses_sending" {
@@ -223,10 +298,10 @@ resource "aws_ses_domain_dkim" "doedensonline" {
 resource "aws_route53_record" "doedensonline_dkim_record" {
   for_each = toset(aws_ses_domain_dkim.doedensonline.dkim_tokens)
   zone_id  = aws_route53_zone.doedensonline.zone_id
-  name = "${each.key}._domainkey"
-  type = "CNAME"
-  ttl  = "60"
-  records = ["${each.key}.dkim.amazonses.com"]
+  name     = "${each.key}._domainkey"
+  type     = "CNAME"
+  ttl      = "60"
+  records  = ["${each.key}.dkim.amazonses.com"]
 }
 
 resource "aws_route53_record" "doedensonline_amazonses_verification_record" {
@@ -269,7 +344,7 @@ data "aws_iam_policy_document" "dlm_lifecycle" {
 
   statement {
     actions = [
-       "ec2:CreateTags",
+      "ec2:CreateTags",
     ]
     resources = ["arn:aws:ec2:*::snapshot/*"]
   }
@@ -323,12 +398,12 @@ resource "aws_dlm_lifecycle_policy" "doedensonline" {
       name = "3 months of daily snapshots"
 
       create_rule {
-        interval = "24"
+        interval      = "24"
         interval_unit = "HOURS"
       }
 
       retain_rule {
-        interval = "3"
+        interval      = "3"
         interval_unit = "MONTHS"
       }
 
@@ -343,7 +418,12 @@ resource "aws_dlm_lifecycle_policy" "doedensonline" {
 
 # Outputs
 
-output "ip" {
-  description = "public ip"
+output "prod_ip" {
+  description = "Prod server public IPv4"
   value       = aws_eip.doedensonline.public_ip
+}
+
+output "dev_ip" {
+  description = "Dev server public IPv4"
+  value       = hcloud_server.doedensonline.ipv4_address
 }

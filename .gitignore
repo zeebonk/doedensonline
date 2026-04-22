@@ -1,5 +1,6 @@
 .terraform
 inventory.yaml
+iac/terraform.tfvars
 designs/
 src/public/images/large/
 src/public/images/medium/

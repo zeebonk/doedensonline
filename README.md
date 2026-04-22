@@ -19,10 +19,20 @@ docker compose run --rm -e RAILS_ENV=test app rake test
 ```
 
 
-## Setup AWS infrastructure
+## Setup infrastructure
+
+Copy the Terraform variables template and paste your Hetzner Cloud API token
+(from the Hetzner Cloud console under Security → API Tokens, read-write scope):
 
 ```
 cd iac
+cp terraform.tfvars.example terraform.tfvars
+# edit terraform.tfvars and set hcloud_token
+```
+
+Then apply:
+
+```
 tofu init
 tofu apply
 ```
