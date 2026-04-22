@@ -9,21 +9,23 @@ http {
         return 301 https://$host$request_uri;
     }
 
+{% for extra in extra_domains %}
     server {
         listen 443 ssl http2;
-        server_name www.doedensonline.nl;
+        server_name {{ extra }};
 
         ssl_certificate "/app/doedensonline-certificate.pem";
         ssl_certificate_key "/app/doedensonline-certificate-key.pem";
         ssl_session_cache shared:SSL:1m; # holds approx 4000 sessions
         ssl_session_timeout 1h;
 
-        return 301 https://doedensonline.nl$request_uri;
+        return 301 https://{{ domain }}$request_uri;
     }
 
+{% endfor %}
     server {
         listen 443 ssl http2;
-        server_name doedensonline.nl;
+        server_name {{ domain }};
 
         ssl_certificate "/app/doedensonline-certificate.pem";
         ssl_certificate_key "/app/doedensonline-certificate-key.pem";
@@ -32,7 +34,7 @@ http {
 
         location / {
             proxy_pass_request_headers on;
-            proxy_set_header Host doedensonline.nl;
+            proxy_set_header Host {{ domain }};
             proxy_pass http://host.docker.internal:8080;
         }
     }
