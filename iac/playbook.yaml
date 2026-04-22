@@ -1,5 +1,5 @@
 - name: Ensure webservers are configured
-  hosts: webservers
+  hosts: prod
   tasks:
 
    - name: Ensure dependencies are installed
