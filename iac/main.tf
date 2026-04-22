@@ -199,8 +199,16 @@ resource "aws_eip" "doedensonline" {
 resource "local_file" "inventory" {
   content = yamlencode({
     "prod" : {
+      "vars" : {
+        "rails_env" : "production",
+        "domain" : "doedensonline.nl",
+        "extra_domains" : ["www.doedensonline.nl"],
+        "image_tag" : "1.0.4",
+        "app_state_path" : "/app-state",
+        "app_state_device" : "/dev/sdf",
+      },
       "hosts" : {
-        "main" : {
+        "prod-webserver" : {
           "ansible_host" : aws_eip.doedensonline.public_ip,
           "ansible_user" : "ec2-user",
           "smtp_host" : "email-smtp.${local.region}.amazonaws.com",
@@ -210,8 +218,15 @@ resource "local_file" "inventory" {
       }
     },
     "dev" : {
+      "vars" : {
+        "rails_env" : "development",
+        "domain" : "dev.doedensonline.nl",
+        "extra_domains" : [],
+        "image_tag" : "latest",
+        "app_state_path" : "/app-state/dev",
+      },
       "hosts" : {
-        "main" : {
+        "dev-webserver" : {
           "ansible_host" : hcloud_server.doedensonline.ipv4_address,
           "ansible_user" : "root",
           "smtp_host" : "email-smtp.${local.region}.amazonaws.com",
