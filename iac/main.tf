@@ -357,6 +357,14 @@ resource "aws_route53_record" "doedensonline" {
   records = [aws_eip.doedensonline.public_ip]
 }
 
+resource "aws_route53_record" "doedensonline_dev" {
+  zone_id = aws_route53_zone.doedensonline.zone_id
+  name    = "dev.${local.domain}"
+  type    = "A"
+  ttl     = 60
+  records = [hcloud_server.doedensonline.ipv4_address]
+}
+
 # Backup
 #
 data "aws_iam_policy_document" "dlm_lifecycle" {
