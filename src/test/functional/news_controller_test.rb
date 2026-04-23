@@ -12,7 +12,7 @@ class NewsControllerTest < ActionController::TestCase
     NewsItem.delete_all
     User.delete_all
 
-    @user = User.create!(
+    @user = create_user!(
       first_name: 'Alice',
       last_name: 'Anderson',
       email: 'alice@example.com',
@@ -20,7 +20,7 @@ class NewsControllerTest < ActionController::TestCase
       notify_news: false,
       isadmin: false
     )
-    @subscriber = User.create!(
+    @subscriber = create_user!(
       first_name: 'Bob',
       last_name: 'Brown',
       email: 'bob@example.com',

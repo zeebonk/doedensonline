@@ -7,7 +7,7 @@ class PhotoAlbumCommentsControllerTest < ActionController::TestCase
     PhotoAlbum.delete_all
     User.delete_all
 
-    @user = User.create!(
+    @user = create_user!(
       first_name: 'Alice',
       last_name: 'Anderson',
       email: 'alice@example.com',
@@ -101,7 +101,7 @@ class PhotoAlbumCommentsControllerTest < ActionController::TestCase
   # PUT /photo_album_comments (update)
 
   test "update saves valid changes" do
-    post :update, photo_album_comment: { id: @comment.id, message: 'Updated' }
+    put :update, id: @comment.id, photo_album_comment: { message: 'Updated' }
 
     assert_redirected_to controller: 'photo_albums', action: 'show', id: @photo_album.id
     assert_equal 'Uw reactie is succesvol aangepast.', flash[:notice]
@@ -109,7 +109,7 @@ class PhotoAlbumCommentsControllerTest < ActionController::TestCase
   end
 
   test "update re-renders edit on validation failure" do
-    post :update, photo_album_comment: { id: @comment.id, message: '' }
+    put :update, id: @comment.id, photo_album_comment: { message: '' }
 
     assert_response :success
     assert_template 'edit'
@@ -117,7 +117,7 @@ class PhotoAlbumCommentsControllerTest < ActionController::TestCase
   end
 
   test "update redirects when comment does not exist" do
-    post :update, photo_album_comment: { id: 999_999, message: 'x' }
+    put :update, id: 999_999, photo_album_comment: { message: 'x' }
 
     assert_redirected_to controller: 'photo_albums', action: 'index'
     assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]

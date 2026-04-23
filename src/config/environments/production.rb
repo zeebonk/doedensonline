@@ -22,4 +22,6 @@ DoedensOnline::Application.configure do
   config.action_mailer.default_url_options = { host: 'doedensonline.nl' }
 
   config.active_support.deprecation = :notify
+
+  config.active_record.mass_assignment_sanitizer = :strict
 end

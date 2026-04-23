@@ -1,4 +1,6 @@
 class PhotoAlbum < ActiveRecord::Base
+  attr_accessible :title, :description, :preview_picture, :user_id
+
   validates_presence_of :title, :description, :preview_picture
   belongs_to :user
   has_many :photo_album_pictures

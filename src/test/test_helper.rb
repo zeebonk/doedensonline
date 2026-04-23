@@ -6,4 +6,8 @@ class ActiveSupport::TestCase
   self.use_transactional_fixtures = true
   self.use_instantiated_fixtures  = false
   fixtures :all
+
+  def create_user!(attrs)
+    User.create!(attrs, as: :admin)
+  end
 end

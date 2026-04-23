@@ -25,7 +25,7 @@ class UsersController < ApplicationController
 
   # POST /users
   def create
-    @user = User.new(params[:user])
+    @user = User.new(params[:user], as: :admin)
 
     if @user.save
       flash[:notice] = t('flash.users.created')
@@ -39,7 +39,7 @@ class UsersController < ApplicationController
   def update
     @user = User.find(params[:id])
 
-    if @user.update_attributes(params[:user])
+    if @user.update_attributes(params[:user], as: :admin)
       flash[:notice] = t('flash.users.updated')
       redirect_to(@user)
     else
