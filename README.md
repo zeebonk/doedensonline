@@ -55,13 +55,13 @@ group via `-e target=<group>`.
 
 ```
 cd iac
-pdm install
-pdm run ansible-playbook -i inventory.yaml playbook.yaml -e target=prod
-pdm run ansible-playbook -i inventory.yaml playbook.yaml -e target=dev
+uv sync
+uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=prod
+uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=dev
 ```
 
 To dry-run and preview changes:
 
 ```
-pdm run ansible-playbook -i inventory.yaml playbook.yaml --check --diff -e target=prod
+uv run ansible-playbook -i inventory.yaml playbook.yaml --check --diff -e target=prod
 ```
