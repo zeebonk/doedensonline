@@ -19,6 +19,20 @@ docker compose run --rm -e RAILS_ENV=test app rake test
 ```
 
 
+## Run RuboCop
+
+```
+cd src
+docker compose run --rm app bundle exec rubocop
+```
+
+To auto-correct fixable offences:
+
+```
+docker compose run --rm app bundle exec rubocop --auto-correct
+```
+
+
 ## Setup infrastructure
 
 Copy the Terraform variables template and paste your Hetzner Cloud API token

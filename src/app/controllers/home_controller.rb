@@ -1,10 +1,9 @@
 class HomeController < ApplicationController
-
-  before_filter :redirect_to_home_if_signed_in, :only => [:sign_in, :authenticate, :password_forgotten, :reset_password]
+  before_filter :redirect_to_home_if_signed_in, only: [:sign_in, :authenticate, :password_forgotten, :reset_password]
 
   # GET /home
   def index
-    @news_items = NewsItem.latest(3,0)
+    @news_items = NewsItem.latest(3, 0)
   end
 
   # GET /home/sign_in
@@ -22,11 +21,11 @@ class HomeController < ApplicationController
       if req
         redirect_to req
       else
-        redirect_to :action => 'index'
+        redirect_to action: 'index'
       end
     else
       flash[:error] = t('flash.home.invalid_credentials')
-      redirect_to :action => 'sign_in'
+      redirect_to action: 'sign_in'
     end
   end
 
@@ -39,9 +38,9 @@ class HomeController < ApplicationController
     if params[:commit] == t('home.sign_out.confirm')
       session[:user_id] = nil
       flash[:notice] = t('flash.home.signed_out')
-      redirect_to :action => 'sign_in'
+      redirect_to action: 'sign_in'
     else
-      redirect_to :action => 'index'
+      redirect_to action: 'index'
     end
   end
 
@@ -55,11 +54,10 @@ class HomeController < ApplicationController
     if user
       user.generate_new_password
       flash[:notice] = t('flash.home.password_reset_sent')
-      redirect_to :action => 'sign_in'
+      redirect_to action: 'sign_in'
     else
       flash[:error] = t('flash.home.invalid_credentials')
-      redirect_to :action => 'password_forgotten'
+      redirect_to action: 'password_forgotten'
     end
   end
-
 end

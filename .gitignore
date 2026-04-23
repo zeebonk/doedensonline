@@ -14,3 +14,4 @@ src/passenger.*.pid
 src/passenger.*.pid.lock
 src/core
 src/core.*
+.claude/

@@ -1,35 +1,30 @@
 class User < ActiveRecord::Base
-
-  validates_length_of :password, :minimum => 4
-  validates_length_of :first_name, :minimum => 3
-  validates_length_of :last_name, :minimum => 3
-  validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+  validates_length_of :password, minimum: 4
+  validates_length_of :first_name, minimum: 3
+  validates_length_of :last_name, minimum: 3
+  validates_format_of :email, with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
 
   # Password setter
-  def password=pwd
+  def password=(pwd)
     # Make sure password isn't blank
-    if pwd.blank?
-      self[:password] = nil
-    else
-      self[:password] = User.encrypted_password(pwd)
-    end
+    self[:password] = if pwd.blank?
+                        nil
+                      else
+                        User.encrypted_password(pwd)
+                      end
   end
 
   # Method to authenticate a user
   def self.authenticate(first_name, password)
-
     # Search for a user with given username, case insensetive
     users = where("lower(first_name) = ?", first_name.downcase).all
 
     # Check if given password and user password are not the same
     for user in users do
-      if user.password == encrypted_password(password)
-        return user
-      end
+      return user if user.password == encrypted_password(password)
     end
 
-    return nil
-
+    nil
   end
 
   def generate_new_password
@@ -41,7 +36,7 @@ class User < ActiveRecord::Base
     Mailer.password_forgotten(self, new_password).deliver
   end
 
-private
+  private
 
   # Method to create an hash for a password and salt combination
   def self.encrypted_password(password)
@@ -50,5 +45,4 @@ private
     # Create and return SHA1 hash for string
     Digest::SHA1.hexdigest(string_to_hash)
   end
-
 end

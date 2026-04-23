@@ -5,7 +5,7 @@ class UploadPictureTest < ActiveSupport::TestCase
 
   def teardown
     return unless @uploader
-    %w[large medium small].each do |size|
+    %w(large medium small).each do |size|
       path = Rails.root.join('public', 'images', size, @uploader.filename)
       File.delete(path) if File.exist?(path)
     end
@@ -21,9 +21,9 @@ class UploadPictureTest < ActiveSupport::TestCase
     refute tempfile.binmode?, 'sanity check: tempfile should not start in binmode'
 
     upload = ActionDispatch::Http::UploadedFile.new(
-      :tempfile => tempfile,
-      :filename => 'sample.jpg',
-      :type     => 'image/jpeg'
+      tempfile: tempfile,
+      filename: 'sample.jpg',
+      type: 'image/jpeg'
     )
 
     @uploader = UploadPicture.new(upload)
@@ -31,7 +31,7 @@ class UploadPictureTest < ActiveSupport::TestCase
     @uploader.create_medium_image
     @uploader.create_small_image
 
-    %w[large medium small].each do |size|
+    %w(large medium small).each do |size|
       path = Rails.root.join('public', 'images', size, @uploader.filename)
       assert File.exist?(path), "expected #{size} variant to be written to #{path}"
     end

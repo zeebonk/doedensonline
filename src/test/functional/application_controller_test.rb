@@ -4,31 +4,31 @@ require 'test_helper'
 # helpers through trivial actions so they can be exercised in isolation.
 class ApplicationControllerTestSubjectController < ApplicationController
   def index
-    render :text => 'index ok'
+    render text: 'index ok'
   end
 
   def current_user_name
-    render :text => current_user.first_name
+    render text: current_user.first_name
   end
 
   def admin_only
     return_to_home_if_user_not_admin
-    render :text => 'admin ok' unless performed?
+    render text: 'admin ok' unless performed?
   end
 
   def home_if_signed_in
     return if redirect_to_home_if_signed_in
-    render :text => 'not signed in'
+    render text: 'not signed in'
   end
 
   def author_only
     item = NewsItem.find(params[:id])
     return unless user_is_author(item)
-    render :text => 'author ok'
+    render text: 'author ok'
   end
 
   def image_path
-    render :text => root_src_img_tag(params[:input])
+    render text: root_src_img_tag(params[:input])
   end
 end
 
@@ -39,20 +39,20 @@ class ApplicationControllerTest < ActionController::TestCase
     NewsItem.delete_all
     User.delete_all
     @user = User.create!(
-      :first_name  => 'Alice',
-      :last_name   => 'Anderson',
-      :email       => 'alice@example.com',
-      :password    => 'secret',
-      :notify_news => false,
-      :isadmin     => false
+      first_name: 'Alice',
+      last_name: 'Anderson',
+      email: 'alice@example.com',
+      password: 'secret',
+      notify_news: false,
+      isadmin: false
     )
     @admin = User.create!(
-      :first_name  => 'Admin',
-      :last_name   => 'User',
-      :email       => 'admin@example.com',
-      :password    => 'secret',
-      :notify_news => false,
-      :isadmin     => true
+      first_name: 'Admin',
+      last_name: 'User',
+      email: 'admin@example.com',
+      password: 'secret',
+      notify_news: false,
+      isadmin: true
     )
   end
 
@@ -64,7 +64,7 @@ class ApplicationControllerTest < ActionController::TestCase
 
   test "is_authorized redirects unauthenticated request to sign_in" do
     get :index
-    assert_redirected_to :controller => 'home', :action => 'sign_in'
+    assert_redirected_to controller: 'home', action: 'sign_in'
   end
 
   test "is_authorized stores the original request path in the session" do
@@ -100,7 +100,7 @@ class ApplicationControllerTest < ActionController::TestCase
   test "return_to_home_if_user_not_admin redirects non-admins to home index" do
     sign_in_as @user
     get :admin_only
-    assert_redirected_to :controller => 'home', :action => 'index'
+    assert_redirected_to controller: 'home', action: 'index'
     assert_equal 'Only admins allowed there', flash[:notice]
   end
 
@@ -109,7 +109,7 @@ class ApplicationControllerTest < ActionController::TestCase
   test "redirect_to_home_if_signed_in redirects signed-in users to home index" do
     sign_in_as @user
     get :home_if_signed_in
-    assert_redirected_to :controller => 'home', :action => 'index'
+    assert_redirected_to controller: 'home', action: 'index'
     assert_equal 'You are already signed in', flash[:notice]
   end
 
@@ -117,9 +117,9 @@ class ApplicationControllerTest < ActionController::TestCase
 
   test "user_is_author lets the author continue" do
     sign_in_as @user
-    news_item = NewsItem.create!(:message => 'hi', :user_id => @user.id)
+    news_item = NewsItem.create!(message: 'hi', user_id: @user.id)
 
-    get :author_only, :id => news_item.id
+    get :author_only, id: news_item.id
 
     assert_response :success
     assert_equal 'author ok', @response.body
@@ -127,11 +127,11 @@ class ApplicationControllerTest < ActionController::TestCase
 
   test "user_is_author redirects non-author with an error flash" do
     sign_in_as @user
-    news_item = NewsItem.create!(:message => 'hi', :user_id => @admin.id)
+    news_item = NewsItem.create!(message: 'hi', user_id: @admin.id)
 
-    get :author_only, :id => news_item.id
+    get :author_only, id: news_item.id
 
-    assert_redirected_to :controller => 'application_controller_test_subject', :action => 'index'
+    assert_redirected_to controller: 'application_controller_test_subject', action: 'index'
     assert_equal 'U bent niet gemachtigd om opgegeven item te mogen wijzigen!', flash[:error]
   end
 
@@ -139,13 +139,13 @@ class ApplicationControllerTest < ActionController::TestCase
 
   test "root_src_img_tag rewrites ../../ prefix to /" do
     sign_in_as @user
-    get :image_path, :input => '../../images/foo.png'
+    get :image_path, input: '../../images/foo.png'
     assert_equal '/images/foo.png', @response.body
   end
 
   test "root_src_img_tag rewrites ../ prefix to /" do
     sign_in_as @user
-    get :image_path, :input => '../images/foo.png'
+    get :image_path, input: '../images/foo.png'
     assert_equal '/images/foo.png', @response.body
   end
 end
