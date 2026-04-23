@@ -16,9 +16,6 @@ module DoedensOnline
 
     config.assets.enabled = true
     config.assets.precompile += %w(
-      home.css
-      photo_albums.css
-      settings.css
       scaffold.css
     )
   end
