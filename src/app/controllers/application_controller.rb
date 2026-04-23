@@ -6,21 +6,21 @@ class ApplicationController < ActionController::Base
 
   layout 'default'
 
-private
+  private
 
   def root_src_img_tag(input)
     input = input.gsub('../../', '/')
     input = input.gsub('../', '/')
-    return input
+    input
   end
 
-  def create_images image
+  def create_images(image)
     image.create_large_image
     image.create_medium_image
     image.create_small_image
   end
 
-  def remove_images filename
+  def remove_images(filename)
     FileUtils.remove_file "#{Rails.root}/public/images/small/#{filename}", true
     FileUtils.remove_file "#{Rails.root}/public/images/medium/#{filename}", true
     FileUtils.remove_file "#{Rails.root}/public/images/large/#{filename}", true
@@ -33,9 +33,9 @@ private
                 action_name == 'reset_password'
     end
 
-    if !session[:user_id]
+    unless session[:user_id]
       session[:request] = request.fullpath
-      redirect_to :controller => 'home', :action => 'sign_in'
+      redirect_to controller: 'home', action: 'sign_in'
     end
   end
 
@@ -43,7 +43,7 @@ private
     if session[:user_id]
       flash[:notice] = t('flash.application.already_signed_in')
       params[:request] = request.fullpath
-      redirect_to :controller => 'home', :action => 'index'
+      redirect_to controller: 'home', action: 'index'
     end
   end
 
@@ -52,19 +52,18 @@ private
   end
 
   def return_to_home_if_user_not_admin
-    if !current_user.isadmin
+    unless current_user.isadmin
       flash[:notice] = t('flash.application.admins_only')
-      redirect_to :controller => 'home', :action => 'index'
+      redirect_to controller: 'home', action: 'index'
     end
   end
 
-  def user_is_author item
+  def user_is_author(item)
     if item.user != current_user
       flash[:error] = t('flash.application.not_authorized')
-      redirect_to :action => 'index'
+      redirect_to action: 'index'
       return false
     end
     true
   end
-
 end

@@ -1,59 +1,50 @@
 class PhotoAlbumPicturesController < ApplicationController
-
   layout 'default'
-
 
   # GET /photo_album_pictures/1
   def show
     @page_title = [t('page_titles.albums_manage_pictures'), t('page_titles.albums_section')]
-  	@photo_album = PhotoAlbum.find(params[:id])
-  	@photo_album_picture = PhotoAlbumPicture.new  	
-  	@photo_album_picture.photo_album_id = @photo_album.id
+    @photo_album = PhotoAlbum.find(params[:id])
+    @photo_album_picture = PhotoAlbumPicture.new
+    @photo_album_picture.photo_album_id = @photo_album.id
   end
-
 
   # POST /photo_album_pictures
   def create
-  	@photo_album_picture = PhotoAlbumPicture.new(params[:photo_album_picture])
-    
+    @photo_album_picture = PhotoAlbumPicture.new(params[:photo_album_picture])
+
     # Picture upload
-    if params[:photo_album_picture][:filename] != nil
+    unless params[:photo_album_picture][:filename].nil?
       begin
         picture = UploadPicture.new params[:photo_album_picture][:filename]
         create_images picture
-        @photo_album_picture.filename  = picture.filename
+        @photo_album_picture.filename = picture.filename
       rescue
         @photo_album_picture.errors.add(:filename, t('flash.photo_albums_errors.unsupported_image'))
       end
-	end
-	
-	if @photo_album_picture.errors.empty? && @photo_album_picture.save
-      redirect_to :action => 'show', :id => @photo_album_picture.photo_album_id
+   end
+
+    if @photo_album_picture.errors.empty? && @photo_album_picture.save
+      redirect_to action: 'show', id: @photo_album_picture.photo_album_id
     else
-      @page_title = [t('page_titles.albums_manage_pictures'), t('page_titles.albums_section')]	
+      @page_title = [t('page_titles.albums_manage_pictures'), t('page_titles.albums_section')]
       @photo_album = @photo_album_picture.photo_album
-      render :action => 'show', :id => @photo_album_picture.photo_album_id
-    end
-  	
+      render action: 'show', id: @photo_album_picture.photo_album_id
+      end
   end
 
-  
   # POST /photo_album_pictures/destory_many
   def destroy_many
- 		
-  	@photo_album = PhotoAlbum.find_by_id params[:album]
-  	
+    @photo_album = PhotoAlbum.find_by_id params[:album]
+
     if params[:delete]
-	  for picture_id in params[:delete]
-	    picture = PhotoAlbumPicture.find(picture_id)
-	    remove_images picture.filename
+      for picture_id in params[:delete]
+        picture = PhotoAlbumPicture.find(picture_id)
+        remove_images picture.filename
         picture.destroy
-	  end		
+      end
     end
-	
-    redirect_to :action => 'show', :id => @photo_album.id
-    
+
+    redirect_to action: 'show', id: @photo_album.id
   end
-  
-  
 end

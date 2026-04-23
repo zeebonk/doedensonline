@@ -4,29 +4,29 @@ module NewsHelper
     output = "<ul class='page-navigation'>"
 
     output << "<li>"
-    if @page == 1
-      output << "« nieuwer"
-    else
-      output << link_to("« nieuwer", {:action => 'page', :page_number => (@page - 1)}, :title => 'Ga een pagina verder')
-    end
+    output << if @page == 1
+                "« nieuwer"
+              else
+                link_to("« nieuwer", { action: 'page', page_number: (@page - 1) }, title: 'Ga een pagina verder')
+              end
     output << "</li>"
 
-    1.upto(@pages) { |i|
+    1.upto(@pages) do |i|
       output << "<li>"
-      if @page == i
-        output << i.to_s
-      else
-        output << link_to(i, {:action => 'page', :page_number => i}, :title => "Ga naar pagina #{i}")
-      end
+      output << if @page == i
+                  i.to_s
+                else
+                  link_to(i, { action: 'page', page_number: i }, title: "Ga naar pagina #{i}")
+                end
       output << "</li>"
-    }
+    end
 
     output << "<li>"
-    if @page == @pages
-      output << "ouder »"
-    else
-      output << link_to("ouder »", {:action => 'page', :page_number => (@page + 1)}, :title => 'Ga een pagina terug')
-    end
+    output << if @page == @pages
+                "ouder »"
+              else
+                link_to("ouder »", { action: 'page', page_number: (@page + 1) }, title: 'Ga een pagina terug')
+              end
     output << "</li>"
 
     output << "</ul>"

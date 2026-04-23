@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class NewsControllerTest < ActionController::TestCase
-
   def setup
     ActionMailer::Base.delivery_method = :test
     ActionMailer::Base.perform_deliveries = true
@@ -14,22 +13,22 @@ class NewsControllerTest < ActionController::TestCase
     User.delete_all
 
     @user = User.create!(
-      :first_name  => 'Alice',
-      :last_name   => 'Anderson',
-      :email       => 'alice@example.com',
-      :password    => 'secret',
-      :notify_news => false,
-      :isadmin     => false
+      first_name: 'Alice',
+      last_name: 'Anderson',
+      email: 'alice@example.com',
+      password: 'secret',
+      notify_news: false,
+      isadmin: false
     )
     @subscriber = User.create!(
-      :first_name  => 'Bob',
-      :last_name   => 'Brown',
-      :email       => 'bob@example.com',
-      :password    => 'secret',
-      :notify_news => true,
-      :isadmin     => false
+      first_name: 'Bob',
+      last_name: 'Brown',
+      email: 'bob@example.com',
+      password: 'secret',
+      notify_news: true,
+      isadmin: false
     )
-    @news_item = NewsItem.create!(:message => 'Existing news', :user_id => @user.id)
+    @news_item = NewsItem.create!(message: 'Existing news', user_id: @user.id)
 
     sign_in_as @user
   end
@@ -43,7 +42,7 @@ class NewsControllerTest < ActionController::TestCase
   test "redirects to sign_in when not signed in" do
     @request.session[:user_id] = nil
     get :index
-    assert_redirected_to :controller => 'home', :action => 'sign_in'
+    assert_redirected_to controller: 'home', action: 'sign_in'
   end
 
   # GET /news
@@ -59,7 +58,7 @@ class NewsControllerTest < ActionController::TestCase
   # GET /news/page/:page_number
 
   test "page renders index with requested page" do
-    get :page, :page_number => '2'
+    get :page, page_number: '2'
     assert_response :success
     assert_template 'index'
     assert_equal 2, assigns(:page)
@@ -78,10 +77,10 @@ class NewsControllerTest < ActionController::TestCase
 
   test "create saves news_item and notifies subscribers" do
     assert_difference('NewsItem.count', 1) do
-      post :create, :news_item => { :message => 'Hello world' }
+      post :create, news_item: { message: 'Hello world' }
     end
 
-    assert_redirected_to :controller => 'news', :action => 'index'
+    assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Nieuwtje succesvol toegevoegd.', flash[:notice]
     assert_equal @user.id, assigns(:news_item).user_id
     assert_equal 1, ActionMailer::Base.deliveries.size
@@ -91,7 +90,7 @@ class NewsControllerTest < ActionController::TestCase
   test "create does not email the author even when they have notify_news" do
     @user.update_attribute(:notify_news, true)
 
-    post :create, :news_item => { :message => 'Hello again' }
+    post :create, news_item: { message: 'Hello again' }
 
     assert_equal 1, ActionMailer::Base.deliveries.size
     assert_equal ['bob@example.com'], ActionMailer::Base.deliveries.first.to
@@ -99,7 +98,7 @@ class NewsControllerTest < ActionController::TestCase
 
   test "create re-renders add on validation failure" do
     assert_no_difference('NewsItem.count') do
-      post :create, :news_item => { :message => '' }
+      post :create, news_item: { message: '' }
     end
 
     assert_response :success
@@ -111,29 +110,29 @@ class NewsControllerTest < ActionController::TestCase
   # GET /news/edit/:id
 
   test "edit renders form for author" do
-    get :edit, :id => @news_item.id
+    get :edit, id: @news_item.id
     assert_response :success
     assert_equal @news_item, assigns(:news_item)
   end
 
   test "edit redirects when news_item does not exist" do
-    get :edit, :id => 999999
-    assert_redirected_to :controller => 'news', :action => 'index'
+    get :edit, id: 999_999
+    assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
 
   # POST /news/update
 
   test "update saves valid changes" do
-    post :update, :news_item => { :id => @news_item.id, :message => 'Updated message' }
+    post :update, news_item: { id: @news_item.id, message: 'Updated message' }
 
-    assert_redirected_to :controller => 'news', :action => 'index'
+    assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Het nieuwtje is succesvol aangepast.', flash[:notice]
     assert_equal 'Updated message', @news_item.reload.message
   end
 
   test "update re-renders edit on validation failure" do
-    post :update, :news_item => { :id => @news_item.id, :message => '' }
+    post :update, news_item: { id: @news_item.id, message: '' }
 
     assert_response :success
     assert_template 'edit'
@@ -141,61 +140,61 @@ class NewsControllerTest < ActionController::TestCase
   end
 
   test "update redirects when news_item does not exist" do
-    post :update, :news_item => { :id => 999999, :message => 'anything' }
+    post :update, news_item: { id: 999_999, message: 'anything' }
 
-    assert_redirected_to :controller => 'news', :action => 'index'
+    assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
 
   # GET /news/remove/:id
 
   test "remove renders confirmation for author" do
-    get :remove, :id => @news_item.id
+    get :remove, id: @news_item.id
     assert_response :success
     assert_equal @news_item, assigns(:news_item)
   end
 
   test "remove redirects when news_item does not exist" do
-    get :remove, :id => 999999
-    assert_redirected_to :controller => 'news', :action => 'index'
+    get :remove, id: 999_999
+    assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
 
   # POST /news/destroy
 
   test "destroy deletes news_item and its comments" do
-    NewsComment.create!(:message => 'comment', :news_item_id => @news_item.id, :user_id => @user.id)
+    NewsComment.create!(message: 'comment', news_item_id: @news_item.id, user_id: @user.id)
 
     assert_difference('NewsItem.count', -1) do
       assert_difference('NewsComment.count', -1) do
-        post :destroy, :id => @news_item.id, :commit => 'Ja, verwijderen'
+        post :destroy, id: @news_item.id, commit: 'Ja, verwijderen'
       end
     end
 
-    assert_redirected_to :controller => 'news', :action => 'index'
+    assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Nieuwtje succesvol verwijderd.', flash[:notice]
   end
 
   test "destroy is a no-op when cancelled" do
     assert_no_difference('NewsItem.count') do
-      post :destroy, :id => @news_item.id, :commit => 'Nee, niet verwijderen'
+      post :destroy, id: @news_item.id, commit: 'Nee, niet verwijderen'
     end
 
-    assert_redirected_to :controller => 'news', :action => 'index'
+    assert_redirected_to controller: 'news', action: 'index'
   end
 
   test "destroy redirects when news_item does not exist" do
-    post :destroy, :id => 999999, :commit => 'Ja, verwijderen'
-    assert_redirected_to :controller => 'news', :action => 'index'
+    post :destroy, id: 999_999, commit: 'Ja, verwijderen'
+    assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
 
   # GET /news/view/:id
 
   test "view renders news_item with its comments" do
-    NewsComment.create!(:message => 'A comment', :news_item_id => @news_item.id, :user_id => @user.id)
+    NewsComment.create!(message: 'A comment', news_item_id: @news_item.id, user_id: @user.id)
 
-    get :view, :id => @news_item.id
+    get :view, id: @news_item.id
 
     assert_response :success
     assert_equal @news_item, assigns(:news_item)
@@ -203,15 +202,15 @@ class NewsControllerTest < ActionController::TestCase
   end
 
   test "view redirects when news_item does not exist" do
-    get :view, :id => 999999
-    assert_redirected_to :controller => 'news', :action => 'index'
+    get :view, id: 999_999
+    assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
 
   # GET /news/add_comment/:id
 
   test "add_comment renders new comment form" do
-    get :add_comment, :id => @news_item.id
+    get :add_comment, id: @news_item.id
     assert_response :success
     assert_not_nil assigns(:news_comment)
     assert_equal @news_item.id.to_s, assigns(:news_comment).news_item_id.to_s
@@ -221,17 +220,17 @@ class NewsControllerTest < ActionController::TestCase
 
   test "create_comment saves valid comment" do
     assert_difference('NewsComment.count', 1) do
-      post :create_comment, :news_comment => { :message => 'Nice', :news_item_id => @news_item.id }
+      post :create_comment, news_comment: { message: 'Nice', news_item_id: @news_item.id }
     end
 
-    assert_redirected_to :controller => 'news', :action => 'view', :id => @news_item.id
+    assert_redirected_to controller: 'news', action: 'view', id: @news_item.id
     assert_equal 'Reactie is succesvol toegevoegd.', flash[:notice]
     assert_equal @user.id, assigns(:news_comment).user_id
   end
 
   test "create_comment re-renders on validation failure" do
     assert_no_difference('NewsComment.count') do
-      post :create_comment, :news_comment => { :message => '', :news_item_id => @news_item.id }
+      post :create_comment, news_comment: { message: '', news_item_id: @news_item.id }
     end
 
     assert_response :success
@@ -242,36 +241,36 @@ class NewsControllerTest < ActionController::TestCase
   # GET /news/edit_comment/:id
 
   test "edit_comment renders form for author" do
-    comment = NewsComment.create!(:message => 'c', :news_item_id => @news_item.id, :user_id => @user.id)
+    comment = NewsComment.create!(message: 'c', news_item_id: @news_item.id, user_id: @user.id)
 
-    get :edit_comment, :id => comment.id
+    get :edit_comment, id: comment.id
 
     assert_response :success
     assert_equal comment, assigns(:news_comment)
   end
 
   test "edit_comment redirects when comment does not exist" do
-    get :edit_comment, :id => 999999
-    assert_redirected_to :controller => 'news', :action => 'index'
+    get :edit_comment, id: 999_999
+    assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
 
   # POST /news/update_comment
 
   test "update_comment saves valid changes" do
-    comment = NewsComment.create!(:message => 'old', :news_item_id => @news_item.id, :user_id => @user.id)
+    comment = NewsComment.create!(message: 'old', news_item_id: @news_item.id, user_id: @user.id)
 
-    post :update_comment, :news_comment => { :id => comment.id, :message => 'new' }
+    post :update_comment, news_comment: { id: comment.id, message: 'new' }
 
-    assert_redirected_to :controller => 'news', :action => 'view', :id => @news_item.id
+    assert_redirected_to controller: 'news', action: 'view', id: @news_item.id
     assert_equal 'Uw reactie is succesvol aangepast.', flash[:notice]
     assert_equal 'new', comment.reload.message
   end
 
   test "update_comment re-renders on validation failure" do
-    comment = NewsComment.create!(:message => 'old', :news_item_id => @news_item.id, :user_id => @user.id)
+    comment = NewsComment.create!(message: 'old', news_item_id: @news_item.id, user_id: @user.id)
 
-    post :update_comment, :news_comment => { :id => comment.id, :message => '' }
+    post :update_comment, news_comment: { id: comment.id, message: '' }
 
     assert_response :success
     assert_template 'edit_comment'
@@ -279,55 +278,54 @@ class NewsControllerTest < ActionController::TestCase
   end
 
   test "update_comment redirects when comment does not exist" do
-    post :update_comment, :news_comment => { :id => 999999, :message => 'x' }
-    assert_redirected_to :controller => 'news', :action => 'index'
+    post :update_comment, news_comment: { id: 999_999, message: 'x' }
+    assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
 
   # GET /news/remove_comment/:id
 
   test "remove_comment renders confirmation for author" do
-    comment = NewsComment.create!(:message => 'c', :news_item_id => @news_item.id, :user_id => @user.id)
+    comment = NewsComment.create!(message: 'c', news_item_id: @news_item.id, user_id: @user.id)
 
-    get :remove_comment, :id => comment.id
+    get :remove_comment, id: comment.id
 
     assert_response :success
     assert_equal comment, assigns(:news_comment)
   end
 
   test "remove_comment redirects when comment does not exist" do
-    get :remove_comment, :id => 999999
-    assert_redirected_to :controller => 'news', :action => 'index'
+    get :remove_comment, id: 999_999
+    assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
 
   # POST /news/destroy_comment
 
   test "destroy_comment deletes the comment" do
-    comment = NewsComment.create!(:message => 'c', :news_item_id => @news_item.id, :user_id => @user.id)
+    comment = NewsComment.create!(message: 'c', news_item_id: @news_item.id, user_id: @user.id)
 
     assert_difference('NewsComment.count', -1) do
-      post :destroy_comment, :id => comment.id, :commit => 'Ja, verwijderen'
+      post :destroy_comment, id: comment.id, commit: 'Ja, verwijderen'
     end
 
-    assert_redirected_to :controller => 'news', :action => 'view', :id => @news_item.id
+    assert_redirected_to controller: 'news', action: 'view', id: @news_item.id
     assert_equal 'Uw reactie is succesvol verwijderd.', flash[:notice]
   end
 
   test "destroy_comment is a no-op when cancelled" do
-    comment = NewsComment.create!(:message => 'c', :news_item_id => @news_item.id, :user_id => @user.id)
+    comment = NewsComment.create!(message: 'c', news_item_id: @news_item.id, user_id: @user.id)
 
     assert_no_difference('NewsComment.count') do
-      post :destroy_comment, :id => comment.id, :commit => 'Nee, niet verwijderen'
+      post :destroy_comment, id: comment.id, commit: 'Nee, niet verwijderen'
     end
 
-    assert_redirected_to :controller => 'news', :action => 'view', :id => @news_item.id
+    assert_redirected_to controller: 'news', action: 'view', id: @news_item.id
   end
 
   test "destroy_comment redirects when comment does not exist" do
-    post :destroy_comment, :id => 999999, :commit => 'Ja, verwijderen'
-    assert_redirected_to :controller => 'news', :action => 'index'
+    post :destroy_comment, id: 999_999, commit: 'Ja, verwijderen'
+    assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
-
 end

@@ -1,8 +1,7 @@
 class SettingsController < ApplicationController
-
   # GET /settings
   def index
-    redirect_to :action => 'profile'
+    redirect_to action: 'profile'
   end
 
   # GET /settings/profile
@@ -32,9 +31,9 @@ class SettingsController < ApplicationController
 
     if @user.update_attributes(params[:user])
       flash[:settings] = t('flash.settings.profile_updated')
-      redirect_to :action => 'profile'
+      redirect_to action: 'profile'
     else
-      render :action => "profile"
+      render action: "profile"
     end
   end
 
@@ -45,9 +44,9 @@ class SettingsController < ApplicationController
 
     if @user.update_attributes(params[:user])
       flash[:settings] = t('flash.settings.notifications_updated')
-      redirect_to :action => 'notifications'
+      redirect_to action: 'notifications'
     else
-      render :action => "notifications"
+      render action: "notifications"
     end
   end
 
@@ -63,16 +62,16 @@ class SettingsController < ApplicationController
       if params[:password] != params[:password_confirmation]
         @user.errors.add(:base, t('flash.settings.password_mismatch'))
       end
-      if @user.errors.size == 0 && @user.update_attribute(:password, params[:password])
+      if @user.errors.empty? && @user.update_attribute(:password, params[:password])
         flash[:settings] = t('flash.settings.password_updated')
-        redirect_to :action => 'password'
+        redirect_to action: 'password'
       else
-        render :action => "password"
+        render action: "password"
       end
     else
       # Authentication failed fo the old password
       @user.errors.add(:base, t('flash.settings.current_password_incorrect'))
-      render :action => "password"
+      render action: "password"
     end
   end
 end

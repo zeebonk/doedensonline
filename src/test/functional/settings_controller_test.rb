@@ -1,19 +1,18 @@
 require 'test_helper'
 
 class SettingsControllerTest < ActionController::TestCase
-
   def setup
     # Fixtures store passwords raw, but User#password= encrypts and
     # update_password authenticates against the encrypted form, so build
     # the user through the model.
     User.delete_all
     @user = User.create!(
-      :first_name  => 'Alice',
-      :last_name   => 'Anderson',
-      :email       => 'alice@example.com',
-      :password    => 'secret',
-      :notify_news => true,
-      :isadmin     => false
+      first_name: 'Alice',
+      last_name: 'Anderson',
+      email: 'alice@example.com',
+      password: 'secret',
+      notify_news: true,
+      isadmin: false
     )
     sign_in_as @user
   end
@@ -27,14 +26,14 @@ class SettingsControllerTest < ActionController::TestCase
   test "redirects to sign_in when not signed in" do
     @request.session[:user_id] = nil
     get :profile
-    assert_redirected_to :controller => 'home', :action => 'sign_in'
+    assert_redirected_to controller: 'home', action: 'sign_in'
   end
 
   # GET /settings
 
   test "index redirects to profile" do
     get :index
-    assert_redirected_to :controller => 'settings', :action => 'profile'
+    assert_redirected_to controller: 'settings', action: 'profile'
   end
 
   # GET /settings/profile
@@ -65,9 +64,9 @@ class SettingsControllerTest < ActionController::TestCase
   # POST /settings/update_profile
 
   test "update_profile saves valid changes" do
-    post :update_profile, :user => { :first_name => 'Alicia', :last_name => 'Anderson', :email => 'alicia@example.com' }
+    post :update_profile, user: { first_name: 'Alicia', last_name: 'Anderson', email: 'alicia@example.com' }
 
-    assert_redirected_to :controller => 'settings', :action => 'profile'
+    assert_redirected_to controller: 'settings', action: 'profile'
     assert_equal 'Uw profiel is succesvol aangepast.', flash[:settings]
     @user.reload
     assert_equal 'Alicia', @user.first_name
@@ -75,7 +74,7 @@ class SettingsControllerTest < ActionController::TestCase
   end
 
   test "update_profile re-renders profile on invalid input" do
-    post :update_profile, :user => { :email => 'not-an-email' }
+    post :update_profile, user: { email: 'not-an-email' }
 
     assert_response :success
     assert_template 'profile'
@@ -86,15 +85,15 @@ class SettingsControllerTest < ActionController::TestCase
   # POST /settings/update_notifications
 
   test "update_notifications saves valid changes" do
-    post :update_notifications, :user => { :notify_news => false }
+    post :update_notifications, user: { notify_news: false }
 
-    assert_redirected_to :controller => 'settings', :action => 'notifications'
+    assert_redirected_to controller: 'settings', action: 'notifications'
     assert_equal 'Uw notificatie instellingen zijn succesvol aangepast.', flash[:settings]
     assert_equal false, @user.reload.notify_news
   end
 
   test "update_notifications re-renders notifications on invalid input" do
-    post :update_notifications, :user => { :email => 'not-an-email' }
+    post :update_notifications, user: { email: 'not-an-email' }
 
     assert_response :success
     assert_template 'notifications'
@@ -106,11 +105,11 @@ class SettingsControllerTest < ActionController::TestCase
   test "update_password changes password with correct old password" do
     original_password = @user.password
     post :update_password,
-      :old_password         => 'secret',
-      :password             => 'newpass',
-      :password_confirmation => 'newpass'
+         old_password: 'secret',
+         password: 'newpass',
+         password_confirmation: 'newpass'
 
-    assert_redirected_to :controller => 'settings', :action => 'password'
+    assert_redirected_to controller: 'settings', action: 'password'
     assert_equal 'Uw wachtwoord is succesvol gewijzigd.', flash[:settings]
     assert_not_equal original_password, @user.reload.password
   end
@@ -118,9 +117,9 @@ class SettingsControllerTest < ActionController::TestCase
   test "update_password rejects incorrect old password" do
     original_password = @user.password
     post :update_password,
-      :old_password         => 'wrong',
-      :password             => 'newpass',
-      :password_confirmation => 'newpass'
+         old_password: 'wrong',
+         password: 'newpass',
+         password_confirmation: 'newpass'
 
     assert_response :success
     assert_template 'password'
@@ -131,9 +130,9 @@ class SettingsControllerTest < ActionController::TestCase
   test "update_password rejects too-short new password" do
     original_password = @user.password
     post :update_password,
-      :old_password         => 'secret',
-      :password             => 'ab',
-      :password_confirmation => 'ab'
+         old_password: 'secret',
+         password: 'ab',
+         password_confirmation: 'ab'
 
     assert_response :success
     assert_template 'password'
@@ -144,14 +143,13 @@ class SettingsControllerTest < ActionController::TestCase
   test "update_password rejects mismatched confirmation" do
     original_password = @user.password
     post :update_password,
-      :old_password         => 'secret',
-      :password             => 'newpass',
-      :password_confirmation => 'different'
+         old_password: 'secret',
+         password: 'newpass',
+         password_confirmation: 'different'
 
     assert_response :success
     assert_template 'password'
     assert assigns(:user).errors.full_messages.any? { |m| m =~ /niet aan elkaar gelijk/ }
     assert_equal original_password, @user.reload.password
   end
-
 end

@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class UsersControllerTest < ActionController::TestCase
-
   def setup
     @admin = users(:admin)
     @user = users(:one)
@@ -14,11 +13,11 @@ class UsersControllerTest < ActionController::TestCase
 
   def valid_user_attributes(overrides = {})
     {
-      :first_name  => 'Charlie',
-      :last_name   => 'Chaplin',
-      :email       => 'charlie@example.com',
-      :password    => 'secret',
-      :notify_news => false
+      first_name: 'Charlie',
+      last_name: 'Chaplin',
+      email: 'charlie@example.com',
+      password: 'secret',
+      notify_news: false
     }.merge(overrides)
   end
 
@@ -27,13 +26,13 @@ class UsersControllerTest < ActionController::TestCase
   test "redirects to home when no user is signed in" do
     @request.session[:user_id] = nil
     get :index
-    assert_redirected_to :controller => 'home', :action => 'sign_in'
+    assert_redirected_to controller: 'home', action: 'sign_in'
   end
 
   test "redirects to home when signed in user is not an admin" do
     sign_in_as users(:one)
     get :index
-    assert_redirected_to :controller => 'home', :action => 'index'
+    assert_redirected_to controller: 'home', action: 'index'
     assert_equal 'Only admins allowed there', flash[:notice]
   end
 
@@ -54,7 +53,7 @@ class UsersControllerTest < ActionController::TestCase
   # GET /users/:id
 
   test "should show user" do
-    get :show, :id => @user.id
+    get :show, id: @user.id
     assert_response :success
     assert_equal @user, assigns(:user)
   end
@@ -72,7 +71,7 @@ class UsersControllerTest < ActionController::TestCase
 
   test "should create user with valid attributes" do
     assert_difference('User.count', 1) do
-      post :create, :user => valid_user_attributes
+      post :create, user: valid_user_attributes
     end
 
     assert_redirected_to user_path(assigns(:user))
@@ -81,7 +80,7 @@ class UsersControllerTest < ActionController::TestCase
 
   test "does not create user with invalid attributes and re-renders new" do
     assert_no_difference('User.count') do
-      post :create, :user => valid_user_attributes(:email => 'not-an-email')
+      post :create, user: valid_user_attributes(email: 'not-an-email')
     end
 
     assert_response :success
@@ -91,7 +90,7 @@ class UsersControllerTest < ActionController::TestCase
 
   test "does not create user with blank password" do
     assert_no_difference('User.count') do
-      post :create, :user => valid_user_attributes(:password => '')
+      post :create, user: valid_user_attributes(password: '')
     end
 
     assert_response :success
@@ -101,7 +100,7 @@ class UsersControllerTest < ActionController::TestCase
   # GET /users/:id/edit
 
   test "should get edit" do
-    get :edit, :id => @user.id
+    get :edit, id: @user.id
     assert_response :success
     assert_equal @user, assigns(:user)
   end
@@ -109,7 +108,7 @@ class UsersControllerTest < ActionController::TestCase
   # PUT /users/:id
 
   test "should update user with valid attributes" do
-    put :update, :id => @user.id, :user => { :first_name => 'Updated' }
+    put :update, id: @user.id, user: { first_name: 'Updated' }
 
     assert_redirected_to user_path(assigns(:user))
     assert_equal I18n.t('flash.users.updated'), flash[:notice]
@@ -117,7 +116,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "does not update user with invalid attributes and re-renders edit" do
-    put :update, :id => @user.id, :user => { :email => 'not-an-email' }
+    put :update, id: @user.id, user: { email: 'not-an-email' }
 
     assert_response :success
     assert_template 'edit'
@@ -128,11 +127,10 @@ class UsersControllerTest < ActionController::TestCase
 
   test "should destroy user" do
     assert_difference('User.count', -1) do
-      delete :destroy, :id => @user.id
+      delete :destroy, id: @user.id
     end
 
     assert_redirected_to users_path
     assert_raise(ActiveRecord::RecordNotFound) { User.find(@user.id) }
   end
-
 end

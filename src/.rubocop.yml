@@ -1,0 +1,89 @@
+AllCops:
+  TargetRubyVersion: 1.9
+  Exclude:
+    - 'db/schema.rb'
+    - 'db/migrate/**/*'
+    - 'vendor/**/*'
+    - 'tmp/**/*'
+    - 'log/**/*'
+    - 'public/**/*'
+    - 'script/**/*'
+    - 'bin/**/*'
+    - 'config/boot.rb'
+    - 'config/environment.rb'
+
+# Relax Metrics cops for a legacy Rails app.
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 180
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+# Documentation is not required for every class/module.
+Style/Documentation:
+  Enabled: false
+
+# Allow both single and double quotes.
+Style/StringLiterals:
+  Enabled: false
+
+# Frozen string literal magic comment is not available in Ruby 1.9.
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# Legacy code uses `for ... in ...`; leave it alone.
+Style/For:
+  Enabled: false
+
+# Existing controllers use non-predicate method names (e.g. `is_authorized`).
+Style/PredicateName:
+  Enabled: false
+
+# Existing regex literals use `/.../`; no need to switch to `%r{}`.
+Style/RegexpLiteral:
+  Enabled: false
+
+# Legacy conditionals are easier to read as-is.
+Style/GuardClause:
+  Enabled: false
+
+# Legacy code uses `class Foo::Bar`; leave the compact style alone.
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+# Legacy controllers rescue Exception intentionally to keep error flows wide.
+Lint/RescueException:
+  Enabled: false
+
+# `rescue Exception => e` leaves `e` unused in a few places; harmless.
+Lint/UselessAssignment:
+  Enabled: false
+
+# Existing user model mixes `private` with `self.` methods; refactor later.
+Lint/UselessAccessModifier:
+  Enabled: false
+Lint/IneffectiveAccessModifier:
+  Enabled: false
+
+# `end` alignment on legacy `unless`/`if` blocks is inconsistent; refactor later.
+Lint/EndAlignment:
+  Enabled: false
+
+# Legacy controllers nest blocks deeper than 3 levels.
+Metrics/BlockNesting:
+  Enabled: false

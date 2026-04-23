@@ -1,5 +1,4 @@
 class UsersController < ApplicationController
-
   layout 'default'
 
   before_filter :return_to_home_if_user_not_admin
@@ -33,7 +32,7 @@ class UsersController < ApplicationController
       flash[:notice] = t('flash.users.created')
       redirect_to(@user)
     else
-      render :action => "new"
+      render action: "new"
     end
   end
 
@@ -45,7 +44,7 @@ class UsersController < ApplicationController
       flash[:notice] = t('flash.users.updated')
       redirect_to(@user)
     else
-      render :action => "edit"
+      render action: "edit"
     end
   end
 
@@ -57,10 +56,9 @@ class UsersController < ApplicationController
     redirect_to(users_url)
   end
 
-private
+  private
 
   def title
     @page_title = [t('page_titles.users')]
   end
-
 end

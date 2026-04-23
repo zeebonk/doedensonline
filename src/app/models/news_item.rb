@@ -1,5 +1,4 @@
 class NewsItem < ActiveRecord::Base
-
   belongs_to :user
   has_many :news_comments
   validates_presence_of :message
@@ -13,11 +12,10 @@ class NewsItem < ActiveRecord::Base
     message = message.gsub(/<\/?[^>]*>/, "")
     message.strip!
     if message.size > size
-      message = message[0,size]
+      message = message[0, size]
       message.strip!
-      message = message + "..."
+      message += "..."
     end
-    return message
+    message
   end
-
 end

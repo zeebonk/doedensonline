@@ -1,5 +1,4 @@
 class PhotoAlbum < ActiveRecord::Base
-
   validates_presence_of :title, :description, :preview_picture
   belongs_to :user
   has_many :photo_album_pictures
@@ -8,5 +7,4 @@ class PhotoAlbum < ActiveRecord::Base
   def self.latest(limit, offset)
     order('created_at DESC').limit(limit).offset(offset)
   end
-
 end
