@@ -15,8 +15,5 @@ module DoedensOnline
     config.filter_parameters += [:password]
 
     config.assets.enabled = true
-    config.assets.precompile += %w(
-      scaffold.css
-    )
   end
 end
