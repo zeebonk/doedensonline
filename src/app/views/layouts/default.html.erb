@@ -5,7 +5,7 @@
 
   <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 
-  <title><% @page_title.each do |page| %><%= (page + " - ") %><% end %><%= t('site.title_suffix') %></title>
+  <title><%= yield(:page_title) %> - <%= t('site.title_suffix') %></title>
 
   <%= stylesheet_link_tag 'main' %>
   <%= controller_stylesheet_link_tag %>
@@ -97,7 +97,7 @@
 
 <div id="content">
   <h2>
-    <%= @page_title[0] %>
+    <%= yield(:page_title) %>
   </h2>
   <%= yield  %>
 </div>

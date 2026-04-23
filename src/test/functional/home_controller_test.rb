@@ -37,7 +37,6 @@ class HomeControllerTest < ActionController::TestCase
     sign_in_as @user
     get :index
     assert_response :success
-    assert_equal ['Home'], assigns(:page_title)
     assert_not_nil assigns(:news_items)
   end
 
@@ -46,7 +45,6 @@ class HomeControllerTest < ActionController::TestCase
   test "sign_in is accessible without authentication" do
     get :sign_in
     assert_response :success
-    assert_equal ['Inloggen'], assigns(:page_title)
   end
 
   test "sign_in redirects to index when already signed in" do
@@ -100,7 +98,6 @@ class HomeControllerTest < ActionController::TestCase
     sign_in_as @user
     get :sign_out
     assert_response :success
-    assert_equal ['Uitloggen'], assigns(:page_title)
   end
 
   # POST /home/destroy_session
@@ -125,7 +122,6 @@ class HomeControllerTest < ActionController::TestCase
   test "password_forgotten is accessible without authentication" do
     get :password_forgotten
     assert_response :success
-    assert_equal ['Wachtwoord vergeten'], assigns(:page_title)
   end
 
   test "password_forgotten redirects to index when signed in" do

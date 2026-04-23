@@ -5,7 +5,6 @@ class PhotoAlbumPicturesController < ApplicationController
 
   # GET /photo_album_pictures/1
   def show
-    @page_title = [t('page_titles.albums_manage_pictures'), t('page_titles.albums_section')]
   	@photo_album = PhotoAlbum.find(params[:id])
   	@photo_album_picture = PhotoAlbumPicture.new  	
   	@photo_album_picture.photo_album_id = @photo_album.id
@@ -30,7 +29,6 @@ class PhotoAlbumPicturesController < ApplicationController
 	if @photo_album_picture.errors.empty? && @photo_album_picture.save
       redirect_to :action => 'show', :id => @photo_album_picture.photo_album_id
     else
-      @page_title = [t('page_titles.albums_manage_pictures'), t('page_titles.albums_section')]	
       @photo_album = @photo_album_picture.photo_album
       render :action => 'show', :id => @photo_album_picture.photo_album_id
     end
