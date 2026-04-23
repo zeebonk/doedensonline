@@ -65,25 +65,3 @@ To dry-run and preview changes:
 ```
 pdm run ansible-playbook -i inventory.yaml playbook.yaml --check --diff -e target=prod
 ```
-
-
-## Provision the dev environment (one-off)
-
-After `tofu apply` has created the Hetzner instance and the `dev.doedensonline.nl`
-Route53 record, wait for DNS propagation (check with `dig dev.doedensonline.nl`)
-and then issue the initial Let's Encrypt certificate on the dev box — the
-Ansible cron only handles renewals:
-
-```
-ssh root@dev.doedensonline.nl \
-    docker run --rm \
-        -v /etc/letsencrypt:/etc/letsencrypt \
-        -v /var/lib/letsencrypt:/var/lib/letsencrypt \
-        -p 80:80 \
-        certbot/certbot certonly \
-        -d dev.doedensonline.nl \
-        --standalone -n --agree-tos -m vandervoort.gijs@gmail.com
-```
-
-Then run the Ansible playbook with `-e target=dev` to configure the box and
-start the app.
