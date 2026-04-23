@@ -203,7 +203,7 @@ resource "local_file" "inventory" {
         "rails_env" : "production",
         "domain" : "doedensonline.nl",
         "extra_domains" : ["www.doedensonline.nl"],
-        "image_tag" : "1.0.4",
+        "image_tag" : "1.0.5",
         "app_state_path" : "/app-state",
         "app_state_device" : "/dev/sdf",
       },
