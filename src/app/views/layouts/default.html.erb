@@ -7,11 +7,9 @@
 
   <title><%= yield(:page_title) %> - <%= t('site.title_suffix') %></title>
 
-  <%= stylesheet_link_tag 'main' %>
+  <%= stylesheet_link_tag 'application' %>
   <%= controller_stylesheet_link_tag %>
-
-  <!--[if lte IE 7]><%= stylesheet_link_tag 'ie7' %><![endif]-->
-  <!--[if lte IE 6]><%= stylesheet_link_tag 'ie6' %><![endif]-->
+  <%= javascript_include_tag 'application' %>
 
   <% if controller.action_name == 'add'            || controller.action_name == 'edit'           || controller.action_name == 'update' ||
         controller.action_name == 'add_comment'    || controller.action_name == 'edit_comment'   || controller.action_name == 'create' ||
@@ -22,7 +20,6 @@
 
   <% if controller.controller_name == 'photo_albums' && controller.action_name == 'show' %>
     <%= stylesheet_link_tag 'colorbox' %>
-    <%= javascript_include_tag 'jquery-1.4.2.min' %>
     <%= javascript_include_tag 'colorbox/jquery.colorbox-min' %>
     <script>
       $(document).ready(function(){ $("a[rel='album']").colorbox({maxWidth:"85%", maxHeight:"85%"}); });
@@ -30,7 +27,6 @@
   <% end %>
 
 	<% if controller.controller_name == 'photo_albums' && (controller.action_name == 'manage_pictures' || controller.action_name == 'add_picture') %>
-		<%= javascript_include_tag 'jquery-1.4.2.min' %>
 		<%= javascript_include_tag 'test' %>
 	<% end %>
 

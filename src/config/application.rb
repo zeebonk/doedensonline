@@ -16,16 +16,12 @@ module DoedensOnline
 
     config.assets.enabled = true
     config.assets.precompile += %w(
-      main.css
       home.css
       photo_albums.css
       settings.css
       colorbox.css
-      ie6.css
-      ie7.css
       scaffold.css
       load-tiny-mce.js
-      jquery-1.4.2.min.js
       colorbox/jquery.colorbox-min.js
       test.js
     )
