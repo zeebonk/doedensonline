@@ -5,7 +5,7 @@
 
   <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 
-  <title><%= yield(:page_title) %><% if content_for?(:page_section) %> - <%= yield(:page_section) %><% end %> - <%= t('site.title_suffix') %></title>
+  <title><%= yield(:page_title) %> - <%= t('site.title_suffix') %></title>
 
   <%= stylesheet_link_tag 'main' %>
   <%= controller_stylesheet_link_tag %>
