@@ -10,7 +10,7 @@
 
   <% for photo_album in @photo_albums %>
     <div class="photo-album">
-  	  <%= link_to image_tag("medium/#{photo_album.preview_picture}"), photo_album %>
+  	  <%= link_to image_tag("/images/medium/#{photo_album.preview_picture}"), photo_album %>
   	  <h3><%=h photo_album.title %></h3>
     </div>
   <% end %>
