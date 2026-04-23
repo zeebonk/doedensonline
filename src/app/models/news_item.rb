@@ -1,4 +1,6 @@
 class NewsItem < ActiveRecord::Base
+  attr_accessible :message, :user_id
+
   belongs_to :user
   has_many :news_comments
   validates_presence_of :message

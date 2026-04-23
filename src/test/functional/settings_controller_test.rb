@@ -6,7 +6,7 @@ class SettingsControllerTest < ActionController::TestCase
     # update_password authenticates against the encrypted form, so build
     # the user through the model.
     User.delete_all
-    @user = User.create!(
+    @user = create_user!(
       first_name: 'Alice',
       last_name: 'Anderson',
       email: 'alice@example.com',

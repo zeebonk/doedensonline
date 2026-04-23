@@ -7,7 +7,7 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
     PhotoAlbum.delete_all
     User.delete_all
 
-    @user = User.create!(
+    @user = create_user!(
       first_name: 'Alice',
       last_name: 'Anderson',
       email: 'alice@example.com',

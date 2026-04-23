@@ -11,7 +11,7 @@ class HomeControllerTest < ActionController::TestCase
     # so clear them too to avoid orphaned associations when rendering index.
     NewsItem.delete_all
     User.delete_all
-    @user = User.create!(
+    @user = create_user!(
       first_name: 'Alice',
       last_name: 'Anderson',
       email: 'alice@example.com',

@@ -3,8 +3,6 @@ DoedensOnline::Application.configure do
 
   config.serve_static_assets = true
 
-  config.whiny_nils = true
-
   config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
 
@@ -15,4 +13,6 @@ DoedensOnline::Application.configure do
   config.action_mailer.delivery_method = :test
 
   config.active_support.deprecation = :stderr
+
+  config.active_record.mass_assignment_sanitizer = :strict
 end
