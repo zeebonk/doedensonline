@@ -19,11 +19,7 @@ module DoedensOnline
       home.css
       photo_albums.css
       settings.css
-      colorbox.css
       scaffold.css
-      load-tiny-mce.js
-      colorbox/jquery.colorbox-min.js
-      test.js
     )
   end
 end

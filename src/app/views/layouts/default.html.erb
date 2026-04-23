@@ -9,26 +9,14 @@
 
   <%= stylesheet_link_tag 'application' %>
   <%= controller_stylesheet_link_tag %>
+  <script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js" referrerpolicy="origin"></script>
   <%= javascript_include_tag 'application' %>
 
-  <% if controller.action_name == 'add'            || controller.action_name == 'edit'           || controller.action_name == 'update' ||
-        controller.action_name == 'add_comment'    || controller.action_name == 'edit_comment'   || controller.action_name == 'create' ||
-        controller.action_name == 'create_comment' || controller.action_name == 'update_comment' || controller.action_name == 'new'    %>
-    <script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js" referrerpolicy="origin"></script>
-    <%= javascript_include_tag 'load-tiny-mce' %>
-  <% end %>
-
   <% if controller.controller_name == 'photo_albums' && controller.action_name == 'show' %>
-    <%= stylesheet_link_tag 'colorbox' %>
-    <%= javascript_include_tag 'colorbox/jquery.colorbox-min' %>
     <script>
       $(document).ready(function(){ $("a[rel='album']").colorbox({maxWidth:"85%", maxHeight:"85%"}); });
     </script>
   <% end %>
-
-	<% if controller.controller_name == 'photo_albums' && (controller.action_name == 'manage_pictures' || controller.action_name == 'add_picture') %>
-		<%= javascript_include_tag 'test' %>
-	<% end %>
 
 </head>
 <body>
