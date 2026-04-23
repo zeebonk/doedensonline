@@ -13,6 +13,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The ruby:1.9.3-p551 base image still uses Docker Schema 1, which
+      # containerd v2+ refuses by default. Re-enable it on the daemon.
+      - name: Enable Schema 1 image pulls
+        run: |
+          sudo mkdir -p /etc/systemd/system/docker.service.d
+          printf '[Service]\nEnvironment="CONTAINERD_ENABLE_DEPRECATED_PULL_SCHEMA_1_IMAGE=1"\n' \
+            | sudo tee /etc/systemd/system/docker.service.d/schema1.conf
+          sudo systemctl daemon-reload
+          sudo systemctl restart docker
+
       - name: Build app image
         run: docker compose build
 
