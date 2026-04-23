@@ -7,20 +7,17 @@ class NewsController < ApplicationController
 
   # GET /news/
   def index
-    @page_title = [t('page_titles.news_index'), t('page_titles.news_section')]
     @news_items = paginate_news
   end
 
   # GET /news/page/:page_number
   def page
-    @page_title = [t('page_titles.news_index'), t('page_titles.news_section')]
     @news_items = paginate_news
     render action: 'index'
   end
 
   # GET /news/add
   def add
-    @page_title = [t('page_titles.news_add'), t('page_titles.news_section')]
     @news_item = NewsItem.new
   end
 
@@ -38,7 +35,6 @@ class NewsController < ApplicationController
       end
       redirect_to action: 'index'
     else
-      @page_title = [t('page_titles.news_add'), t('page_titles.news_section')]
       flash[:error] = t('flash.news.message_required')
       render action: "add"
     end
@@ -46,7 +42,6 @@ class NewsController < ApplicationController
 
   # GET /news/edit
   def edit
-    @page_title = [t('page_titles.news_edit'), t('page_titles.news_section')]
   end
 
   # POST /news/update
@@ -56,7 +51,6 @@ class NewsController < ApplicationController
       flash[:notice] = t('flash.news.updated')
       redirect_to action: "index"
     else
-      @page_title = [t('page_titles.news_edit'), t('page_titles.news_section')]
       flash[:error] = t('flash.news.message_required')
       render action: "edit"
     end
@@ -64,7 +58,6 @@ class NewsController < ApplicationController
 
   # GET /news/remove/:id
   def remove
-    @page_title = [t('page_titles.news_remove'), t('page_titles.news_section')]
   end
 
   # POST /news/destroy
@@ -80,7 +73,6 @@ class NewsController < ApplicationController
 
   # GET /news/view/:id
   def view
-    @page_title = [t('page_titles.news_view'), t('page_titles.news_section')]
     @news_item = news_item_by_id params[:id]
     if !@news_item
       flash[:error] = t('flash.news.item_not_found')
@@ -92,7 +84,6 @@ class NewsController < ApplicationController
 
   # GET /news/add_comment
   def add_comment
-    @page_title = [t('page_titles.comment_add'), t('page_titles.news_section')]
     @news_comment = NewsComment.new
     @news_comment.news_item_id = params[:id]
   end
@@ -107,7 +98,6 @@ class NewsController < ApplicationController
       flash[:notice] = t('flash.news.comment_created')
       redirect_to action: 'view', id: @news_comment.news_item_id
     else
-      @page_title = [t('page_titles.comment_add'), t('page_titles.news_section')]
       flash[:error] = t('flash.news.comment_message_required')
       @news_item = NewsItem.find(@news_comment.news_item_id)
       render action: "add_comment"
@@ -116,7 +106,6 @@ class NewsController < ApplicationController
 
   # GET /news/edit_comment/:id
   def edit_comment
-    @page_title = [t('page_titles.comment_edit'), t('page_titles.news_section')]
   end
 
   # POST /news/update_comment
@@ -126,7 +115,6 @@ class NewsController < ApplicationController
       flash[:notice] = t('flash.news.comment_updated')
       redirect_to action: 'view', id: @news_comment.news_item.id
     else
-      @page_title = [t('page_titles.comment_edit'), t('page_titles.news_section')]
       flash[:error] = t('flash.news.comment_message_required')
       render action: "edit_comment"
     end
@@ -134,7 +122,6 @@ class NewsController < ApplicationController
 
   # GET /news/remove_comment/:id
   def remove_comment
-    @page_title = [t('page_titles.comment_remove'), t('page_titles.news_section')]
   end
 
   # POST /news/destroy_comment

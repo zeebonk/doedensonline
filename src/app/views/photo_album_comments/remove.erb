@@ -1,3 +1,5 @@
+<% content_for :page_title, t('page_titles.albums_comment_remove') %>
+
 <p class="intro"><strong><%= t('.confirmation') %></strong></p>
 
 <%= form_tag('/photo_album_comments/destroy', :method => 'post') do %>

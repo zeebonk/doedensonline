@@ -45,11 +45,6 @@ class UsersControllerTest < ActionController::TestCase
     assert assigns(:users).include?(@user)
   end
 
-  test "sets the page title on index" do
-    get :index
-    assert_equal [I18n.t('page_titles.users')], assigns(:page_title)
-  end
-
   # GET /users/:id
 
   test "should show user" do

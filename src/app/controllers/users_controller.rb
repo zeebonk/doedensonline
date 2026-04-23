@@ -2,7 +2,6 @@ class UsersController < ApplicationController
   layout 'default'
 
   before_filter :return_to_home_if_user_not_admin
-  before_filter :title
 
   # GET /users
   def index
@@ -54,11 +53,5 @@ class UsersController < ApplicationController
     @user.destroy
 
     redirect_to(users_url)
-  end
-
-  private
-
-  def title
-    @page_title = [t('page_titles.users')]
   end
 end

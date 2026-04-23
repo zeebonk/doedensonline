@@ -4,7 +4,6 @@ class PhotoAlbumCommentsController < ApplicationController
 
   # GET /photo_album_comments/new/1
   def new
-    @page_title = [t('page_titles.comment_add'), t('page_titles.albums_section')]
     @photo_album_comment = PhotoAlbumComment.new
 
     if photo_album_from_id(params[:id])
@@ -17,7 +16,6 @@ class PhotoAlbumCommentsController < ApplicationController
 
   # GET /photo_album_comments/1/edit
   def edit
-    @page_title = [t('page_titles.comment_edit'), t('page_titles.albums_section')]
   end
 
   # POST /photo_album_comments
@@ -30,7 +28,6 @@ class PhotoAlbumCommentsController < ApplicationController
       flash[:notice] = t('flash.photo_album_comments.created')
       redirect_to controller: 'photo_albums', action: 'show', id: @photo_album_comment.photo_album_id
     else
-      @page_title = [t('page_titles.comment_add'), t('page_titles.albums_section')]
       flash[:error] = t('flash.photo_album_comments.message_required')
       render action: "new"
     end
@@ -43,7 +40,6 @@ class PhotoAlbumCommentsController < ApplicationController
       flash[:notice] = t('flash.photo_album_comments.updated')
       redirect_to controller: 'photo_albums', action: 'show', id: @photo_album_comment.photo_album.id
     else
-      @page_title = [t('page_titles.comment_edit'), t('page_titles.albums_section')]
       flash[:error] = t('flash.photo_album_comments.message_required')
       render action: "edit"
     end
@@ -51,7 +47,6 @@ class PhotoAlbumCommentsController < ApplicationController
 
   # GET /photo_album_comments/remove/:id
   def remove
-    @page_title = [t('page_titles.comment_remove'), t('page_titles.albums_section')]
   end
 
   # DELETE /photo_album_comments/1

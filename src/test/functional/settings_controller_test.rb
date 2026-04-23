@@ -42,7 +42,6 @@ class SettingsControllerTest < ActionController::TestCase
     get :profile
     assert_response :success
     assert_equal @user, assigns(:user)
-    assert_equal ['Instellingen'], assigns(:page_title)
   end
 
   # GET /settings/password
