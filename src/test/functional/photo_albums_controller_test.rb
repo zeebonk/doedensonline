@@ -30,6 +30,10 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
     @request.session[:user_id] = user.id
   end
 
+  def uploaded_jpeg_fixture
+    fixture_file_upload('files/sample.jpg', 'image/jpeg', :binary)
+  end
+
   # Authorization
 
   test "redirects to sign_in when not signed in" do
@@ -111,6 +115,26 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
     assert !assigns(:photo_album).errors.empty?
   end
 
+  test "create saves the album and processes the uploaded preview image" do
+    assert_difference('PhotoAlbum.count', 1) do
+      post :create, :photo_album => {
+        :title           => 'New album',
+        :description     => 'Holiday photos',
+        :preview_picture => uploaded_jpeg_fixture
+      }
+    end
+
+    album = PhotoAlbum.last
+    assert_redirected_to album
+    assert_equal @user.id, album.user_id
+    assert_match(/\A\d+\.jpg\z/, album.preview_picture)
+    %w[large medium small].each do |size|
+      path = Rails.root.join('public', 'images', size, album.preview_picture)
+      assert File.exist?(path), "expected #{size} variant at #{path}"
+      File.delete(path)
+    end
+  end
+
   # PUT /photo_albums/:id (update)
 
   test "update saves valid changes when no preview picture is uploaded" do
@@ -162,6 +186,21 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
     assert_response :success
     assert_template 'manage_pictures'
     assert_equal "U heeft geen foto's geselecteerd om toe te voegen.", flash[:error]
+  end
+
+  test "add_picture stores the uploaded image and creates resized variants" do
+    assert_difference('PhotoAlbumPicture.count', 1) do
+      post :add_picture, :album_id => @photo_album.id, :file => [uploaded_jpeg_fixture]
+    end
+
+    picture = PhotoAlbumPicture.last
+    assert_equal @photo_album.id, picture.photo_album_id
+    %w[large medium small].each do |size|
+      path = Rails.root.join('public', 'images', size, picture.filename)
+      assert File.exist?(path), "expected #{size} variant at #{path}"
+      File.delete(path)
+    end
+    assert_equal I18n.t('flash.photo_albums.pictures_added'), flash[:notice]
   end
 
   # POST /photo_albums/destroy_many_pictures
