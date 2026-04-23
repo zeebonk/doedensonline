@@ -9,6 +9,7 @@ src/public/images/small/
 src/db/*.sqlite3
 src/log/
 src/tmp/
+src/public/assets/
 .DS_Store
 src/passenger.*.pid
 src/passenger.*.pid.lock

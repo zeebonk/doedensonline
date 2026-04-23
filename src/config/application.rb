@@ -14,8 +14,20 @@ module DoedensOnline
 
     config.filter_parameters += [:password]
 
-    # The legacy app serves all CSS/JS straight out of public/, so the asset
-    # pipeline is intentionally disabled to keep the upgrade minimal.
-    config.assets.enabled = false
+    config.assets.enabled = true
+    config.assets.precompile += %w(
+      main.css
+      home.css
+      photo_albums.css
+      settings.css
+      colorbox.css
+      ie6.css
+      ie7.css
+      scaffold.css
+      load-tiny-mce.js
+      jquery-1.4.2.min.js
+      colorbox/jquery.colorbox-min.js
+      test.js
+    )
   end
 end
