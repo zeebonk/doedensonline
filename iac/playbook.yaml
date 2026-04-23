@@ -12,6 +12,15 @@
        state: present
      when: 0 > 1  # Disabled: not enough memory to run `yum` :(
 
+   - name: Ensure dependencies are installed (Debian)
+     ansible.builtin.apt:
+       name:
+        - htop
+        - vim
+        - amazon-ecr-credential-helper
+       state: present
+     when: ansible_os_family == 'Debian'
+
    - name: Ensure app state volume is xfs
      community.general.filesystem:
        fstype: xfs
@@ -34,7 +43,32 @@
        group: root
        state: directory
        mode: '777'  # TODO: better permissions
-       recurse: true
+
+   - name: Ensure app state subdirectories exist
+     ansible.builtin.file:
+       path: "{{ app_state_path }}/{{ item }}"
+       state: directory
+       owner: root
+       group: root
+       mode: '777'  # TODO: better permissions
+     loop:
+       - db
+       - small
+       - medium
+       - large
+
+   - name: Ensure sqlite database files exist
+     ansible.builtin.file:
+       path: "{{ app_state_path }}/db/{{ item }}.sqlite3"
+       state: touch
+       owner: root
+       group: root
+       mode: '777'  # TODO: better permissions
+       modification_time: preserve
+       access_time: preserve
+     loop:
+       - development
+       - production
 
    - name: Ensure Docker is running
      ansible.builtin.service:
@@ -58,6 +92,13 @@
    - name: Ensure requests is installed  # Required by the Docker module
      ansible.builtin.pip:
        name: requests
+     when: ansible_os_family != 'Debian'
+
+   - name: Ensure python3-requests is installed (Debian)  # Required by the Docker module
+     ansible.builtin.apt:
+       name: python3-requests
+       state: present
+     when: ansible_os_family == 'Debian'
 
    - name: Ensure ~/.aws/ exists
      ansible.builtin.file:
@@ -83,6 +124,7 @@
      community.docker.docker_container:
        name: doedensonline
        image: "313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:{{ image_tag }}"
+       pull: "{{ image_tag == 'latest' }}"
        restart_policy: always
        published_ports:
         - 0.0.0.0:8080:8080
@@ -97,6 +139,22 @@
         - "{{ app_state_path }}/small/:/app/public/images/small/"
         - "{{ app_state_path }}/medium/:/app/public/images/medium/"
         - "{{ app_state_path }}/large/:/app/public/images/large/"
+
+   - name: Ensure database schema is up to date
+     community.docker.docker_container_exec:
+       container: doedensonline
+       command: rake db:migrate
+       env:
+         RAILS_ENV: "{{ rails_env }}"
+     when: rails_env == 'development'
+
+   - name: Ensure database is seeded
+     community.docker.docker_container_exec:
+       container: doedensonline
+       command: rake db:seed
+       env:
+         RAILS_ENV: "{{ rails_env }}"
+     when: rails_env == 'development'
 
    - name: Ensure proxy configuration is present
      ansible.builtin.template:

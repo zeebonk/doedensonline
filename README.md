@@ -50,14 +50,18 @@ docker buildx build --push \
 
 ## Deploy application
 
+Deploys target either `prod` (AWS EC2) or `dev` (Hetzner Cloud). Pass the target
+group via `-e target=<group>`.
+
 ```
 cd iac
 pdm install
-pdm run ansible-playbook -i inventory.yaml playbook.yaml
+pdm run ansible-playbook -i inventory.yaml playbook.yaml -e target=prod
+pdm run ansible-playbook -i inventory.yaml playbook.yaml -e target=dev
 ```
 
 To dry-run and preview changes:
 
 ```
-pdm run ansible-playbook -i inventory.yaml playbook.yaml --check --diff
+pdm run ansible-playbook -i inventory.yaml playbook.yaml --check --diff -e target=prod
 ```

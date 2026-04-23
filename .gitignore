@@ -5,7 +5,7 @@ designs/
 src/public/images/large/
 src/public/images/medium/
 src/public/images/small/
-src/db/
+src/db/*.sqlite3
 src/log/
 src/tmp/
 .DS_Store
