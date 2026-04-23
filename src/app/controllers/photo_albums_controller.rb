@@ -6,14 +6,12 @@ class PhotoAlbumsController < ApplicationController
 
   # GET /photo_albums
   def index
-    @page_title = [t('page_titles.albums_index'), t('page_titles.albums_section')]
     @photo_albums = paginate_photo_albums
   end
 
 
   # GET /photo_albums/page/:page_number
   def page
-    @page_title = [t('page_titles.albums_index'), t('page_titles.albums_section')]
     @photo_albums = paginate_photo_albums
     render :action => 'index'
   end
@@ -22,33 +20,28 @@ class PhotoAlbumsController < ApplicationController
   # GET /photo_albums/1
   def show
     @current_user = current_user
-    @page_title = [t('page_titles.albums_view'), t('page_titles.albums_section')]
     @photo_album_comments = PhotoAlbumComment.where("photo_album_id = ?", @photo_album.id).order('created_at ASC').all
   end
 
 
   # GET /photo_albums/new
   def new
-    @page_title = [t('page_titles.albums_new'), t('page_titles.albums_section')]
     @photo_album = PhotoAlbum.new
   end
 
 
   # GET /photo_albums/1/edit
   def edit
-    @page_title = [t('page_titles.albums_edit'), t('page_titles.albums_section')]
   end
 
 
   # GET /photo_albums/1/remove
   def remove
-    @page_title = [t('page_titles.albums_remove'), t('page_titles.albums_section')]
   end
 
 
   # GET /photo_albums/1/manage_pictures
   def manage_pictures
-    @page_title = [t('page_titles.albums_manage_pictures'), t('page_titles.albums_section')]
   end
 
 
@@ -80,7 +73,6 @@ class PhotoAlbumsController < ApplicationController
       end
     end
 
-    @page_title = [t('page_titles.albums_manage_pictures'), t('page_titles.albums_section')]
     render :action => 'manage_pictures', :id => @photo_album.id
   end
 
@@ -98,7 +90,6 @@ class PhotoAlbumsController < ApplicationController
       flash[:error] = t('flash.photo_albums.no_pictures_selected_destroy')
     end
 
-    @page_title = [t('page_titles.albums_manage_pictures'), t('page_titles.albums_section')]
     render :action => 'manage_pictures', :id => @photo_album.id
   end
 
@@ -123,7 +114,6 @@ class PhotoAlbumsController < ApplicationController
       flash[:notice] = t('flash.photo_albums.created')
       redirect_to(@photo_album)
     else
-      @page_title = [t('page_titles.albums_new'), t('page_titles.albums_section')]
       remove_images @photo_album.preview_picture
 
 			@title_error = true if @photo_album.errors[:title]
@@ -152,7 +142,6 @@ class PhotoAlbumsController < ApplicationController
       flash[:notice] = t('flash.photo_albums.updated')
       redirect_to(@photo_album)
     else
-      @page_title = [t('page_titles.albums_edit'), t('page_titles.albums_section')]
 			@title_error = true if @photo_album.errors[:title]
 			@description_error = true if @photo_album.errors[:description]
 			@preview_picture_error = true if @photo_album.errors[:preview_picture]

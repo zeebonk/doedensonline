@@ -1,3 +1,5 @@
+<% content_for :page_title, t('page_titles.sign_out') %>
+
 <p class="intro"><%= t('.intro') %></p>
 <p class="intro"><strong><%= t('.confirmation') %></strong></p>
 <%= form_tag :action => 'destroy_session' do %>

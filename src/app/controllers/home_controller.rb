@@ -4,13 +4,11 @@ class HomeController < ApplicationController
 
   # GET /home
   def index
-    @page_title = [t('page_titles.home')]
     @news_items = NewsItem.latest(3,0)
   end
 
   # GET /home/sign_in
   def sign_in
-    @page_title = [t('page_titles.sign_in')]
   end
 
   # POST /home/authenticate
@@ -34,7 +32,6 @@ class HomeController < ApplicationController
 
   # GET /home/sign_out
   def sign_out
-    @page_title = [t('page_titles.sign_out')]
   end
 
   # POST /home/session_destroy
@@ -50,7 +47,6 @@ class HomeController < ApplicationController
 
   # GET /home/password_forgotten
   def password_forgotten
-    @page_title = [t('page_titles.password_forgotten')]
   end
 
   # POST /home/reset_password
