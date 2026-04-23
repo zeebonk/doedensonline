@@ -20,3 +20,5 @@ RUN gem install json -v '1.8.6' \
 RUN bundle install
 
 COPY . .
+
+RUN bundle exec rake assets:precompile RAILS_ENV=production
