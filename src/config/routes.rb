@@ -4,8 +4,6 @@ DoedensOnline::Application.routes.draw do
   end
   resources :photo_album_pictures
   resources :photo_albums
-  resources :news_comments
-  resources :news_items
   resources :users
 
   get  'sign_in',  to: 'home#sign_in'
@@ -21,11 +19,11 @@ DoedensOnline::Application.routes.draw do
 
   get  'news/add',                      to: 'news#add'
   post 'news/create',                   to: 'news#create'
-  post 'news/update',                   to: 'news#update'
+  put  'news/update',                   to: 'news#update'
   post 'news/destroy',                  to: 'news#destroy'
 
   post 'news/create_comment',           to: 'news#create_comment'
-  post 'news/update_comment',           to: 'news#update_comment'
+  put  'news/update_comment',           to: 'news#update_comment'
   post 'news/destroy_comment',          to: 'news#destroy_comment'
 
   get  'news/:id/remove',               to: 'news#remove'
@@ -49,9 +47,9 @@ DoedensOnline::Application.routes.draw do
   get  'settings/profile',              to: 'settings#profile'
   get  'settings/password',             to: 'settings#password'
   get  'settings/notifications',        to: 'settings#notifications'
-  post 'settings/update_profile',       to: 'settings#update_profile'
-  post 'settings/update_password',      to: 'settings#update_password'
-  post 'settings/update_notifications', to: 'settings#update_notifications'
+  put  'settings/update_profile',       to: 'settings#update_profile'
+  put  'settings/update_password',      to: 'settings#update_password'
+  put  'settings/update_notifications', to: 'settings#update_notifications'
 
   root to: 'home#index'
 end

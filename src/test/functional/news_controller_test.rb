@@ -121,10 +121,10 @@ class NewsControllerTest < ActionController::TestCase
     assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
 
-  # POST /news/update
+  # PUT /news/update
 
   test "update saves valid changes" do
-    post :update, news_item: { id: @news_item.id, message: 'Updated message' }
+    put :update, news_item: { id: @news_item.id, message: 'Updated message' }
 
     assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Het nieuwtje is succesvol aangepast.', flash[:notice]
@@ -132,7 +132,7 @@ class NewsControllerTest < ActionController::TestCase
   end
 
   test "update re-renders edit on validation failure" do
-    post :update, news_item: { id: @news_item.id, message: '' }
+    put :update, news_item: { id: @news_item.id, message: '' }
 
     assert_response :success
     assert_template 'edit'
@@ -140,7 +140,7 @@ class NewsControllerTest < ActionController::TestCase
   end
 
   test "update redirects when news_item does not exist" do
-    post :update, news_item: { id: 999_999, message: 'anything' }
+    put :update, news_item: { id: 999_999, message: 'anything' }
 
     assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
@@ -255,12 +255,12 @@ class NewsControllerTest < ActionController::TestCase
     assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
 
-  # POST /news/update_comment
+  # PUT /news/update_comment
 
   test "update_comment saves valid changes" do
     comment = NewsComment.create!(message: 'old', news_item_id: @news_item.id, user_id: @user.id)
 
-    post :update_comment, news_comment: { id: comment.id, message: 'new' }
+    put :update_comment, news_comment: { id: comment.id, message: 'new' }
 
     assert_redirected_to controller: 'news', action: 'view', id: @news_item.id
     assert_equal 'Uw reactie is succesvol aangepast.', flash[:notice]
@@ -270,7 +270,7 @@ class NewsControllerTest < ActionController::TestCase
   test "update_comment re-renders on validation failure" do
     comment = NewsComment.create!(message: 'old', news_item_id: @news_item.id, user_id: @user.id)
 
-    post :update_comment, news_comment: { id: comment.id, message: '' }
+    put :update_comment, news_comment: { id: comment.id, message: '' }
 
     assert_response :success
     assert_template 'edit_comment'
@@ -278,7 +278,7 @@ class NewsControllerTest < ActionController::TestCase
   end
 
   test "update_comment redirects when comment does not exist" do
-    post :update_comment, news_comment: { id: 999_999, message: 'x' }
+    put :update_comment, news_comment: { id: 999_999, message: 'x' }
     assert_redirected_to controller: 'news', action: 'index'
     assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end

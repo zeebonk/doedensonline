@@ -60,10 +60,10 @@ class SettingsControllerTest < ActionController::TestCase
     assert_equal @user, assigns(:user)
   end
 
-  # POST /settings/update_profile
+  # PUT /settings/update_profile
 
   test "update_profile saves valid changes" do
-    post :update_profile, user: { first_name: 'Alicia', last_name: 'Anderson', email: 'alicia@example.com' }
+    put :update_profile, user: { first_name: 'Alicia', last_name: 'Anderson', email: 'alicia@example.com' }
 
     assert_redirected_to controller: 'settings', action: 'profile'
     assert_equal 'Uw profiel is succesvol aangepast.', flash[:settings]
@@ -73,7 +73,7 @@ class SettingsControllerTest < ActionController::TestCase
   end
 
   test "update_profile re-renders profile on invalid input" do
-    post :update_profile, user: { email: 'not-an-email' }
+    put :update_profile, user: { email: 'not-an-email' }
 
     assert_response :success
     assert_template 'profile'
@@ -81,10 +81,10 @@ class SettingsControllerTest < ActionController::TestCase
     assert_not_equal 'not-an-email', @user.reload.email
   end
 
-  # POST /settings/update_notifications
+  # PUT /settings/update_notifications
 
   test "update_notifications saves valid changes" do
-    post :update_notifications, user: { notify_news: false }
+    put :update_notifications, user: { notify_news: false }
 
     assert_redirected_to controller: 'settings', action: 'notifications'
     assert_equal 'Uw notificatie instellingen zijn succesvol aangepast.', flash[:settings]
@@ -92,21 +92,21 @@ class SettingsControllerTest < ActionController::TestCase
   end
 
   test "update_notifications re-renders notifications on invalid input" do
-    post :update_notifications, user: { email: 'not-an-email' }
+    put :update_notifications, user: { email: 'not-an-email' }
 
     assert_response :success
     assert_template 'notifications'
     assert assigns(:user).errors[:email].present?
   end
 
-  # POST /settings/update_password
+  # PUT /settings/update_password
 
   test "update_password changes password with correct old password" do
     original_password = @user.password
-    post :update_password,
-         old_password: 'secret',
-         password: 'newpass',
-         password_confirmation: 'newpass'
+    put :update_password,
+        old_password: 'secret',
+        password: 'newpass',
+        password_confirmation: 'newpass'
 
     assert_redirected_to controller: 'settings', action: 'password'
     assert_equal 'Uw wachtwoord is succesvol gewijzigd.', flash[:settings]
@@ -115,10 +115,10 @@ class SettingsControllerTest < ActionController::TestCase
 
   test "update_password rejects incorrect old password" do
     original_password = @user.password
-    post :update_password,
-         old_password: 'wrong',
-         password: 'newpass',
-         password_confirmation: 'newpass'
+    put :update_password,
+        old_password: 'wrong',
+        password: 'newpass',
+        password_confirmation: 'newpass'
 
     assert_response :success
     assert_template 'password'
@@ -128,10 +128,10 @@ class SettingsControllerTest < ActionController::TestCase
 
   test "update_password rejects too-short new password" do
     original_password = @user.password
-    post :update_password,
-         old_password: 'secret',
-         password: 'ab',
-         password_confirmation: 'ab'
+    put :update_password,
+        old_password: 'secret',
+        password: 'ab',
+        password_confirmation: 'ab'
 
     assert_response :success
     assert_template 'password'
@@ -141,10 +141,10 @@ class SettingsControllerTest < ActionController::TestCase
 
   test "update_password rejects mismatched confirmation" do
     original_password = @user.password
-    post :update_password,
-         old_password: 'secret',
-         password: 'newpass',
-         password_confirmation: 'different'
+    put :update_password,
+        old_password: 'secret',
+        password: 'newpass',
+        password_confirmation: 'different'
 
     assert_response :success
     assert_template 'password'

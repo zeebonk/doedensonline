@@ -44,7 +44,7 @@ class NewsController < ApplicationController
   def edit
   end
 
-  # POST /news/update
+  # PUT /news/update
   def update
     params[:news_item][:message] = root_src_img_tag(params[:news_item][:message])
     if @news_item.update_attributes(params[:news_item])
@@ -108,7 +108,7 @@ class NewsController < ApplicationController
   def edit_comment
   end
 
-  # POST /news/update_comment
+  # PUT /news/update_comment
   def update_comment
     params[:news_comment][:message] = root_src_img_tag(params[:news_comment][:message])
     if @news_comment.update_attributes(params[:news_comment])
