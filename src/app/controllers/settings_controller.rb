@@ -21,7 +21,7 @@ class SettingsController < ApplicationController
     @user = current_user
   end
 
-  # POST /settings/update_profile
+  # PUT /settings/update_profile
   def update_profile
     @user = current_user
 
@@ -33,7 +33,7 @@ class SettingsController < ApplicationController
     end
   end
 
-  # POST /settings/update_profile
+  # PUT /settings/update_notifications
   def update_notifications
     @user = current_user
 
@@ -45,7 +45,7 @@ class SettingsController < ApplicationController
     end
   end
 
-  # POST /settings/update_password
+  # PUT /settings/update_password
   def update_password
     @user = current_user
     # Try to authenticate the username and old password
