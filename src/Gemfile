@@ -9,6 +9,11 @@ gem 'dynamic_form', '1.1.4'
 gem 'rubocop', '0.41.0', require: false
 gem 'parser', '2.3.3.1', require: false
 
+group :assets do
+  gem 'uglifier', '2.7.2'
+  gem 'execjs',   '2.7.0'
+end
+
 # Pin transitive dependencies that have since dropped Ruby 1.9 support.
 gem 'multi_json',     '1.15.0'
 gem 'i18n',           '0.7.0'

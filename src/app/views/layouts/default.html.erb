@@ -7,32 +7,15 @@
 
   <title><%= yield(:page_title) %> - <%= t('site.title_suffix') %></title>
 
-  <%= stylesheet_link_tag 'main' %>
-  <%= controller_stylesheet_link_tag %>
-
-  <!--[if lte IE 7]><%= stylesheet_link_tag 'ie7' %><![endif]-->
-  <!--[if lte IE 6]><%= stylesheet_link_tag 'ie6' %><![endif]-->
-
-  <% if controller.action_name == 'add'            || controller.action_name == 'edit'           || controller.action_name == 'update' ||
-        controller.action_name == 'add_comment'    || controller.action_name == 'edit_comment'   || controller.action_name == 'create' ||
-        controller.action_name == 'create_comment' || controller.action_name == 'update_comment' || controller.action_name == 'new'    %>
-    <script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js" referrerpolicy="origin"></script>
-    <%= javascript_include_tag 'load-tiny-mce' %>
-  <% end %>
+  <%= stylesheet_link_tag 'application' %>
+  <script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js" referrerpolicy="origin"></script>
+  <%= javascript_include_tag 'application' %>
 
   <% if controller.controller_name == 'photo_albums' && controller.action_name == 'show' %>
-    <%= stylesheet_link_tag 'colorbox' %>
-    <%= javascript_include_tag 'jquery-1.4.2.min' %>
-    <%= javascript_include_tag 'colorbox/jquery.colorbox-min' %>
     <script>
       $(document).ready(function(){ $("a[rel='album']").colorbox({maxWidth:"85%", maxHeight:"85%"}); });
     </script>
   <% end %>
-
-	<% if controller.controller_name == 'photo_albums' && (controller.action_name == 'manage_pictures' || controller.action_name == 'add_picture') %>
-		<%= javascript_include_tag 'jquery-1.4.2.min' %>
-		<%= javascript_include_tag 'test' %>
-	<% end %>
 
 </head>
 <body>
@@ -83,7 +66,7 @@
 <div id="header">
   <div id="header-content">
     <h1>
-      <%= link_to image_tag("header.png", :alt => t('site.logo_alt')), {:controller => 'home', :action => 'index'}, :title => t('site.logo_title') %>
+      <%= link_to image_tag("/images/header.png", :alt => t('site.logo_alt')), {:controller => 'home', :action => 'index'}, :title => t('site.logo_title') %>
     </h1>
     <p class="sub-title">
       <%= t('site.sub_title') %>

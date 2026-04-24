@@ -14,8 +14,6 @@ module DoedensOnline
 
     config.filter_parameters += [:password]
 
-    # The legacy app serves all CSS/JS straight out of public/, so the asset
-    # pipeline is intentionally disabled to keep the upgrade minimal.
-    config.assets.enabled = false
+    config.assets.enabled = true
   end
 end

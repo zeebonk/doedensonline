@@ -3,6 +3,10 @@ DoedensOnline::Application.configure do
 
   config.serve_static_assets = true
 
+  config.assets.compress = true
+  config.assets.compile = true
+  config.assets.digest = true
+
   config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
 

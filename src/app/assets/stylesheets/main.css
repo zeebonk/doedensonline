@@ -28,7 +28,7 @@ p.intro a
 
 #main-menu
 {
-  background: url("../images/main-menu-background.gif") repeat-x;
+  background: url("/images/main-menu-background.gif") repeat-x;
   margin: 0;
   padding: 0;
   height: 63px;
@@ -65,7 +65,7 @@ p.intro a
 
 #main-menu ul li a.active
 {
-  background: url("../images/main-menu-active-item.gif") center top no-repeat;
+  background: url("/images/main-menu-active-item.gif") center top no-repeat;
 }
 
 #main-menu ul li a
@@ -193,14 +193,14 @@ p.error { color: red; }
 
 #footer
 {
-  background: url("../images/footer-background.gif") repeat-x;
+  background: url("/images/footer-background.gif") repeat-x;
   height: 50px;
 }
 
 div.even div.poster-wrapper
 {
   float: left;
-  background: url("../images/big-balloon-arrow-left.gif") top right no-repeat;
+  background: url("/images/big-balloon-arrow-left.gif") top right no-repeat;
   padding-right: 41px;
 }
 
@@ -250,7 +250,7 @@ span.month-year
 
 div.balloon-top
 {
-  background: url("../images/big-balloon-top.gif") no-repeat top #99b2b7;
+  background: url("/images/big-balloon-top.gif") no-repeat top #99b2b7;
   width: 679px;
   font-family: georgia;
   color: white;
@@ -263,7 +263,7 @@ div.balloon-top p {
 
 div.balloon-bottom
 {
-  background: url("../images/big-balloon-bottom.gif") no-repeat bottom;
+  background: url("/images/big-balloon-bottom.gif") no-repeat bottom;
   padding: 20px;
   padding-top: 2px;
 }
@@ -357,7 +357,7 @@ div.odd div.balloon-top { float: left; }
 div.odd div.poster-wrapper
 {
   float: right;
-  background: url("../images/big-balloon-arrow-right.gif") top left no-repeat;
+  background: url("/images/big-balloon-arrow-right.gif") top left no-repeat;
   padding-left: 41px;
 }
 /* ######################### VIEW ######################### */
@@ -368,18 +368,18 @@ div.news-index-actions a.next
 
 div.reaction div.balloon-top
 {
-  background: url("../images/big-balloon-top-reaction.gif") no-repeat top #7a6a53;
+  background: url("/images/big-balloon-top-reaction.gif") no-repeat top #7a6a53;
 }
 
 div.reaction div.balloon-bottom
 {
-  background: url("../images/big-balloon-bottom-reaction.gif") no-repeat bottom;
+  background: url("/images/big-balloon-bottom-reaction.gif") no-repeat bottom;
   padding-bottom: 3px;
 }
 
 div.reaction div.poster-wrapper
 {
-  background: url("../images/big-balloon-arrow-right-reaction.gif") 0px -17px no-repeat;
+  background: url("/images/big-balloon-arrow-right-reaction.gif") 0px -17px no-repeat;
 }
 
 div.reaction div.balloon-bottom
