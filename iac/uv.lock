@@ -286,7 +286,7 @@ dev = [
 requires-dist = [{ name = "ansible", specifier = "==8.5.0" }]
 
 [package.metadata.requires-dev]
-dev = [{ name = "ansible-lint" }]
+dev = [{ name = "ansible-lint", specifier = "==24.12.2" }]
 
 [[package]]
 name = "importlib-metadata"
