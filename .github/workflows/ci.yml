@@ -45,3 +45,26 @@ jobs:
 
       - name: Check OpenTofu formatting
         run: tofu fmt -check -recursive
+
+  ansible-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: iac
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Ansible and ansible-lint
+        run: pip install ansible==8.5.0 ansible-lint
+
+      - name: Run ansible-lint
+        run: ansible-lint playbook.yaml sync.yaml
+
+      - name: Check playbook syntax
+        run: |
+          ansible-playbook --syntax-check -i localhost, -e target=localhost playbook.yaml
+          ansible-playbook --syntax-check -i localhost, -e target=localhost sync.yaml
