@@ -3,9 +3,12 @@
 inventory.yaml
 iac/terraform.tfvars
 designs/
-src/public/images/large/
-src/public/images/medium/
-src/public/images/small/
+src/public/images/large/*
+src/public/images/medium/*
+src/public/images/small/*
+!src/public/images/large/.keep
+!src/public/images/medium/.keep
+!src/public/images/small/.keep
 src/db/*.sqlite3
 src/log/
 src/tmp/

@@ -1,4 +1,4 @@
-name: Lint
+name: CI
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  rubocop:
+  ci:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -29,3 +29,6 @@ jobs:
 
       - name: Run RuboCop
         run: docker compose run --rm app bundle exec rubocop
+
+      - name: Run tests
+        run: docker compose run --rm -e RAILS_ENV=test app bundle exec rake db:migrate test
