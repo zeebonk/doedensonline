@@ -11,6 +11,10 @@ terraform {
       source  = "hetznercloud/hcloud"
       version = "~> 1.60"
     }
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.0"
+    }
   }
 }
 
@@ -33,6 +37,10 @@ variable "hcloud_token" {
 
 provider "hcloud" {
   token = var.hcloud_token
+}
+
+provider "github" {
+  owner = "zeebonk"
 }
 
 resource "aws_default_subnet" "doedensonline" {
@@ -295,7 +303,6 @@ resource "local_file" "inventory" {
         "rails_env" : "development",
         "domain" : "dev.doedensonline.nl",
         "extra_domains" : [],
-        "image_tag" : "latest",
         "app_state_path" : "/app-state/dev",
       },
       "hosts" : {
@@ -322,13 +329,31 @@ resource "hcloud_ssh_key" "gijs_macbook" {
   public_key = local.gijs_macbook_public_key
 }
 
+resource "tls_private_key" "github_actions_dev" {
+  algorithm = "ED25519"
+}
+
+resource "hcloud_ssh_key" "github_actions" {
+  name       = "github-actions"
+  public_key = trimspace(tls_private_key.github_actions_dev.public_key_openssh)
+}
+
 resource "hcloud_server" "doedensonline" {
   name        = "doedensonline"
   server_type = "cx23"
   image       = "ubuntu-24.04"
   location    = "fsn1"
   backups     = true
-  ssh_keys    = [hcloud_ssh_key.gijs_macbook.id]
+  ssh_keys = [
+    hcloud_ssh_key.gijs_macbook.id,
+    hcloud_ssh_key.github_actions.id,
+  ]
+
+  # ssh_keys is only honored at server creation. Adding the github-actions
+  # key after the fact requires appending it to authorized_keys directly.
+  lifecycle {
+    ignore_changes = [ssh_keys]
+  }
 }
 
 resource "hcloud_firewall" "doedensonline" {
@@ -526,6 +551,26 @@ resource "aws_dlm_lifecycle_policy" "doedensonline" {
     }
   }
 }
+
+# GitHub Actions secrets for the dev deploy job
+
+locals {
+  github_actions_dev_secrets = {
+    DEV_SSH_HOST        = hcloud_server.doedensonline.ipv4_address
+    DEV_SSH_PRIVATE_KEY = tls_private_key.github_actions_dev.private_key_openssh
+    DEV_SMTP_HOST       = "email-smtp.${local.region}.amazonaws.com"
+    DEV_SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
+    DEV_SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
+  }
+}
+
+resource "github_actions_secret" "dev_deploy" {
+  for_each        = local.github_actions_dev_secrets
+  repository      = "doedensonline"
+  secret_name     = each.key
+  plaintext_value = each.value
+}
+
 
 # Outputs
 

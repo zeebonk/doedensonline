@@ -124,7 +124,6 @@
      community.docker.docker_container:
        name: doedensonline
        image: "313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:{{ image_tag }}"
-       pull: "{{ image_tag == 'latest' }}"
        restart_policy: always
        published_ports:
         - 0.0.0.0:8080:8080
