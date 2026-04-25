@@ -55,6 +55,13 @@ cp terraform.tfvars.example terraform.tfvars
 # edit terraform.tfvars and set hcloud_token
 ```
 
+Export a GitHub personal access token with `repo` scope so Terraform can
+manage the GitHub Actions secrets used by the dev deploy workflow:
+
+```
+export GITHUB_TOKEN=...
+```
+
 Then apply:
 
 ```
