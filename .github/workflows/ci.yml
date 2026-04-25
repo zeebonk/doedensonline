@@ -8,11 +8,24 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     defaults:
       run:
         working-directory: src
+    env:
+      ECR_REGISTRY: 313336455033.dkr.ecr.eu-west-1.amazonaws.com
+      ECR_REPOSITORY: doedensonline
     steps:
       - uses: actions/checkout@v4
+
+      - name: Compute image tag
+        id: tag
+        env:
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: echo "tag=$(echo "${BRANCH}" | tr '/' '-').$(git rev-parse --short "${SHA}")" >> "$GITHUB_OUTPUT"
 
       # The ruby:1.9.3-p551 base image still uses Docker Schema 1, which
       # containerd v2+ refuses by default. Re-enable it on the daemon.
@@ -25,13 +38,33 @@ jobs:
           sudo systemctl restart docker
 
       - name: Build app image
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
         run: docker compose build
 
       - name: Run RuboCop
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
         run: docker compose run --rm app bundle exec rubocop
 
       - name: Run tests
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
         run: docker compose run --rm -e RAILS_ENV=test app bundle exec rake db:migrate test
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::313336455033:role/github-actions
+          aws-region: eu-west-1
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Push image to ECR
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: docker push "${ECR_REGISTRY}/${ECR_REPOSITORY}:${TAG}"
 
   tofu-fmt:
     runs-on: ubuntu-latest
