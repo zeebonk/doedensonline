@@ -25,7 +25,7 @@ jobs:
         env:
           BRANCH: ${{ github.head_ref || github.ref_name }}
           SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: echo "tag=$(echo "${BRANCH}" | tr '/' '-')-${SHA}" >> "$GITHUB_OUTPUT"
+        run: echo "tag=$(echo "${BRANCH}" | tr '/' '-')-$(git rev-parse --short "${SHA}")" >> "$GITHUB_OUTPUT"
 
       # The ruby:1.9.3-p551 base image still uses Docker Schema 1, which
       # containerd v2+ refuses by default. Re-enable it on the daemon.
