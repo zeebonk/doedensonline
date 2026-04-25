@@ -54,17 +54,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      - uses: astral-sh/setup-uv@v5
 
-      - name: Install Ansible and ansible-lint
-        run: pip install ansible==8.5.0 ansible-lint
+      - name: Install dependencies
+        run: uv sync --all-groups
 
       - name: Run ansible-lint
-        run: ansible-lint playbook.yaml sync.yaml
+        run: uv run ansible-lint playbook.yaml sync.yaml
 
       - name: Check playbook syntax
         run: |
-          ansible-playbook --syntax-check -i localhost, -e target=localhost playbook.yaml
-          ansible-playbook --syntax-check -i localhost, -e target=localhost sync.yaml
+          uv run ansible-playbook --syntax-check -i localhost, -e target=localhost playbook.yaml
+          uv run ansible-playbook --syntax-check -i localhost, -e target=localhost sync.yaml
