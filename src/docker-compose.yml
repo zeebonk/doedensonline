@@ -1,6 +1,13 @@
 services:
     app:
-        build: .
+        build:
+            context: .
+            cache_from:
+                - type=gha
+            cache_to:
+                - type=gha,mode=max
+            x-bake:
+                load: true
         image: 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:${TAG:-latest}
         platform: linux/amd64
         environment:
