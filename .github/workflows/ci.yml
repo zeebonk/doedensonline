@@ -45,3 +45,24 @@ jobs:
 
       - name: Check OpenTofu formatting
         run: tofu fmt -check -recursive
+
+  ansible-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: iac
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install dependencies
+        run: uv sync --all-groups
+
+      - name: Run ansible-lint
+        run: uv run ansible-lint playbook.yaml sync.yaml
+
+      - name: Check playbook syntax
+        run: |
+          uv run ansible-playbook --syntax-check -i localhost, -e target=localhost playbook.yaml
+          uv run ansible-playbook --syntax-check -i localhost, -e target=localhost sync.yaml

@@ -33,6 +33,17 @@ docker compose run --rm app bundle exec rubocop --auto-correct
 ```
 
 
+## Lint Ansible playbooks
+
+```
+cd iac
+uv sync --all-groups
+uv run ansible-lint playbook.yaml sync.yaml
+uv run ansible-playbook --syntax-check -i localhost, -e target=localhost playbook.yaml
+uv run ansible-playbook --syntax-check -i localhost, -e target=localhost sync.yaml
+```
+
+
 ## Setup infrastructure
 
 Copy the Terraform variables template and paste your Hetzner Cloud API token
