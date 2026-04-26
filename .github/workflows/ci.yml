@@ -4,6 +4,8 @@ on:
   push:
     branches: [master]
   pull_request:
+  release:
+    types: [published]
 
 jobs:
   ci:
@@ -25,9 +27,16 @@ jobs:
       - name: Compute image tag
         id: tag
         env:
+          EVENT: ${{ github.event_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
           BRANCH: ${{ github.head_ref || github.ref_name }}
           SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: echo "tag=$(echo "${BRANCH}" | tr '/' '-').$(git rev-parse --short "${SHA}")" >> "$GITHUB_OUTPUT"
+        run: |
+          if [ "${EVENT}" = "release" ]; then
+            echo "tag=${RELEASE_TAG}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=$(echo "${BRANCH}" | tr '/' '-').$(git rev-parse --short "${SHA}")" >> "$GITHUB_OUTPUT"
+          fi
 
       # The ruby:1.9.3-p551 base image still uses Docker Schema 1, which
       # containerd v2+ refuses by default. Re-enable it on the daemon.
@@ -154,4 +163,57 @@ jobs:
 
           docker exec -e RAILS_ENV=development doedensonline rake db:migrate
           docker exec -e RAILS_ENV=development doedensonline rake db:seed
+          REMOTE
+
+  deploy-prod:
+    needs: [ci, tofu-fmt, ansible-lint]
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    env:
+      ECR_REGISTRY: 313336455033.dkr.ecr.eu-west-1.amazonaws.com
+      ECR_REPOSITORY: doedensonline
+      APP_STATE_PATH: /app-state
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${SSH_PRIVATE_KEY}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${SSH_HOST}" >> ~/.ssh/known_hosts
+
+      - name: Deploy to prod
+        env:
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          TAG: ${{ needs.ci.outputs.tag }}
+          SMTP_HOST: ${{ secrets.PROD_SMTP_HOST }}
+          SMTP_USERNAME: ${{ secrets.PROD_SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.PROD_SMTP_PASSWORD }}
+        run: |
+          ssh "ec2-user@${SSH_HOST}" sudo bash -se <<REMOTE
+          set -euo pipefail
+
+          IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}:${TAG}"
+
+          docker pull "\${IMAGE}"
+          docker rm -f doedensonline 2>/dev/null || true
+          docker run -d \\
+            --name doedensonline \\
+            --restart always \\
+            -p 0.0.0.0:8080:8080 \\
+            -e RAILS_ENV=production \\
+            -e DO_SMTP_HOST='${SMTP_HOST}' \\
+            -e DO_SMTP_USERNAME='${SMTP_USERNAME}' \\
+            -e DO_SMTP_PASSWORD='${SMTP_PASSWORD}' \\
+            -v '${APP_STATE_PATH}/db/development.sqlite3:/app/db/development.sqlite3:rw' \\
+            -v '${APP_STATE_PATH}/db/production.sqlite3:/app/db/production.sqlite3:rw' \\
+            -v '${APP_STATE_PATH}/small/:/app/public/images/small/' \\
+            -v '${APP_STATE_PATH}/medium/:/app/public/images/medium/' \\
+            -v '${APP_STATE_PATH}/large/:/app/public/images/large/' \\
+            "\${IMAGE}"
+
+          docker exec -e RAILS_ENV=production doedensonline rake db:migrate
           REMOTE

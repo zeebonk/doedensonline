@@ -284,7 +284,6 @@ resource "local_file" "inventory" {
         "rails_env" : "production",
         "domain" : "doedensonline.nl",
         "extra_domains" : ["www.doedensonline.nl"],
-        "image_tag" : "1.0.5",
         "app_state_path" : "/app-state",
         "app_state_device" : "/dev/sdf",
       },
@@ -336,6 +335,17 @@ resource "tls_private_key" "github_actions_dev" {
 resource "hcloud_ssh_key" "github_actions" {
   name       = "github-actions"
   public_key = trimspace(tls_private_key.github_actions_dev.public_key_openssh)
+}
+
+resource "tls_private_key" "github_actions_prod" {
+  algorithm = "ED25519"
+}
+
+module "key_pair_github_actions_prod" {
+  source = "terraform-aws-modules/key-pair/aws"
+
+  key_name   = "github-actions"
+  public_key = trimspace(tls_private_key.github_actions_prod.public_key_openssh)
 }
 
 resource "hcloud_server" "doedensonline" {
@@ -562,10 +572,25 @@ locals {
     DEV_SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
     DEV_SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
   }
+
+  github_actions_prod_secrets = {
+    PROD_SSH_HOST        = aws_eip.doedensonline.public_ip
+    PROD_SSH_PRIVATE_KEY = tls_private_key.github_actions_prod.private_key_openssh
+    PROD_SMTP_HOST       = "email-smtp.${local.region}.amazonaws.com"
+    PROD_SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
+    PROD_SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
+  }
 }
 
 resource "github_actions_secret" "dev_deploy" {
   for_each        = local.github_actions_dev_secrets
+  repository      = "doedensonline"
+  secret_name     = each.key
+  plaintext_value = each.value
+}
+
+resource "github_actions_secret" "prod_deploy" {
+  for_each        = local.github_actions_prod_secrets
   repository      = "doedensonline"
   secret_name     = each.key
   plaintext_value = each.value

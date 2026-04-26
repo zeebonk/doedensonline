@@ -82,18 +82,32 @@ docker buildx build --push \
 
 ## Deploy application
 
-Deploys target either `prod` (AWS EC2) or `dev` (Hetzner Cloud). Pass the target
-group via `-e target=<group>`.
+Releases are automated via GitHub Actions:
+
+- **Dev** — every push to `master` builds and pushes the image to ECR, then
+  SSHes into the Hetzner dev host and replaces the running container.
+- **Prod** — publishing a GitHub Release builds and pushes an image tagged with
+  the release tag, then SSHes into the AWS EC2 prod host and replaces the
+  running container.
+
+Both flows run the test, RuboCop, ansible-lint, and `tofu fmt` jobs first; a
+failure in any of those blocks the deploy.
+
+### Manual deploy via Ansible
+
+The Ansible playbook is still available for one-off runs (e.g. to re-converge
+host config or roll back to a specific image). Pass the target group via
+`-e target=<group>` and the image tag via `-e image_tag=<tag>`:
 
 ```
 cd iac
 uv sync
-uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=prod
-uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=dev
+uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=prod -e image_tag=1.0.5
+uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=dev -e image_tag=master.abc1234
 ```
 
 To dry-run and preview changes:
 
 ```
-uv run ansible-playbook -i inventory.yaml playbook.yaml --check --diff -e target=prod
+uv run ansible-playbook -i inventory.yaml playbook.yaml --check --diff -e target=prod -e image_tag=1.0.5
 ```
