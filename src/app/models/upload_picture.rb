@@ -2,10 +2,17 @@
 require 'mini_magick'
 
 class UploadPicture
+  ALLOWED_EXTENSIONS = %w(.jpg .jpeg .png .gif).freeze
+  MAX_SIZE_BYTES = 10 * 1024 * 1024
+
   attr_accessor :filename, :source_image, :error
+
+  class InvalidUpload < StandardError; end
 
   # The initialisation method
   def initialize(upload)
+    validate!(upload)
+
     # Load the image and create a new filename
     source = upload.respond_to?(:tempfile) ? upload.tempfile : upload
     source.binmode if source.respond_to?(:binmode)
@@ -35,6 +42,26 @@ class UploadPicture
   end
 
   private
+
+  def validate!(upload)
+    raise InvalidUpload, "no upload" if upload.nil?
+
+    name = upload.respond_to?(:original_filename) ? upload.original_filename.to_s : ''
+    extension = File.extname(name).downcase
+    unless ALLOWED_EXTENSIONS.include?(extension)
+      raise InvalidUpload, "unsupported extension: #{extension.inspect}"
+    end
+
+    size =
+      if upload.respond_to?(:size)
+        upload.size
+      elsif upload.respond_to?(:tempfile)
+        upload.tempfile.size
+      else
+        File.size(upload.path)
+      end
+    raise InvalidUpload, "file too large: #{size} bytes" if size && size > MAX_SIZE_BYTES
+  end
 
   def draw_picture_in_canvas(width, height)
     # Create a new image with the size of the box and a white background

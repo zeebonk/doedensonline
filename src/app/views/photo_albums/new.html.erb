@@ -21,12 +21,12 @@
 			<%= f.text_area :description, :rows => 12 %>
 		</p>
 		<p>
-			<%= f.label :preview_picture %>
-			<% if (@preview_picture_error) %>
-				<span class="error-message"><%= t('.preview_picture_error') %></span>
+			<%= label_tag 'photo_album_pictures', t('.pictures_label') %>
+			<% if (@pictures_error) %>
+				<span class="error-message"><%= t('.pictures_error') %></span>
 			<% end %>
 			<br>
-			<%= f.file_field :preview_picture %>
+			<%= file_field_tag 'photo_album[pictures][]', multiple: true %>
 		</p>
 		<p>
 			<%= f.submit t('.submit') %>

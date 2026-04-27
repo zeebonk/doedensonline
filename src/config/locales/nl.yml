@@ -141,6 +141,7 @@ nl:
       updated: "Gebruiker is succesvol aangepast."
     photo_albums_errors:
       unsupported_image: "Unsupported image selected"
+      no_pictures_selected: "U heeft geen foto's geselecteerd."
 
   layouts:
     default:
@@ -243,10 +244,11 @@ nl:
       edit_comment: "Aanpassen »"
       edit_comment_title: "Pas deze reactie aan"
     new:
-      intro: "Op deze pagina kunt u een nieuw fotoalbum aanmaken. Vul eerst een titel en beschrijving in. Vervolgens kiest u onder Voorbeeld afbeelding een foto bestand die op de voorkant van de album moet komen. Klik vervolgens op \"Maak album aan\", deze knop stuur u naar de foto beheer pagina voor de nu door u aangemaakte fotoalbum. Op deze pagina kunt u uw album vervolgens vullen met uw foto's."
+      intro: "Op deze pagina kunt u een nieuw fotoalbum aanmaken. Vul een titel en beschrijving in en selecteer alle foto's voor het album in één keer (houd Ctrl/Cmd ingedrukt om meerdere bestanden te kiezen). De eerste foto wordt automatisch gebruikt als voorbeeld afbeelding. Klik vervolgens op \"Maak album aan\"."
       title_error: " er moet een titel worden ingevuld."
       description_error: " er moet een beschrijving worden ingevuld."
-      preview_picture_error: " er moet een geldige voorbeeld afbeelding worden geselecteerd."
+      pictures_label: "Foto's:"
+      pictures_error: " selecteer minimaal één geldige foto."
       submit: "Maak album aan"
       back: "« Terug naar het overzicht"
     edit:
@@ -258,7 +260,7 @@ nl:
       submit: "Aanpassingen opslaan"
       back: "« Terug naar het overzicht"
     manage_pictures:
-      intro: "Op deze pagina kunt u foto's toevoegen en verwijderen aan een fotoalbum. Toevoegen doet u door foto's te selecteren met de bestand selecteer velden en vervolgens op de Geselecteerde foto's uploaden knop te drukken. Het verwijderen van foto's doet u door foto's te selecteren door ze aan te vinken en vervolgens op de knop Geselecteerde foto's verwijderen te drukken."
+      intro: "Op deze pagina kunt u foto's toevoegen en verwijderen aan een fotoalbum. Toevoegen doet u door één of meerdere foto's te selecteren (houd Ctrl/Cmd ingedrukt om meerdere bestanden te kiezen) en vervolgens op de Geselecteerde foto's uploaden knop te drukken. Het verwijderen van foto's doet u door foto's te selecteren door ze aan te vinken en vervolgens op de knop Geselecteerde foto's verwijderen te drukken."
       add_pictures_label: "Foto's toevoegen:"
       upload_submit: "Geselecteerde foto's uploaden"
       remove_pictures_label: "Foto's verwijderen:"

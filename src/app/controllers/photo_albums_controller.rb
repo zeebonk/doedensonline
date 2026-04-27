@@ -40,30 +40,30 @@ class PhotoAlbumsController < ApplicationController
 
   # POST /photo_albums/add_picture
   def add_picture
-    flash[:error] = nil
-    flash[:notice] = t('flash.photo_albums.pictures_added')
+    files = Array(params['file']).reject(&:blank?)
 
-    if !params['file']
+    if files.empty?
       flash[:error] = t('flash.photo_albums.no_pictures_selected_upload')
-      flash[:notice] = nil
-    else
-      for file in params['file']
-        @photo_album_picture = PhotoAlbumPicture.new
-        @photo_album_picture.photo_album_id = @photo_album.id
+      return render action: 'manage_pictures', id: @photo_album.id
+    end
 
-        begin
-          picture = UploadPicture.new file
+    written_filenames = []
+    begin
+      PhotoAlbumPicture.transaction do
+        files.each do |file|
+          picture = UploadPicture.new(file)
           create_images picture
-          @photo_album_picture.filename = picture.filename
-          @photo_album_picture.save
-        rescue
-          @photo_album_picture.errors.add(:filename, t('flash.photo_albums_errors.unsupported_image'))
-          @photo_album_picture.destroy
-          remove_images picture.filename if picture
-          flash[:notice] = nil
-          flash[:error] = t('flash.photo_albums.some_pictures_failed')
+          written_filenames << picture.filename
+          PhotoAlbumPicture.create!(
+            photo_album_id: @photo_album.id,
+            filename: picture.filename
+          )
         end
       end
+      flash[:notice] = t('flash.photo_albums.pictures_added')
+    rescue UploadPicture::InvalidUpload, ActiveRecord::ActiveRecordError, StandardError
+      written_filenames.each { |fn| remove_images fn }
+      flash[:error] = t('flash.photo_albums.some_pictures_failed')
     end
 
     render action: 'manage_pictures', id: @photo_album.id
@@ -87,29 +87,48 @@ class PhotoAlbumsController < ApplicationController
 
   # POST /photo_albums
   def create
-    @photo_album = PhotoAlbum.new(params[:photo_album])
+    album_params = params[:photo_album] || {}
+    @photo_album = PhotoAlbum.new(title: album_params[:title], description: album_params[:description])
     @photo_album.user_id = current_user.id
 
-    # Picture upload
-    unless params[:photo_album][:preview_picture].nil?
+    files = Array(album_params[:pictures]).reject(&:blank?)
+
+    if files.empty?
+      @photo_album.errors.add(:pictures, t('flash.photo_albums_errors.no_pictures_selected'))
+    end
+
+    written_filenames = []
+    if @photo_album.errors.empty?
       begin
-        @picture = UploadPicture.new params[:photo_album][:preview_picture]
-        create_images @picture
-        @photo_album.preview_picture = @picture.filename
-      rescue
-        @photo_album.errors.add(:preview_picture, t('flash.photo_albums_errors.unsupported_image'))
+        PhotoAlbum.transaction do
+          files.each_with_index do |file, index|
+            picture = UploadPicture.new(file)
+            create_images picture
+            written_filenames << picture.filename
+            @photo_album.preview_picture = picture.filename if index == 0
+          end
+          @photo_album.save!
+          written_filenames.each do |fn|
+            PhotoAlbumPicture.create!(photo_album_id: @photo_album.id, filename: fn)
+          end
+        end
+      rescue UploadPicture::InvalidUpload
+        written_filenames.each { |fn| remove_images fn }
+        @photo_album.errors.add(:pictures, t('flash.photo_albums_errors.unsupported_image'))
+      rescue ActiveRecord::RecordInvalid, ActiveRecord::ActiveRecordError
+        written_filenames.each { |fn| remove_images fn }
       end
     end
 
-    if @photo_album.errors.empty? && @photo_album.save
+    if @photo_album.errors.empty? && @photo_album.persisted?
       flash[:notice] = t('flash.photo_albums.created')
       redirect_to(@photo_album)
     else
-      remove_images @photo_album.preview_picture
+      written_filenames.each { |fn| remove_images fn } unless @photo_album.persisted?
 
-      @title_error = true if @photo_album.errors[:title]
-      @description_error = true if @photo_album.errors[:description]
-      @preview_picture_error = true if @photo_album.errors[:preview_picture]
+      @title_error = true if @photo_album.errors[:title].present?
+      @description_error = true if @photo_album.errors[:description].present?
+      @pictures_error = true if @photo_album.errors[:pictures].present?
 
       render action: "new"
     end
