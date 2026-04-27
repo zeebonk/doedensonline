@@ -1,4 +1,6 @@
 class NewsController < ApplicationController
+  include Paginatable
+
   before_filter :current_user
   before_filter :load_news_item,            only: [:edit, :update, :remove, :destroy]
   before_filter :check_news_item_author,    only: [:edit, :update, :remove, :destroy]
@@ -7,12 +9,12 @@ class NewsController < ApplicationController
 
   # GET /news/
   def index
-    @news_items = paginate_news
+    @news_items = paginate(NewsItem, per_page: 10)
   end
 
   # GET /news/page/:page_number
   def page
-    @news_items = paginate_news
+    @news_items = paginate(NewsItem, per_page: 10)
     render action: 'index'
   end
 
@@ -165,17 +167,5 @@ class NewsController < ApplicationController
     NewsItem.find(id)
   rescue Exception => e
     nil
-  end
-
-  def paginate_news
-    @page = if params[:page_number]
-              params[:page_number].to_i
-            else
-              1
-            end
-    @news_per_page = 6
-    @pages = (NewsItem.all.count.to_f / @news_per_page).ceil
-    offset = (@page - 1) * @news_per_page
-    NewsItem.latest(@news_per_page, offset)
   end
 end
