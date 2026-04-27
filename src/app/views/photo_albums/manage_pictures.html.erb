@@ -9,17 +9,7 @@
 		<p>
 			<label><%= t('.add_pictures_label') %></label>
 		<p>
-			<%= file_field_tag 'file[]' %>
-			<%= file_field_tag 'file[]' %>
-			<%= file_field_tag 'file[]' %>
-
-			<%= file_field_tag 'file[]' %>
-			<%= file_field_tag 'file[]' %>
-			<%= file_field_tag 'file[]' %>
-
-			<%= file_field_tag 'file[]' %>
-			<%= file_field_tag 'file[]' %>
-			<%= file_field_tag 'file[]' %>
+			<%= file_field_tag 'file[]', multiple: true %>
 		</p>
 		<p>
 			<%= hidden_field_tag 'album_id', @photo_album.id %>

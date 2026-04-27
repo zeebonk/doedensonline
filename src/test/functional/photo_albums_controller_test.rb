@@ -7,6 +7,14 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
     PhotoAlbum.delete_all
     User.delete_all
 
+    # Clean up any image files leaked by prior tests in the suite.
+    %w(small medium large).each do |size|
+      Dir.glob(Rails.root.join('public', 'images', size, '*')).each do |path|
+        next if %w(temp.bmp preview.jpg).include?(File.basename(path))
+        File.delete(path)
+      end
+    end
+
     @user = create_user!(
       first_name: 'Alice',
       last_name: 'Anderson',
@@ -31,6 +39,12 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
 
   def uploaded_jpeg_fixture
     fixture_file_upload('files/sample.jpg', 'image/jpeg', :binary)
+  end
+
+  def uploaded_bad_extension_fixture
+    upload = fixture_file_upload('files/sample.jpg', 'application/octet-stream', :binary)
+    upload.instance_variable_set(:@original_filename, 'evil.exe')
+    upload
   end
 
   # Authorization
@@ -105,33 +119,73 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
 
   # POST /photo_albums (create)
 
-  test "create re-renders new with validation errors when preview_picture missing" do
+  test "create re-renders new with validation errors when no pictures uploaded" do
     assert_no_difference('PhotoAlbum.count') do
-      post :create, photo_album: { title: '', description: '', preview_picture: nil }
+      post :create, photo_album: { title: 'Title', description: 'Desc' }
     end
     assert_response :success
     assert_template 'new'
-    assert !assigns(:photo_album).errors.empty?
+    assert assigns(:photo_album).errors[:pictures].present?
   end
 
-  test "create saves the album and processes the uploaded preview image" do
+  test "create re-renders new with validation errors when title and description blank" do
+    before = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
+    assert_no_difference('PhotoAlbum.count') do
+      post :create, photo_album: { title: '', description: '', pictures: [uploaded_jpeg_fixture] }
+    end
+    after = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
+
+    assert_response :success
+    assert_template 'new'
+    refute assigns(:photo_album).persisted?
+    assert_equal before, after, "no files should orphan when validation fails"
+  end
+
+  test "create saves the album with multiple pictures and uses first as preview" do
     assert_difference('PhotoAlbum.count', 1) do
-      post :create, photo_album: {
-        title: 'New album',
-        description: 'Holiday photos',
-        preview_picture: uploaded_jpeg_fixture
-      }
+      assert_difference('PhotoAlbumPicture.count', 2) do
+        post :create, photo_album: {
+          title: 'New album',
+          description: 'Holiday photos',
+          pictures: [uploaded_jpeg_fixture, uploaded_jpeg_fixture]
+        }
+      end
     end
 
     album = PhotoAlbum.last
     assert_redirected_to album
     assert_equal @user.id, album.user_id
-    assert_match(/\A\d+\.jpg\z/, album.preview_picture)
-    %w(large medium small).each do |size|
-      path = Rails.root.join('public', 'images', size, album.preview_picture)
-      assert File.exist?(path), "expected #{size} variant at #{path}"
-      File.delete(path)
+    assert_equal 2, album.photo_album_pictures.count
+
+    pictures = album.photo_album_pictures.order(:id).to_a
+    assert_equal pictures.first.filename, album.preview_picture
+
+    pictures.each do |picture|
+      %w(large medium small).each do |size|
+        path = Rails.root.join('public', 'images', size, picture.filename)
+        assert File.exist?(path), "expected #{size} variant at #{path}"
+        File.delete(path)
+      end
     end
+  end
+
+  test "create rejects unsupported file types and writes no images" do
+    bad_file = uploaded_bad_extension_fixture
+
+    before = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
+    assert_no_difference('PhotoAlbum.count') do
+      post :create, photo_album: {
+        title: 'New album',
+        description: 'Holiday photos',
+        pictures: [bad_file]
+      }
+    end
+    after = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
+
+    assert_response :success
+    assert_template 'new'
+    assert assigns(:photo_album).errors[:pictures].present?
+    assert_equal before, after, "no files should be left on disk"
   end
 
   # PUT /photo_albums/:id (update)
@@ -200,6 +254,35 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
       File.delete(path)
     end
     assert_equal I18n.t('flash.photo_albums.pictures_added'), flash[:notice]
+  end
+
+  test "add_picture stores multiple uploaded images" do
+    assert_difference('PhotoAlbumPicture.count', 3) do
+      post(:add_picture,
+           album_id: @photo_album.id,
+           file: [uploaded_jpeg_fixture, uploaded_jpeg_fixture, uploaded_jpeg_fixture])
+    end
+
+    PhotoAlbumPicture.last(3).each do |picture|
+      %w(large medium small).each do |size|
+        path = Rails.root.join('public', 'images', size, picture.filename)
+        assert File.exist?(path), "expected #{size} variant at #{path}"
+        File.delete(path)
+      end
+    end
+  end
+
+  test "add_picture rolls back all writes when one upload fails" do
+    bad_file = uploaded_bad_extension_fixture
+
+    before = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
+    assert_no_difference('PhotoAlbumPicture.count') do
+      post :add_picture, album_id: @photo_album.id, file: [uploaded_jpeg_fixture, bad_file]
+    end
+    after = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
+
+    assert_equal before, after, "no files should be left on disk after partial failure"
+    assert_equal I18n.t('flash.photo_albums.some_pictures_failed'), flash[:error]
   end
 
   # POST /photo_albums/destroy_many_pictures
