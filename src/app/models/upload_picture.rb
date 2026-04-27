@@ -17,7 +17,7 @@ class UploadPicture
     source = upload.respond_to?(:tempfile) ? upload.tempfile : upload
     source.binmode if source.respond_to?(:binmode)
     @source_image = MiniMagick::Image.read(source)
-    @filename = "#{SecureRandom.hex(16)}.jpg"
+    @filename = "#{Time.now.strftime('%d%m%Y%H%M%S')}#{Time.now.usec}.jpg"
   end
 
   # This method creates a medium copy of the source image
