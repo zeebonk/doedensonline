@@ -47,7 +47,7 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert assigns(:photo_albums).include?(@photo_album)
-    assert_equal 1, assigns(:page)
+    assert_equal 1, assigns(:paginator).current_page
   end
 
   # GET /photo_albums/page/:page_number
@@ -56,7 +56,7 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
     get :page, page_number: '2'
     assert_response :success
     assert_template 'index'
-    assert_equal 2, assigns(:page)
+    assert_equal 2, assigns(:paginator).current_page
   end
 
   # GET /photo_albums/:id

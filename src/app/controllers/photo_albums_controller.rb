@@ -1,15 +1,17 @@
 class PhotoAlbumsController < ApplicationController
+  include Paginatable
+
   before_filter :load_photo_album,         only: [:show, :edit, :remove, :manage_pictures, :update, :destroy, :add_picture, :destroy_many_pictures]
   before_filter :check_photo_album_author, only: [:update, :destroy, :add_picture, :destroy_many_pictures]
 
   # GET /photo_albums
   def index
-    @photo_albums = paginate_photo_albums
+    @photo_albums = paginate(PhotoAlbum, per_page: 6)
   end
 
   # GET /photo_albums/page/:page_number
   def page
-    @photo_albums = paginate_photo_albums
+    @photo_albums = paginate(PhotoAlbum, per_page: 6)
     render action: 'index'
   end
 
@@ -159,17 +161,5 @@ class PhotoAlbumsController < ApplicationController
 
   def check_photo_album_author
     user_is_author @photo_album
-  end
-
-  def paginate_photo_albums
-    @page = if params[:page_number]
-              params[:page_number].to_i
-            else
-              1
-            end
-    @news_per_page = 6
-    @pages = (PhotoAlbum.all.count.to_f / @news_per_page).ceil
-    offset = (@page - 1) * @news_per_page
-    PhotoAlbum.latest(@news_per_page, offset)
   end
 end

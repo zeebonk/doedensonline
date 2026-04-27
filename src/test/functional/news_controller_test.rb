@@ -52,7 +52,7 @@ class NewsControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:news_items)
     assert assigns(:news_items).include?(@news_item)
-    assert_equal 1, assigns(:page)
+    assert_equal 1, assigns(:paginator).current_page
   end
 
   # GET /news/page/:page_number
@@ -61,7 +61,7 @@ class NewsControllerTest < ActionController::TestCase
     get :page, page_number: '2'
     assert_response :success
     assert_template 'index'
-    assert_equal 2, assigns(:page)
+    assert_equal 2, assigns(:paginator).current_page
   end
 
   # GET /news/add
