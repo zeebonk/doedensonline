@@ -2,6 +2,10 @@ require 'test_helper'
 
 class PhotoAlbumsControllerTest < ActionController::TestCase
   def setup
+    ActionMailer::Base.delivery_method = :test
+    ActionMailer::Base.perform_deliveries = true
+    ActionMailer::Base.deliveries.clear
+
     PhotoAlbumComment.delete_all
     PhotoAlbumPicture.delete_all
     PhotoAlbum.delete_all
@@ -21,6 +25,16 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
       email: 'alice@example.com',
       password: 'secret',
       notify_news: false,
+      notify_photo_album: false,
+      isadmin: false
+    )
+    @subscriber = create_user!(
+      first_name: 'Bob',
+      last_name: 'Brown',
+      email: 'bob@example.com',
+      password: 'secret',
+      notify_news: false,
+      notify_photo_album: true,
       isadmin: false
     )
     @photo_album = PhotoAlbum.create!(
@@ -167,6 +181,55 @@ class PhotoAlbumsControllerTest < ActionController::TestCase
         File.delete(path)
       end
     end
+  end
+
+  test "create notifies subscribers" do
+    post :create, photo_album: {
+      title: 'New album',
+      description: 'Holiday photos',
+      pictures: [uploaded_jpeg_fixture]
+    }
+
+    album = PhotoAlbum.last
+    assert_redirected_to album
+    assert_equal 1, ActionMailer::Base.deliveries.size
+    assert_equal ['bob@example.com'], ActionMailer::Base.deliveries.first.to
+
+    PhotoAlbumPicture.where(photo_album_id: album.id).each do |picture|
+      %w(large medium small).each do |size|
+        path = Rails.root.join('public', 'images', size, picture.filename)
+        File.delete(path) if File.exist?(path)
+      end
+    end
+  end
+
+  test "create does not email the author even when they have notify_photo_album" do
+    @user.update_attribute(:notify_photo_album, true)
+
+    post :create, photo_album: {
+      title: 'New album',
+      description: 'Holiday photos',
+      pictures: [uploaded_jpeg_fixture]
+    }
+
+    album = PhotoAlbum.last
+    assert_equal 1, ActionMailer::Base.deliveries.size
+    assert_equal ['bob@example.com'], ActionMailer::Base.deliveries.first.to
+
+    PhotoAlbumPicture.where(photo_album_id: album.id).each do |picture|
+      %w(large medium small).each do |size|
+        path = Rails.root.join('public', 'images', size, picture.filename)
+        File.delete(path) if File.exist?(path)
+      end
+    end
+  end
+
+  test "create sends no email when validation fails" do
+    assert_no_difference('PhotoAlbum.count') do
+      post :create, photo_album: { title: 'Title', description: 'Desc' }
+    end
+
+    assert_equal 0, ActionMailer::Base.deliveries.size
   end
 
   test "create rejects unsupported file types and writes no images" do

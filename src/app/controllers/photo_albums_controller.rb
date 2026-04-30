@@ -122,6 +122,10 @@ class PhotoAlbumsController < ApplicationController
 
     if @photo_album.errors.empty? && @photo_album.persisted?
       flash[:notice] = t('flash.photo_albums.created')
+      targets = User.where(notify_photo_album: true).where('id != ?', current_user.id)
+      targets.each do |target|
+        Mailer.notify_new_photo_album(target.email, @photo_album, current_user).deliver
+      end
       redirect_to(@photo_album)
     else
       written_filenames.each { |fn| remove_images fn } unless @photo_album.persisted?

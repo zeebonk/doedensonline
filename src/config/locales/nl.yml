@@ -7,6 +7,7 @@ nl:
         email: "E-mail adres"
         password: "Wachtwoord"
         notify_news: "Mail bij nieuwe nieuwtjes"
+        notify_photo_album: "Mail bij nieuwe fotoalbums"
         isadmin: "Beheerder"
       news_item:
         message: "Bericht"
@@ -342,6 +343,7 @@ nl:
     subjects:
       password_forgotten: "Nieuw wachtwoord"
       notify_new_news: "Nieuw nieuwtje"
+      notify_new_photo_album: "Nieuw fotoalbum"
     notify_new_news:
       greeting: "Beste familielid,"
       posted_by: "Er is een nieuw nieuwtje geplaatst door %{name}."
@@ -349,6 +351,16 @@ nl:
       link_text: "HIER"
       link_suffix: "om het nieuwtje te bekijken."
       link_text_plain: "Ga naar %{url} om het nieuwtje te bekijken."
+      closing: "Met vriendelijke groet,"
+      signature: "DoedensOnline.nl"
+      ps: "PS. Dit is een automatisch gegenereerd bericht."
+    notify_new_photo_album:
+      greeting: "Beste familielid,"
+      posted_by: "Er is een nieuw fotoalbum geplaatst door %{name}."
+      link_prefix: "Klik"
+      link_text: "HIER"
+      link_suffix: "om het fotoalbum te bekijken."
+      link_text_plain: "Ga naar %{url} om het fotoalbum te bekijken."
       closing: "Met vriendelijke groet,"
       signature: "DoedensOnline.nl"
       ps: "PS. Dit is een automatisch gegenereerd bericht."
