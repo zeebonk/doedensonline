@@ -25,6 +25,11 @@
   <%=h @user.notify_news %>
 </p>
 
+<p>
+  <%= label :user, :notify_photo_album %>:
+  <%=h @user.notify_photo_album %>
+</p>
+
 
 <%= link_to t('.edit'), edit_user_path(@user) %> |
 <%= link_to t('.back'), users_path %>
