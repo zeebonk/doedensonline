@@ -7,7 +7,7 @@
 {
 	width: 268px;
 	height: 210px;
-	background: url("/images/album.png") no-repeat;
+	background: image-url("album.png") no-repeat;
 	margin-left: 25px;
 	margin-right: 25px;
 	float : left;
@@ -45,7 +45,7 @@
 
 #pictures-wrapper li
 {
-  background: url("/images/thumb.gif") no-repeat;
+  background: image-url("thumb.gif") no-repeat;
   display: block;
   width: 124px; 
   height: 124px; 
