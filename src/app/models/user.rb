@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
-  attr_accessible :first_name, :last_name, :email, :notify_news
-  attr_accessible :first_name, :last_name, :email, :notify_news,
+  attr_accessible :first_name, :last_name, :email, :notify_news, :notify_photo_album
+  attr_accessible :first_name, :last_name, :email, :notify_news, :notify_photo_album,
                   :password, :isadmin, as: :admin
 
   validates_length_of :password, minimum: 4

@@ -6,6 +6,7 @@ admin:
   email: admin@example.com
   password: secret
   notify_news: false
+  notify_photo_album: false
   isadmin: true
 
 one:
@@ -14,6 +15,7 @@ one:
   email: alice@example.com
   password: secret
   notify_news: false
+  notify_photo_album: false
   isadmin: false
 
 two:
@@ -22,4 +24,5 @@ two:
   email: bob@example.com
   password: secret
   notify_news: false
+  notify_photo_album: false
   isadmin: false

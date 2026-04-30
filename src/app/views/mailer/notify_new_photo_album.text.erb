@@ -1,0 +1,11 @@
+<%= t('.greeting') %>
+
+<%= t('.posted_by', :name => "#{h @photo_album.user.first_name} #{h @photo_album.user.last_name}") %>
+
+<%= t('.link_text_plain', :url => "http://www.doedensonline.nl/photo_albums/#{@photo_album.id}") %>
+
+<%= t('.closing') %>
+
+<%= t('.signature') %>
+
+<%= t('.ps') %>

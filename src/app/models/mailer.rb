@@ -14,4 +14,11 @@ class Mailer < ActionMailer::Base
     @current_user = current_user
     mail(to: target, subject: I18n.t('mailer.subjects.notify_new_news'))
   end
+
+  # Sent a new photo album email
+  def notify_new_photo_album(target, photo_album, current_user)
+    @photo_album  = photo_album
+    @current_user = current_user
+    mail(to: target, subject: I18n.t('mailer.subjects.notify_new_photo_album'))
+  end
 end
