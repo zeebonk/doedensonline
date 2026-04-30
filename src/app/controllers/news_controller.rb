@@ -31,9 +31,9 @@ class NewsController < ApplicationController
 
     if @news_item.save
       flash[:notice] = t('flash.news.created')
-      targets = User.find_all_by_notify_news(true)
-      for target in targets
-        Mailer.notify_new_news(target.email, @news_item, current_user).deliver if target != current_user
+      targets = User.where(notify_news: true).where('id != ?', current_user.id)
+      targets.each do |target|
+        Mailer.notify_new_news(target.email, @news_item, current_user).deliver
       end
       redirect_to action: 'index'
     else
