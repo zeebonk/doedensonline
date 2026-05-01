@@ -1,1 +1,0 @@
-DoedensOnline::Application.config.secret_token = 'bf8c8ab44574438e07b659b876d3ee22dfb8ff1159dd1589a2c9839bb87cd97c13bc631cedee5137a19017a9b5b3bb36e668683b92d6da645728d2cac2e6d253'
