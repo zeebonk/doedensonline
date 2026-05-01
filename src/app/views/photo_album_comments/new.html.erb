@@ -4,6 +4,7 @@
 
 <div id="edit-form">
   <%= form_for(@photo_album_comment) do |f| %>
+    <%= f.error_messages %>
     <p>
       <%= f.hidden_field :photo_album_id %>
     </p>

@@ -1,4 +1,7 @@
 nl:
+  errors:
+    format: "%{attribute}: %{message}"
+
   activerecord:
     attributes:
       user:
@@ -6,6 +9,8 @@ nl:
         last_name: "Achternaam"
         email: "E-mail adres"
         password: "Wachtwoord"
+        old_password: "Huidig wachtwoord"
+        password_confirmation: "Wachtwoord bevestiging"
         notify_news: "Mail bij nieuwe nieuwtjes"
         notify_photo_album: "Mail bij nieuwe fotoalbums"
         isadmin: "Beheerder"
@@ -17,6 +22,7 @@ nl:
         title: "Titel"
         description: "Beschrijving"
         preview_picture: "Voorbeeld afbeelding"
+        pictures: "Foto's"
       photo_album_comment:
         message: "Reactie"
       photo_album_picture:
@@ -104,12 +110,10 @@ nl:
       password_reset_sent: "Een nieuw wachtwoord is naar het opgegeven emailadres verstuurd."
     news:
       created: "Nieuwtje succesvol toegevoegd."
-      message_required: "Let op: een nieuwtje moet wel tekst bevatten!"
       updated: "Het nieuwtje is succesvol aangepast."
       destroyed: "Nieuwtje succesvol verwijderd."
       item_not_found: "Opgegeven nieuwtje is niet gevonden!"
       comment_created: "Reactie is succesvol toegevoegd."
-      comment_message_required: "Een reactie moet wel tekst bevatten!"
       comment_updated: "Uw reactie is succesvol aangepast."
       comment_destroyed: "Uw reactie is succesvol verwijderd."
       comment_not_found: "Opgegeven reactie is niet gevonden!"
@@ -127,7 +131,6 @@ nl:
       album_not_found: "Fotoalbum om reactie bij te plaatsen bestaat niet."
       comment_not_found: "Opgegeven reactie is niet gevonden!"
       created: "Reactie is succesvol toegevoegd."
-      message_required: "Een reactie moet wel tekst bevatten!"
       updated: "Uw reactie is succesvol aangepast."
       destroyed: "Uw reactie is succesvol verwijderd."
     settings:
@@ -246,18 +249,12 @@ nl:
       edit_comment_title: "Pas deze reactie aan"
     new:
       intro: "Op deze pagina kunt u een nieuw fotoalbum aanmaken. Vul een titel en beschrijving in en selecteer alle foto's voor het album in één keer (houd Ctrl/Cmd ingedrukt om meerdere bestanden te kiezen). De eerste foto wordt automatisch gebruikt als voorbeeld afbeelding. Klik vervolgens op \"Maak album aan\"."
-      title_error: " er moet een titel worden ingevuld."
-      description_error: " er moet een beschrijving worden ingevuld."
       pictures_label: "Foto's:"
-      pictures_error: " selecteer minimaal één geldige foto."
       submit: "Maak album aan"
       back: "« Terug naar het overzicht"
     edit:
       intro: "Op deze pagina kunt u de gegevens van uw fotoalbum aanpassen."
-      title_error: " er moet een titel worden ingevuld."
-      description_error: " er moet een beschrijving worden ingevuld."
       current_preview_picture: "Huidige voorbeeld afbeelding:"
-      preview_picture_error: " er moet een geldige voorbeeld afbeelding worden geselecteerd."
       submit: "Aanpassingen opslaan"
       back: "« Terug naar het overzicht"
     manage_pictures:

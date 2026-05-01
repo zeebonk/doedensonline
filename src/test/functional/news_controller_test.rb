@@ -103,7 +103,7 @@ class NewsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_template 'add'
-    assert_equal 'Let op: een nieuwtje moet wel tekst bevatten!', flash[:error]
+    assert_includes assigns(:news_item).errors[:message], 'Een nieuwtje moet tekst bevatten'
     assert_equal 0, ActionMailer::Base.deliveries.size
   end
 
@@ -136,7 +136,7 @@ class NewsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_template 'edit'
-    assert_equal 'Let op: een nieuwtje moet wel tekst bevatten!', flash[:error]
+    assert_includes assigns(:news_item).errors[:message], 'Een nieuwtje moet tekst bevatten'
   end
 
   test "update redirects when news_item does not exist" do
@@ -235,7 +235,7 @@ class NewsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_template 'add_comment'
-    assert_equal 'Een reactie moet wel tekst bevatten!', flash[:error]
+    assert_not_empty assigns(:news_comment).errors[:message]
   end
 
   # GET /news/edit_comment/:id
@@ -274,7 +274,7 @@ class NewsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_template 'edit_comment'
-    assert_equal 'Een reactie moet wel tekst bevatten!', flash[:error]
+    assert_not_empty assigns(:news_comment).errors[:message]
   end
 
   test "update_comment redirects when comment does not exist" do
