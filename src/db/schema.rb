@@ -9,16 +9,16 @@
 # from scratch. The latter is a flawed and unsustainable approach (the more migrations
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
-# It's strongly recommended to check this file into your version control system.
+# It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20260430120000) do
+ActiveRecord::Schema.define(version: 20260430120000) do
 
-  create_table "mailers", :force => true do |t|
+  create_table "mailers", force: true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "news_comments", :force => true do |t|
+  create_table "news_comments", force: true do |t|
     t.text     "message"
     t.integer  "news_item_id"
     t.integer  "user_id"
@@ -26,14 +26,14 @@ ActiveRecord::Schema.define(:version => 20260430120000) do
     t.datetime "updated_at"
   end
 
-  create_table "news_items", :force => true do |t|
+  create_table "news_items", force: true do |t|
     t.text     "message"
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "photo_album_comments", :force => true do |t|
+  create_table "photo_album_comments", force: true do |t|
     t.string   "message"
     t.integer  "photo_album_id"
     t.integer  "user_id"
@@ -41,14 +41,14 @@ ActiveRecord::Schema.define(:version => 20260430120000) do
     t.datetime "updated_at"
   end
 
-  create_table "photo_album_pictures", :force => true do |t|
+  create_table "photo_album_pictures", force: true do |t|
     t.integer  "photo_album_id"
     t.string   "filename"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "photo_albums", :force => true do |t|
+  create_table "photo_albums", force: true do |t|
     t.string   "title"
     t.text     "description"
     t.integer  "user_id"
@@ -57,7 +57,7 @@ ActiveRecord::Schema.define(:version => 20260430120000) do
     t.string   "preview_picture"
   end
 
-  create_table "users", :force => true do |t|
+  create_table "users", force: true do |t|
     t.string   "first_name"
     t.string   "last_name"
     t.string   "email"
