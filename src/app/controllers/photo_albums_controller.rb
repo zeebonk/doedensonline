@@ -93,6 +93,8 @@ class PhotoAlbumsController < ApplicationController
 
     files = Array(album_params[:pictures]).reject(&:blank?)
 
+    @photo_album.valid?
+    @photo_album.errors.delete(:preview_picture)
     if files.empty?
       @photo_album.errors.add(:pictures, t('flash.photo_albums_errors.no_pictures_selected'))
     end
