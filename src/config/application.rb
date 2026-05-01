@@ -2,9 +2,7 @@ require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
 
-if defined?(Bundler)
-  Bundler.require(*Rails.groups)
-end
+Bundler.require(*Rails.groups) if defined?(Bundler)
 
 module DoedensOnline
   class Application < Rails::Application
