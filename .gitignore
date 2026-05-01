@@ -16,6 +16,7 @@ src/public/assets/
 .DS_Store
 src/passenger.*.pid
 src/passenger.*.pid.lock
+src/passenger.*.log
 src/core
 src/core.*
 .claude/
