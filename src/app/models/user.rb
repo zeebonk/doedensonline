@@ -1,8 +1,4 @@
 class User < ActiveRecord::Base
-  attr_accessible :first_name, :last_name, :email, :notify_news, :notify_photo_album
-  attr_accessible :first_name, :last_name, :email, :notify_news, :notify_photo_album,
-                  :password, :isadmin, as: :admin
-
   validates_length_of :password, minimum: 4
   validates_length_of :first_name, minimum: 3
   validates_length_of :last_name, minimum: 3
@@ -21,7 +17,7 @@ class User < ActiveRecord::Base
   # Method to authenticate a user
   def self.authenticate(first_name, password)
     # Search for a user with given username, case insensetive
-    users = where("lower(first_name) = ?", first_name.downcase).all
+    users = where("lower(first_name) = ?", first_name.downcase)
 
     # Check if given password and user password are not the same
     for user in users do
