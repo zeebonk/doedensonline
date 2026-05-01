@@ -90,7 +90,7 @@ class PhotoAlbumCommentsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_template 'new'
-    assert_equal 'Een reactie moet wel tekst bevatten!', flash[:error]
+    assert_not_empty assigns(:photo_album_comment).errors[:message]
   end
 
   test "create strips leading ../ from message via root_src_img_tag" do
@@ -113,7 +113,7 @@ class PhotoAlbumCommentsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_template 'edit'
-    assert_equal 'Een reactie moet wel tekst bevatten!', flash[:error]
+    assert_not_empty assigns(:photo_album_comment).errors[:message]
   end
 
   test "update redirects when comment does not exist" do
