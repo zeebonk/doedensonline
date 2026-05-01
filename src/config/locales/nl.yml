@@ -47,6 +47,14 @@ nl:
               too_short: "moet uit minimaal %{count} tekens bestaan"
             password:
               too_short: "moet uit minimaal %{count} tekens bestaan"
+        photo_album:
+          attributes:
+            title:
+              blank: "moet worden ingevuld"
+            description:
+              blank: "moet worden ingevuld"
+            preview_picture:
+              blank: "moet worden ingevuld"
         photo_album_picture:
           attributes:
             filename:
