@@ -3,7 +3,7 @@ require File.expand_path('../boot', __FILE__)
 require 'rails/all'
 
 if defined?(Bundler)
-  Bundler.require(*Rails.groups(assets: %w(development test)))
+  Bundler.require(*Rails.groups)
 end
 
 module DoedensOnline
@@ -15,7 +15,5 @@ module DoedensOnline
     config.filter_parameters += [:password]
 
     config.assets.enabled = true
-
-    config.autoload_paths += %W(#{config.root}/app/controllers/concerns)
   end
 end

@@ -1,10 +1,11 @@
 DoedensOnline::Application.configure do
   config.cache_classes = false
 
+  config.eager_load = false
+
   config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
 
-  config.assets.compress = false
   config.assets.debug = true
 
   config.action_mailer.delivery_method = :smtp
@@ -21,9 +22,6 @@ DoedensOnline::Application.configure do
   config.action_mailer.default_url_options = { host: 'dev.doedensonline.nl' }
 
   config.active_support.deprecation = :log
-
-  config.active_record.mass_assignment_sanitizer = :strict
-  config.active_record.auto_explain_threshold_in_seconds = 0.5
 
   config.log_level = :debug
 end

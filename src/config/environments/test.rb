@@ -1,9 +1,10 @@
 DoedensOnline::Application.configure do
   config.cache_classes = true
 
-  config.serve_static_assets = true
+  config.eager_load = false
 
-  config.assets.compress = true
+  config.serve_static_files = true
+
   config.assets.compile = true
   config.assets.digest = true
 
@@ -17,6 +18,4 @@ DoedensOnline::Application.configure do
   config.action_mailer.delivery_method = :test
 
   config.active_support.deprecation = :stderr
-
-  config.active_record.mass_assignment_sanitizer = :strict
 end
