@@ -25,7 +25,7 @@ class SettingsController < ApplicationController
   def update_profile
     @user = current_user
 
-    if @user.update_attributes(params[:user])
+    if @user.update(profile_params)
       flash[:settings] = t('flash.settings.profile_updated')
       redirect_to action: 'profile'
     else
@@ -37,7 +37,7 @@ class SettingsController < ApplicationController
   def update_notifications
     @user = current_user
 
-    if @user.update_attributes(params[:user])
+    if @user.update(notification_params)
       flash[:settings] = t('flash.settings.notifications_updated')
       redirect_to action: 'notifications'
     else
@@ -67,5 +67,15 @@ class SettingsController < ApplicationController
       @user.errors.add(:base, t('flash.settings.current_password_incorrect'))
       render action: "password"
     end
+  end
+
+  private
+
+  def profile_params
+    params.require(:user).permit(:first_name, :last_name, :email)
+  end
+
+  def notification_params
+    params.require(:user).permit(:notify_news, :notify_photo_album)
   end
 end

@@ -1,6 +1,6 @@
 class PhotoAlbumCommentsController < ApplicationController
-  before_filter :load_photo_album_comment,         only: [:edit, :update, :remove, :destroy]
-  before_filter :check_photo_album_comment_author, only: [:edit, :update, :remove, :destroy]
+  before_action :load_photo_album_comment,         only: [:edit, :update, :remove, :destroy]
+  before_action :check_photo_album_comment_author, only: [:edit, :update, :remove, :destroy]
 
   # GET /photo_album_comments/new/1
   def new
@@ -20,7 +20,7 @@ class PhotoAlbumCommentsController < ApplicationController
 
   # POST /photo_album_comments
   def create
-    @photo_album_comment = PhotoAlbumComment.new(params[:photo_album_comment])
+    @photo_album_comment = PhotoAlbumComment.new(photo_album_comment_params)
     @photo_album_comment.message = root_src_img_tag(@photo_album_comment.message)
     @photo_album_comment.user_id = current_user.id
 
@@ -34,8 +34,9 @@ class PhotoAlbumCommentsController < ApplicationController
 
   # PUT /photo_album_comments/1
   def update
-    params[:photo_album_comment][:message] = root_src_img_tag(params[:photo_album_comment][:message])
-    if @photo_album_comment.update_attributes(params[:photo_album_comment])
+    attrs = photo_album_comment_params
+    attrs[:message] = root_src_img_tag(attrs[:message]) if attrs[:message]
+    if @photo_album_comment.update(attrs)
       flash[:notice] = t('flash.photo_album_comments.updated')
       redirect_to controller: 'photo_albums', action: 'show', id: @photo_album_comment.photo_album.id
     else
@@ -58,6 +59,10 @@ class PhotoAlbumCommentsController < ApplicationController
 
   private
 
+  def photo_album_comment_params
+    params.require(:photo_album_comment).permit(:message, :photo_album_id)
+  end
+
   def photo_album_from_id(id)
     PhotoAlbum.find(id)
   rescue Exception => e
@@ -66,7 +71,7 @@ class PhotoAlbumCommentsController < ApplicationController
 
   def load_photo_album_comment
     id = params[:id] || (params[:photo_album_comment] && params[:photo_album_comment][:id])
-    @photo_album_comment = PhotoAlbumComment.find_by_id(id)
+    @photo_album_comment = PhotoAlbumComment.find_by(id: id)
     unless @photo_album_comment
       flash[:error] = t('flash.photo_album_comments.comment_not_found')
       redirect_to controller: 'photo_albums', action: 'index'

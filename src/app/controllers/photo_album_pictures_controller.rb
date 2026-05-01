@@ -10,12 +10,13 @@ class PhotoAlbumPicturesController < ApplicationController
 
   # POST /photo_album_pictures
   def create
-    @photo_album_picture = PhotoAlbumPicture.new(params[:photo_album_picture])
+    attrs = photo_album_picture_params
+    @photo_album_picture = PhotoAlbumPicture.new(attrs)
 
     # Picture upload
-    unless params[:photo_album_picture][:filename].nil?
+    unless attrs[:filename].nil?
       begin
-        picture = UploadPicture.new params[:photo_album_picture][:filename]
+        picture = UploadPicture.new(attrs[:filename])
         create_images picture
         @photo_album_picture.filename = picture.filename
       rescue
@@ -33,7 +34,7 @@ class PhotoAlbumPicturesController < ApplicationController
 
   # POST /photo_album_pictures/destory_many
   def destroy_many
-    @photo_album = PhotoAlbum.find_by_id params[:album]
+    @photo_album = PhotoAlbum.find_by(id: params[:album])
 
     if params[:delete]
       for picture_id in params[:delete]
@@ -44,5 +45,11 @@ class PhotoAlbumPicturesController < ApplicationController
     end
 
     redirect_to action: 'show', id: @photo_album.id
+  end
+
+  private
+
+  def photo_album_picture_params
+    params.require(:photo_album_picture).permit(:filename, :photo_album_id)
   end
 end

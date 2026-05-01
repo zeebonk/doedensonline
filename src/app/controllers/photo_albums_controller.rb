@@ -1,8 +1,8 @@
 class PhotoAlbumsController < ApplicationController
   include Paginatable
 
-  before_filter :load_photo_album,         only: [:show, :edit, :remove, :manage_pictures, :update, :destroy, :add_picture, :destroy_many_pictures]
-  before_filter :check_photo_album_author, only: [:update, :destroy, :add_picture, :destroy_many_pictures]
+  before_action :load_photo_album,         only: [:show, :edit, :remove, :manage_pictures, :update, :destroy, :add_picture, :destroy_many_pictures]
+  before_action :check_photo_album_author, only: [:update, :destroy, :add_picture, :destroy_many_pictures]
 
   # GET /photo_albums
   def index
@@ -18,7 +18,7 @@ class PhotoAlbumsController < ApplicationController
   # GET /photo_albums/1
   def show
     @current_user = current_user
-    @photo_album_comments = PhotoAlbumComment.where("photo_album_id = ?", @photo_album.id).order('created_at ASC').all
+    @photo_album_comments = PhotoAlbumComment.where("photo_album_id = ?", @photo_album.id).order('created_at ASC').to_a
   end
 
   # GET /photo_albums/new
@@ -137,18 +137,23 @@ class PhotoAlbumsController < ApplicationController
 
   # PUT /photo_albums/1
   def update
-    unless params["photo_album"]["preview_picture"].nil?
+    attrs = photo_album_params
+
+    if attrs[:preview_picture].present?
       begin
-        @picture = UploadPicture.new params["photo_album"]["preview_picture"]
+        @picture = UploadPicture.new(attrs[:preview_picture])
         create_images @picture
         remove_images @photo_album.preview_picture
-        params["photo_album"]["preview_picture"] = @picture.filename
+        attrs[:preview_picture] = @picture.filename
       rescue
         @photo_album.errors.add(:preview_picture, t('flash.photo_albums_errors.unsupported_image'))
+        attrs.delete(:preview_picture)
       end
+    else
+      attrs.delete(:preview_picture)
     end
 
-    if @photo_album.errors.count == 0 && @photo_album.update_attributes(params[:photo_album])
+    if @photo_album.errors.count == 0 && @photo_album.update(attrs)
       flash[:notice] = t('flash.photo_albums.updated')
       redirect_to(@photo_album)
     else
@@ -167,9 +172,13 @@ class PhotoAlbumsController < ApplicationController
 
   private
 
+  def photo_album_params
+    params.require(:photo_album).permit(:title, :description, :preview_picture)
+  end
+
   def load_photo_album
     id = params[:id] || params[:album_id]
-    @photo_album = PhotoAlbum.find_by_id(id)
+    @photo_album = PhotoAlbum.find_by(id: id)
     unless @photo_album
       flash[:error] = t('flash.photo_albums.album_not_found')
       redirect_to action: 'index'

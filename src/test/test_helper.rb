@@ -8,6 +8,6 @@ class ActiveSupport::TestCase
   fixtures :all
 
   def create_user!(attrs)
-    User.create!(attrs, as: :admin)
+    User.create!(attrs)
   end
 end
