@@ -7,13 +7,17 @@
 
   <title><%= yield(:page_title) %> - <%= t('site.title_suffix') %></title>
 
-  <%= stylesheet_link_tag 'application' %>
+  <%= stylesheet_link_tag 'application', 'data-turbolinks-track' => true %>
   <script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js" referrerpolicy="origin"></script>
-  <%= javascript_include_tag 'application' %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
 
   <% if controller.controller_name == 'photo_albums' && controller.action_name == 'show' %>
     <script>
-      $(document).ready(function(){ $("a[rel='album']").colorbox({maxWidth:"85%", maxHeight:"85%"}); });
+      var bindAlbumColorbox = function() {
+        $("a[rel='album']").colorbox({maxWidth:"85%", maxHeight:"85%"});
+      };
+      $(document).ready(bindAlbumColorbox);
+      $(document).on('page:load', bindAlbumColorbox);
     </script>
   <% end %>
 
