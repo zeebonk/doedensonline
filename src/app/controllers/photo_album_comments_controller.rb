@@ -28,7 +28,6 @@ class PhotoAlbumCommentsController < ApplicationController
       flash[:notice] = t('flash.photo_album_comments.created')
       redirect_to controller: 'photo_albums', action: 'show', id: @photo_album_comment.photo_album_id
     else
-      flash[:error] = t('flash.photo_album_comments.message_required')
       render action: "new"
     end
   end
@@ -40,7 +39,6 @@ class PhotoAlbumCommentsController < ApplicationController
       flash[:notice] = t('flash.photo_album_comments.updated')
       redirect_to controller: 'photo_albums', action: 'show', id: @photo_album_comment.photo_album.id
     else
-      flash[:error] = t('flash.photo_album_comments.message_required')
       render action: "edit"
     end
   end

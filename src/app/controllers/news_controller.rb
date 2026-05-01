@@ -37,7 +37,6 @@ class NewsController < ApplicationController
       end
       redirect_to action: 'index'
     else
-      flash[:error] = t('flash.news.message_required')
       render action: "add"
     end
   end
@@ -53,7 +52,6 @@ class NewsController < ApplicationController
       flash[:notice] = t('flash.news.updated')
       redirect_to action: "index"
     else
-      flash[:error] = t('flash.news.message_required')
       render action: "edit"
     end
   end
@@ -100,7 +98,6 @@ class NewsController < ApplicationController
       flash[:notice] = t('flash.news.comment_created')
       redirect_to action: 'view', id: @news_comment.news_item_id
     else
-      flash[:error] = t('flash.news.comment_message_required')
       @news_item = NewsItem.find(@news_comment.news_item_id)
       render action: "add_comment"
     end
@@ -117,7 +114,6 @@ class NewsController < ApplicationController
       flash[:notice] = t('flash.news.comment_updated')
       redirect_to action: 'view', id: @news_comment.news_item.id
     else
-      flash[:error] = t('flash.news.comment_message_required')
       render action: "edit_comment"
     end
   end

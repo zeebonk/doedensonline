@@ -129,11 +129,6 @@ class PhotoAlbumsController < ApplicationController
       redirect_to(@photo_album)
     else
       written_filenames.each { |fn| remove_images fn } unless @photo_album.persisted?
-
-      @title_error = true if @photo_album.errors[:title].present?
-      @description_error = true if @photo_album.errors[:description].present?
-      @pictures_error = true if @photo_album.errors[:pictures].present?
-
       render action: "new"
     end
   end
@@ -155,9 +150,6 @@ class PhotoAlbumsController < ApplicationController
       flash[:notice] = t('flash.photo_albums.updated')
       redirect_to(@photo_album)
     else
-      @title_error = true if @photo_album.errors[:title]
-      @description_error = true if @photo_album.errors[:description]
-      @preview_picture_error = true if @photo_album.errors[:preview_picture]
       render action: "edit"
     end
   end

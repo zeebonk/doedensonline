@@ -4,6 +4,7 @@
 
 <div id="edit-form">
 <%= form_for @news_item, :url => { :action => "update" } do |f| %>
+  <%= f.error_messages %>
   <p><%= f.hidden_field :id %></p>
   <p>
     <%= f.label :message %><br />
