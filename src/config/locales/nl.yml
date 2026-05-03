@@ -37,6 +37,10 @@ nl:
           attributes:
             message:
               blank: "Een nieuwtje moet tekst bevatten"
+        news_comment:
+          attributes:
+            message:
+              blank: "Een reactie moet tekst bevatten"
         user:
           attributes:
             email:
@@ -55,6 +59,10 @@ nl:
               blank: "moet worden ingevuld"
             preview_picture:
               blank: "moet worden ingevuld"
+        photo_album_comment:
+          attributes:
+            message:
+              blank: "Een reactie moet tekst bevatten"
         photo_album_picture:
           attributes:
             filename:
