@@ -26,4 +26,8 @@ DoedensOnline::Application.configure do
   config.active_record.auto_explain_threshold_in_seconds = 0.5
 
   config.log_level = :debug
+
+  I18n.exception_handler = lambda do |exception, _locale, _key, _options|
+    raise exception.is_a?(I18n::MissingTranslation) ? exception.to_exception : exception
+  end
 end
