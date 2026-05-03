@@ -19,8 +19,4 @@ DoedensOnline::Application.configure do
   config.active_support.deprecation = :stderr
 
   config.active_record.mass_assignment_sanitizer = :strict
-
-  I18n.exception_handler = lambda do |exception, _locale, _key, _options|
-    raise exception.is_a?(I18n::MissingTranslation) ? exception.to_exception : exception
-  end
 end
