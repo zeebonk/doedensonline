@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).on('page:change', function() {
 
 	$("#pictures-wrapper a").filter(function() {
 		return $(this).siblings("input.checkbox").length > 0;

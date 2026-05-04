@@ -1,5 +1,6 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
-//= require test
-//= require load-tiny-mce
+//= require picture-checkbox
+//= require tiny-mce
+//= require album-colorbox
