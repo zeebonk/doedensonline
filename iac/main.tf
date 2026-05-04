@@ -600,17 +600,17 @@ resource "random_id" "dev_secret_key_base" {
 }
 
 resource "github_actions_secret" "dev_deploy" {
-  for_each        = local.github_actions_dev_secrets
-  repository      = "doedensonline"
-  secret_name     = each.key
-  plaintext_value = each.value
+  for_each    = local.github_actions_dev_secrets
+  repository  = "doedensonline"
+  secret_name = each.key
+  value       = each.value
 }
 
 resource "github_actions_secret" "prod_deploy" {
-  for_each        = local.github_actions_prod_secrets
-  repository      = "doedensonline"
-  secret_name     = each.key
-  plaintext_value = each.value
+  for_each    = local.github_actions_prod_secrets
+  repository  = "doedensonline"
+  secret_name = each.key
+  value       = each.value
 }
 
 
