@@ -8,8 +8,17 @@
   <title><%= yield(:page_title) %> - <%= t('site.title_suffix') %></title>
 
   <%= stylesheet_link_tag 'application', 'data-turbolinks-track' => true %>
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/jquery-colorbox@1.6.4/example1/colorbox.css"
+        integrity="sha384-+YVIw9d0IQ47CXWBP/xgZi3bJsu2BLZtcayuW6PF4QkMyvTJKebLf1AuIApT4wyq"
+        crossorigin="anonymous"
+        referrerpolicy="origin">
   <script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js" referrerpolicy="origin"></script>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-colorbox@1.6.4/jquery.colorbox-min.js"
+          integrity="sha384-MiuiPDrnIKG1EsaEPM0JvPlp2RAJDBvaaLbuWAX7ME7Z6/tBptQ0KEFSqEnPUpZB"
+          crossorigin="anonymous"
+          referrerpolicy="origin"></script>
 
   <% if controller.controller_name == 'photo_albums' && controller.action_name == 'show' %>
     <script>
