@@ -1,0 +1,27 @@
+base_locale: nl
+locales: [nl]
+
+data:
+  read:
+    - config/locales/%{locale}.yml
+
+search:
+  paths:
+    - app/
+
+ignore_missing:
+  # Rails / activerecord helpers look these up dynamically.
+  - 'activerecord.errors.messages.record_invalid'
+  - 'activerecord.errors.messages.restrict_dependent_destroy.*'
+
+ignore_unused:
+  # Activerecord attribute and model name keys are looked up reflectively
+  # (e.g. via `human_attribute_name` / `model_name.human`), so static scanning
+  # cannot see the references.
+  - 'activerecord.attributes.*'
+  - 'activerecord.models.*'
+  - 'activerecord.errors.models.*'
+  # Used by dynamic_form's `error_messages_for` to render the error block.
+  - 'activerecord.errors.template.*'
+  # Format strings used by the i18n / errors helpers.
+  - 'errors.format'

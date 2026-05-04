@@ -1,388 +1,425 @@
+---
 nl:
-  errors:
-    format: "%{attribute}: %{message}"
-
   activerecord:
     attributes:
-      user:
-        first_name: "Voornaam"
-        last_name: "Achternaam"
-        email: "E-mail adres"
-        password: "Wachtwoord"
-        old_password: "Huidig wachtwoord"
-        password_confirmation: "Wachtwoord bevestiging"
-        notify_news: "Mail bij nieuwe nieuwtjes"
-        notify_photo_album: "Mail bij nieuwe fotoalbums"
-        isadmin: "Beheerder"
-      news_item:
-        message: "Bericht"
       news_comment:
-        message: "Reactie"
+        message: Reactie
+      news_item:
+        message: Bericht
       photo_album:
-        title: "Titel"
-        description: "Beschrijving"
-        preview_picture: "Voorbeeld afbeelding"
-        pictures: "Foto's"
+        description: Beschrijving
+        pictures: Foto's
+        preview_picture: Voorbeeld afbeelding
+        title: Titel
       photo_album_comment:
-        message: "Reactie"
+        message: Reactie
       photo_album_picture:
-        filename: "Bestand"
-        photo_album_id: "Fotoalbum"
+        filename: Bestand
+        photo_album_id: Fotoalbum
+      user:
+        email: E-mail adres
+        first_name: Voornaam
+        isadmin: Beheerder
+        last_name: Achternaam
+        notify_news: Mail bij nieuwe nieuwtjes
+        notify_photo_album: Mail bij nieuwe fotoalbums
+        old_password: Huidig wachtwoord
+        password: Wachtwoord
+        password_confirmation: Wachtwoord bevestiging
     errors:
-      template:
-        header: "Er zijn problemen met de ingevoerde gegevens:"
-        body: ""
       models:
-        news_item:
-          attributes:
-            message:
-              blank: "Een nieuwtje moet tekst bevatten"
         news_comment:
           attributes:
             message:
-              blank: "Een reactie moet tekst bevatten"
-        user:
+              blank: Een reactie moet tekst bevatten
+        news_item:
           attributes:
-            email:
-              invalid: "is ongeldig."
-            first_name:
-              too_short: "moet uit minimaal %{count} tekens bestaan"
-            last_name:
-              too_short: "moet uit minimaal %{count} tekens bestaan"
-            password:
-              too_short: "moet uit minimaal %{count} tekens bestaan"
+            message:
+              blank: Een nieuwtje moet tekst bevatten
         photo_album:
           attributes:
-            title:
-              blank: "moet worden ingevuld"
             description:
-              blank: "moet worden ingevuld"
+              blank: moet worden ingevuld
             preview_picture:
-              blank: "moet worden ingevuld"
+              blank: moet worden ingevuld
+            title:
+              blank: moet worden ingevuld
         photo_album_comment:
           attributes:
             message:
-              blank: "Een reactie moet tekst bevatten"
+              blank: Een reactie moet tekst bevatten
         photo_album_picture:
           attributes:
             filename:
-              blank: "moet worden ingevuld"
+              blank: moet worden ingevuld
             photo_album_id:
-              blank: "moet worden ingevuld"
-
-  site:
-    title_suffix: "Doedensonline.nl"
-    sub_title: "Ditjes en datjes van oma Doed"
-    logo_alt: "Doedens Online"
-    logo_title: "Doedens Online"
-
-  page_titles:
-    home: "Home"
-    sign_in: "Inloggen"
-    sign_out: "Uitloggen"
-    password_forgotten: "Wachtwoord vergeten"
-    news_index: "Nieuwtjes overzicht"
-    news_add: "Nieuwtje toevoegen"
-    news_edit: "Nieuwtje aanpassen"
-    news_remove: "Nieuwtje verwijderen"
-    news_view: "Nieuwtje bekijken"
-    news_comment_add: "Reactie op nieuwtje plaatsen"
-    news_comment_edit: "Reactie op nieuwtje aanpassen"
-    news_comment_remove: "Reactie op nieuwtje verwijderen"
-    albums_index: "Fotoalbums overzicht"
-    albums_view: "Fotoalbum bekijken"
-    albums_new: "Fotoalbum aanmaken"
-    albums_edit: "Fotoalbum aanpassen"
-    albums_remove: "Fotoalbum verwijderen"
-    albums_manage_pictures: "Foto's beheren"
-    albums_comment_add: "Reactie op fotoalbum plaatsen"
-    albums_comment_edit: "Reactie op fotoalbum aanpassen"
-    albums_comment_remove: "Reactie op fotoalbum verwijderen"
-    settings: "Instellingen"
-    users: "Gebruikers"
-
-  menu:
-    home: "Home"
-    home_title_active: "De begin pagina"
-    home_title: "Naar de begin pagina"
-    news: "Nieuwtjes"
-    news_title: "Het nieuwtjes overzicht"
-    albums: "Fotoalbums"
-    albums_title: "Het fotoalbums overzicht"
-    settings: "Instellingen"
-    settings_title: "Uw persoonlijke instellingen"
-    sign_out: "Uitloggen"
-    sign_out_title: "De uitlog pagina"
-
+              blank: moet worden ingevuld
+        user:
+          attributes:
+            email:
+              invalid: is ongeldig.
+            first_name:
+              too_short: moet uit minimaal %{count} tekens bestaan
+            last_name:
+              too_short: moet uit minimaal %{count} tekens bestaan
+            password:
+              too_short: moet uit minimaal %{count} tekens bestaan
+      template:
+        body: ''
+        header: 'Er zijn problemen met de ingevoerde gegevens:'
+  errors:
+    format: "%{attribute}: %{message}"
   flash:
     application:
-      already_signed_in: "You are already signed in"
-      admins_only: "Only admins allowed there"
-      not_authorized: "U bent niet gemachtigd om opgegeven item te mogen wijzigen!"
+      admins_only: Only admins allowed there
+      already_signed_in: You are already signed in
+      not_authorized: U bent niet gemachtigd om opgegeven item te mogen wijzigen!
     home:
-      signed_in: "U bent succesvol ingelogd!"
-      invalid_credentials: "U heeft een ongeldige voornaam/wachtwoord combinatie ingevuld!"
-      signed_out: "U bent succesvol uitgelogd!"
-      password_reset_sent: "Een nieuw wachtwoord is naar het opgegeven emailadres verstuurd."
+      invalid_credentials: U heeft een ongeldige voornaam/wachtwoord combinatie ingevuld!
+      password_reset_sent: Een nieuw wachtwoord is naar het opgegeven emailadres verstuurd.
+      signed_in: U bent succesvol ingelogd!
+      signed_out: U bent succesvol uitgelogd!
     news:
-      created: "Nieuwtje succesvol toegevoegd."
-      updated: "Het nieuwtje is succesvol aangepast."
-      destroyed: "Nieuwtje succesvol verwijderd."
-      item_not_found: "Opgegeven nieuwtje is niet gevonden!"
-      comment_created: "Reactie is succesvol toegevoegd."
-      comment_updated: "Uw reactie is succesvol aangepast."
-      comment_destroyed: "Uw reactie is succesvol verwijderd."
-      comment_not_found: "Opgegeven reactie is niet gevonden!"
-    photo_albums:
-      pictures_added: "Alle foto's zijn succesvol toegevoegd."
-      no_pictures_selected_upload: "U heeft geen foto's geselecteerd om toe te voegen."
-      some_pictures_failed: "Niet alle foto's konden worden toegevoegd."
-      pictures_destroyed: "Geselecteerde foto(s) succesvol verwijderd."
-      no_pictures_selected_destroy: "Geen foto's geselecteerd om te verwijderen."
-      created: "Fotoalbum is succesvol toegevoegd."
-      updated: "Fotoalbum is succesvol aangepast."
-      destroyed: "Foto album succesvol verwijderd."
-      album_not_found: "Opgegeven fotoalbum is niet gevonden!"
+      comment_created: Reactie is succesvol toegevoegd.
+      comment_destroyed: Uw reactie is succesvol verwijderd.
+      comment_not_found: Opgegeven reactie is niet gevonden!
+      comment_updated: Uw reactie is succesvol aangepast.
+      created: Nieuwtje succesvol toegevoegd.
+      destroyed: Nieuwtje succesvol verwijderd.
+      item_not_found: Opgegeven nieuwtje is niet gevonden!
+      updated: Het nieuwtje is succesvol aangepast.
     photo_album_comments:
-      album_not_found: "Fotoalbum om reactie bij te plaatsen bestaat niet."
-      comment_not_found: "Opgegeven reactie is niet gevonden!"
-      created: "Reactie is succesvol toegevoegd."
-      updated: "Uw reactie is succesvol aangepast."
-      destroyed: "Uw reactie is succesvol verwijderd."
-    settings:
-      profile_updated: "Uw profiel is succesvol aangepast."
-      notifications_updated: "Uw notificatie instellingen zijn succesvol aangepast."
-      password_updated: "Uw wachtwoord is succesvol gewijzigd."
-      password_too_short: "Nieuw wachtwoord moet uit minimaal 3 tekens bestaan"
-      password_mismatch: "Nieuw wachtwoord en confirmatie zijn niet aan elkaar gelijk"
-      current_password_incorrect: "Huidig wachtwoord in incorrect"
-    users:
-      created: "Gebruiker is succesvol aangemaakt."
-      updated: "Gebruiker is succesvol aangepast."
+      album_not_found: Fotoalbum om reactie bij te plaatsen bestaat niet.
+      comment_not_found: Opgegeven reactie is niet gevonden!
+      created: Reactie is succesvol toegevoegd.
+      destroyed: Uw reactie is succesvol verwijderd.
+      updated: Uw reactie is succesvol aangepast.
+    photo_albums:
+      album_not_found: Opgegeven fotoalbum is niet gevonden!
+      created: Fotoalbum is succesvol toegevoegd.
+      destroyed: Foto album succesvol verwijderd.
+      no_pictures_selected_destroy: Geen foto's geselecteerd om te verwijderen.
+      no_pictures_selected_upload: U heeft geen foto's geselecteerd om toe te voegen.
+      pictures_added: Alle foto's zijn succesvol toegevoegd.
+      pictures_destroyed: Geselecteerde foto(s) succesvol verwijderd.
+      some_pictures_failed: Niet alle foto's konden worden toegevoegd.
+      updated: Fotoalbum is succesvol aangepast.
     photo_albums_errors:
-      unsupported_image: "Unsupported image selected"
-      no_pictures_selected: "U heeft geen foto's geselecteerd."
-
-  layouts:
-    default:
-      sub_title: "Ditjes en datjes van oma Doed"
-
+      no_pictures_selected: U heeft geen foto's geselecteerd.
+      unsupported_image: Unsupported image selected
+    settings:
+      current_password_incorrect: Huidig wachtwoord in incorrect
+      notifications_updated: Uw notificatie instellingen zijn succesvol aangepast.
+      password_mismatch: Nieuw wachtwoord en confirmatie zijn niet aan elkaar gelijk
+      password_too_short: Nieuw wachtwoord moet uit minimaal 3 tekens bestaan
+      password_updated: Uw wachtwoord is succesvol gewijzigd.
+      profile_updated: Uw profiel is succesvol aangepast.
+    users:
+      created: Gebruiker is succesvol aangemaakt.
+      updated: Gebruiker is succesvol aangepast.
   home:
     index:
-      intro_html: "Dit is de homepage van Doedens Online. Hieronder vind u de drie laatst geplaatste nieuws berichtjes. U kunt via het hoofd menu boven aan de pagina naar de andere onderdelen van de site, of u kunt via een \"lees verder\" link bij een nieuws berichtje direct het hele bericht bekijken. Wilt u meer informatie over hoe de website te gebruiken? Bekijk dan de <a href=\"/media/handleiding.doc\" title=\"Gebruikers handleiding (.doc)\">handleiding</a>."
-      read_more: "Lees verder »"
-      read_more_title: "Lees de rest van dit bericht"
-      zandvaart_alt: "Zandvaart 7"
+      intro_html: Dit is de homepage van Doedens Online. Hieronder vind u de drie
+        laatst geplaatste nieuws berichtjes. U kunt via het hoofd menu boven aan de
+        pagina naar de andere onderdelen van de site, of u kunt via een "lees verder"
+        link bij een nieuws berichtje direct het hele bericht bekijken. Wilt u meer
+        informatie over hoe de website te gebruiken? Bekijk dan de <a href="/media/handleiding.doc"
+        title="Gebruikers handleiding (.doc)">handleiding</a>.
+      read_more: Lees verder »
+      read_more_title: Lees de rest van dit bericht
+      zandvaart_alt: Zandvaart 7
+    password_forgotten:
+      email: E-mail
+      first_name: Voornaam
+      intro: Bent u uw wachtwoord vergeten? U kunt met het "wachtwoord vergeten formulier"
+        hieronder een nieuw wachtwoord aanvragen. Wanneer u uw voornaam en emailadres
+        heeft ingevuld word er een nieuw email adres voor u aangemaakt, deze krijg
+        u vervolgens naar uw email adres gestuurd.
+      submit: Reset mijn wachtwoord...
     sign_in:
-      intro: "Welkom op DoedensOnline.nl. De website van de famillie Doedens. Om verder te gaan op deze website moet u eerst inloggen. Inloggen kunt u doen met het inlog formulier hieronder."
-      first_name: "Voornaam"
-      password: "Wachtwoord"
-      forgot_password: "Wachtwoord vergeten?"
-      forgot_password_title: "Vraag een nieuw wachtwoord aan"
-      submit: "Log in..."
+      first_name: Voornaam
+      forgot_password: Wachtwoord vergeten?
+      forgot_password_title: Vraag een nieuw wachtwoord aan
+      intro: Welkom op DoedensOnline.nl. De website van de famillie Doedens. Om verder
+        te gaan op deze website moet u eerst inloggen. Inloggen kunt u doen met het
+        inlog formulier hieronder.
+      password: Wachtwoord
+      submit: Log in...
     sign_out:
-      intro: "Bent u weer helemaal op de hoogte van de familie en is het weer tijd om wat anders te gaan doen? Log dan eerst uit! Met het uitloggen zorgt u er voor dat wanneer de website weer word geopend op uw computer, er eerst weer moet worden ingelogd om verder de site op te kunnen!"
-      confirmation: "Weet u zeker dat u wilt uitloggen?"
-      confirm: "Ja, log mij uit!"
-      cancel: "Nee, ik blijf nog even!"
-    password_forgotten:
-      intro: "Bent u uw wachtwoord vergeten? U kunt met het \"wachtwoord vergeten formulier\" hieronder een nieuw wachtwoord aanvragen. Wanneer u uw voornaam en emailadres heeft ingevuld word er een nieuw email adres voor u aangemaakt, deze krijg u vervolgens naar uw email adres gestuurd."
-      first_name: "Voornaam"
-      email: "E-mail"
-      submit: "Reset mijn wachtwoord..."
-
-  news:
-    index:
-      intro: "Bij het nieuwtjes overzicht kunt u door alle geplaatste nieuwtjes bladeren. De nieuwtjes zijn gesorteerd op datum, waarbij de nieuwste berichten altijd bovenaan staan. Via de pagina navigatie (rechts onder deze tekst) kunt u ook oudere berichten terug zien. Via de link \"Nieuwtje toevoegen\" (links onder deze tekst), kunt u naar het scherm gaan om een nieuw bericht te plaatsen."
-      add: "Nieuwtje toevoegen »"
-      add_title: "Plaats een nieuw nieuwtje"
-      view_comments: "Bekijk/plaats reacties (%{count}) »"
-      view_comments_title: "Bekijk het hele bericht en lees/schrijf reacties"
-      remove: "Verwijderen » "
-      remove_title: "Verwijder dit complete bericht"
-      edit: "Aanpassen » "
-      edit_title: "Pas dit bericht aan"
-    add:
-      intro: "Op deze pagina kunt u een nieuw nieuwtje aanmaken. Typ uw verhaal in het tekstvak hieronder en druk op \"Plaats nieuwtje\". Uw verhaal zal bovenaan de lijst met nieuwtjes worden geplaatst."
-      placeholder: "Hier uw tekst"
-      submit: "Plaats nieuwtje"
-      back: "« Terug naar het overzicht"
-      back_title: "Keer terug naar het nieuwtjes overzicht"
-    edit:
-      intro: "Op deze pagina kunt u een reeds eerder aangemaakt nieuwtje aanpassen. Vergeet niet op de knop \"Wijzigingen opslaan...\" te klikken zodat uw wijzigen ook daadwerkelijk doorgevoerd worden."
-      submit: "Wijzigingen opslaan..."
-      back: "« Terug naar het overzicht"
-      back_title: "Keer terug naar het nieuwtjes overzicht"
-    remove:
-      confirmation: "Weet u zeker dat u dit nieuwtje wilt verwijderen?"
-      confirm: "Ja, verwijderen"
-      cancel: "Nee, niet verwijderen"
-    view:
-      intro: "Op deze pagina bekijkt u een nieuwtje, inclusief alle bijhorende reacties. Hier kunt u zelf ook reacties plaatsen bij een nieuwtje, dit doet u door op \"Reactie plaatsen\" te klikken. Wanneer u weer terug wilt keren naar het nieuwtjes overzicht kunt u dit doen door op \"Terug naar het overzicht\" te klikken of in het hoofd menu \"Nieuwtjes\" aan te klikken."
-      back: "« Terug naar het overzicht"
-      back_title: "Keer terug naar het nieuwtjes overzicht"
-      add_comment: "Reactie plaatsen »"
-      add_comment_title: "Plaats een reactie op dit bericht"
-      remove: "Verwijderen » "
-      remove_title: "Verwijder dit complete bericht"
-      edit: "Aanpassen » "
-      edit_title: "Pas dit bericht aan"
-      remove_comment: "Verwijderen »"
-      remove_comment_title: "Verwijder deze reactie"
-      edit_comment: "Aanpassen »"
-      edit_comment_title: "Pas deze reactie aan"
-    add_comment:
-      intro: "Op deze pagina kunt u een nieuwe reactie aanmaken. Typ uw reactie in het tekstvak hieronder en druk op \"Reactie plaatsen\". Uw reactie zal bovenaan de lijst met reacties worden geplaatst."
-      placeholder: "Hier uw reactie"
-      submit: "Reactie plaatsen"
-      back: "« Terug naar het nieuwtje"
-      back_title: "Keer terug naar het nieuwtje waarop u wilde reageren"
-    edit_comment:
-      intro: "Op deze pagina kunt u een door u geplaatste reactie aanpassen. Verander uw reactie en druk op \"Aanpassen\". Uw aanpassingen worden direct doorgevoerd.\""
-      submit: "Aanpassen"
-      back: "« Terug naar het nieuwtje"
-      back_title: "Keer terug naar het nieuwtje waar u deze reactie bij heeft geplaatst"
-    remove_comment:
-      confirmation: "Weet u zeker dat u deze reactie wilt verwijderen?"
-      confirm: "Ja, verwijderen"
-      cancel: "Nee, niet verwijderen"
-
-  photo_albums:
-    index:
-      intro: "Bij het fotoalbums overzicht kunt u door alle geplaatste fotoalbums bladeren. Net als de nieuwtjes zijn ook de fotoalbums gesorteerd op datum en zult u van boven naar beneden steeds oudere fotoalbums tegenkomen. Wilt u zelf een fotoalbum toevoegen klik dan op de link: \"Fotoalbum toevoegen\"."
-      add: "Fotoalbum toevoegen »"
-    show:
-      intro: "Op deze pagina bekijkt u een fotoalbum, inclusief alle bijhorende reacties. om een reactie te plaatsen klikt u op \"Reactie plaatsen\".   Wanneer u weer terug wilt keren naar het fotoalbums overzicht kunt u dit doen door op \"Terug naar het overzicht\" te klikken."
-      back: "« Terug naar het overzicht"
-      add_comment: "Reactie plaatsen »"
-      add_comment_title: "Plaats een reactie bij dit album"
-      remove: "Verwijderen  »"
-      manage_pictures: "Foto's beheren  »"
-      edit: "Aanpassen  »"
-      remove_comment: "Verwijderen »"
-      remove_comment_title: "Verwijder deze reactie"
-      edit_comment: "Aanpassen »"
-      edit_comment_title: "Pas deze reactie aan"
-    new:
-      intro: "Op deze pagina kunt u een nieuw fotoalbum aanmaken. Vul een titel en beschrijving in en selecteer alle foto's voor het album in één keer (houd Ctrl/Cmd ingedrukt om meerdere bestanden te kiezen). De eerste foto wordt automatisch gebruikt als voorbeeld afbeelding. Klik vervolgens op \"Maak album aan\"."
-      pictures_label: "Foto's:"
-      submit: "Maak album aan"
-      back: "« Terug naar het overzicht"
-    edit:
-      intro: "Op deze pagina kunt u de gegevens van uw fotoalbum aanpassen."
-      current_preview_picture: "Huidige voorbeeld afbeelding:"
-      submit: "Aanpassingen opslaan"
-      back: "« Terug naar het overzicht"
-    manage_pictures:
-      intro: "Op deze pagina kunt u foto's toevoegen en verwijderen aan een fotoalbum. Toevoegen doet u door één of meerdere foto's te selecteren (houd Ctrl/Cmd ingedrukt om meerdere bestanden te kiezen) en vervolgens op de Geselecteerde foto's uploaden knop te drukken. Het verwijderen van foto's doet u door foto's te selecteren door ze aan te vinken en vervolgens op de knop Geselecteerde foto's verwijderen te drukken."
-      add_pictures_label: "Foto's toevoegen:"
-      upload_submit: "Geselecteerde foto's uploaden"
-      remove_pictures_label: "Foto's verwijderen:"
-      remove_submit: "Geselecteerde foto's verwijderen"
-      back: "« Terug naar het overzicht"
-    remove:
-      confirmation: "Weet u zeker dat u deze foto album inclusief foto's wilt verwijderen?"
-      confirm: "Ja, verwijderen"
-      cancel: "Nee, niet verwijderen"
-
-  photo_album_comments:
-    new:
-      intro: "Op deze pagina kunt u een nieuwe reactie aanmaken. Typ uw reactie in het tekstvak hieronder en druk op \"Reactie plaatsen\". Uw reactie zal bovenaan de lijst met reacties worden geplaatst."
-      placeholder: "Hier uw reactie"
-      submit: "Reactie plaatsen"
-      back: "« Terug naar de fotoalbum"
-      back_title: "Keer terug naar het nieuwtje waarop u wilde reageren"
-    edit:
-      intro: "Op deze pagina kunt u een door u geplaatste reactie aanpassen. Verander uw reactie en druk op \"Aanpassen\". Uw aanpassingen worden direct doorgevoerd.\""
-      submit: "Aanpassen"
-      back: "« Terug naar de fotoalbum"
-      back_title: "Keer terug naar het nieuwtje waarop u wilde reageren"
-    remove:
-      confirmation: "Weet u zeker dat u deze reactie wilt verwijderen?"
-      confirm: "Ja, verwijderen"
-      cancel: "Nee, niet verwijderen"
-
-  photo_album_pictures:
-    show:
-      submit: "Create"
-      back: "Back"
-      back_to_albums: "Terug naar het overzicht"
-    pictures_list:
-      remove_selected: "Remove selected"
-
-  settings:
-    settings_menu:
-      profile: "Profiel"
-      notifications: "Notificaties"
-      password: "Wachtwoord"
-    profile:
-      intro: "Op deze pagina kunt u uw profiel instellingen aanpassen, zoals uw naam en email adres."
-      submit: "Opslaan"
-    notifications:
-      intro: "Deze pagina laat u instellen van welke gebeurtenissen u op de hoogte wilt worden gesteld. Een vinkje zetten betekend ontvangen van mail."
-      submit: "Opslaan"
-    password:
-      intro: "Als u uw wachtwoord wilt wijzigen kunt u dit hier doen. U moet uw huidge wachtwoord en twee maal het nieuwe wachtwoord invoeren."
-      old_password_label: "Huidig wachtwoord:"
-      new_password_label: "Nieuw wachtwoord:"
-      new_password_confirmation_label: "Nieuw wachtwoord opnieuw:"
-      submit: "Wachtwoord wijzigen"
-
-  users:
-    index:
-      heading: "Gebruikers overzicht"
-      show: "Bekijken"
-      edit: "Aanpassen"
-      destroy: "Verwijderen"
-      confirm_destroy: "Weet u het zeker?"
-      new_user: "Gebruiker toevoegen"
-    new:
-      heading: "Gebruiker toevoegen"
-      submit: "Aanmaken"
-      back: "« Terug naar het overzicht"
-    edit:
-      heading: "Gebruiker aanpassen"
-      submit: "Opslaan"
-      show: "Bekijken"
-      back: "« Terug naar het overzicht"
-    show:
-      edit: "Aanpassen"
-      back: "« Terug naar het overzicht"
-    sign_in:
-      submit: "Inloggen"
-      back: "« Terug"
-
+      cancel: Nee, ik blijf nog even!
+      confirm: Ja, log mij uit!
+      confirmation: Weet u zeker dat u wilt uitloggen?
+      intro: Bent u weer helemaal op de hoogte van de familie en is het weer tijd
+        om wat anders te gaan doen? Log dan eerst uit! Met het uitloggen zorgt u er
+        voor dat wanneer de website weer word geopend op uw computer, er eerst weer
+        moet worden ingelogd om verder de site op te kunnen!
   mailer:
-    subjects:
-      password_forgotten: "Nieuw wachtwoord"
-      notify_new_news: "Nieuw nieuwtje"
-      notify_new_photo_album: "Nieuw fotoalbum"
     notify_new_news:
-      greeting: "Beste familielid,"
-      posted_by: "Er is een nieuw nieuwtje geplaatst door %{name}."
-      link_prefix: "Klik"
-      link_text: "HIER"
-      link_suffix: "om het nieuwtje te bekijken."
-      link_text_plain: "Ga naar %{url} om het nieuwtje te bekijken."
-      closing: "Met vriendelijke groet,"
-      signature: "DoedensOnline.nl"
-      ps: "PS. Dit is een automatisch gegenereerd bericht."
+      closing: Met vriendelijke groet,
+      greeting: Beste familielid,
+      link_prefix: Klik
+      link_suffix: om het nieuwtje te bekijken.
+      link_text: HIER
+      link_text_plain: Ga naar %{url} om het nieuwtje te bekijken.
+      posted_by: Er is een nieuw nieuwtje geplaatst door %{name}.
+      ps: PS. Dit is een automatisch gegenereerd bericht.
+      signature: DoedensOnline.nl
     notify_new_photo_album:
-      greeting: "Beste familielid,"
-      posted_by: "Er is een nieuw fotoalbum geplaatst door %{name}."
-      link_prefix: "Klik"
-      link_text: "HIER"
-      link_suffix: "om het fotoalbum te bekijken."
-      link_text_plain: "Ga naar %{url} om het fotoalbum te bekijken."
-      closing: "Met vriendelijke groet,"
-      signature: "DoedensOnline.nl"
-      ps: "PS. Dit is een automatisch gegenereerd bericht."
+      closing: Met vriendelijke groet,
+      greeting: Beste familielid,
+      link_prefix: Klik
+      link_suffix: om het fotoalbum te bekijken.
+      link_text: HIER
+      link_text_plain: Ga naar %{url} om het fotoalbum te bekijken.
+      posted_by: Er is een nieuw fotoalbum geplaatst door %{name}.
+      ps: PS. Dit is een automatisch gegenereerd bericht.
+      signature: DoedensOnline.nl
     password_forgotten:
-      greeting: "Beste %{name},"
-      intro: "Er is voor uw account het \"wachtwoord vergeten\" formulier ingevuld. Dit betekend dat uw oude wachtwoord is vervangen door een nieuw automatisch gegenereerd wachtwoord."
+      closing: Met vriendelijke groet,
+      greeting: Beste %{name},
+      instructions: Log met uw nieuwe wachtwoord in en wijzig (indien u het automatisch
+        gegenereerde wachtwoord niet wilt gebruiken) vervolgens het nieuwe wachtwoord
+        in een wachtwoord die u makkelijker kunt onthouden.
+      intro: Er is voor uw account het "wachtwoord vergeten" formulier ingevuld. Dit
+        betekend dat uw oude wachtwoord is vervangen door een nieuw automatisch gegenereerd
+        wachtwoord.
       new_password_html: "<strong>%{password}</strong> is uw nieuwe wachtwoord."
       new_password_text: "%{password} <-- is uw nieuwe wachtwoord."
-      instructions: "Log met uw nieuwe wachtwoord in en wijzig (indien u het automatisch gegenereerde wachtwoord niet wilt gebruiken) vervolgens het nieuwe wachtwoord in een wachtwoord die u makkelijker kunt onthouden."
-      closing: "Met vriendelijke groet,"
-      signature: "DoedensOnline.nl"
-      ps: "PS. Dit is een automatisch gegenereed bericht."
+      ps: PS. Dit is een automatisch gegenereed bericht.
+      signature: DoedensOnline.nl
+    subjects:
+      notify_new_news: Nieuw nieuwtje
+      notify_new_photo_album: Nieuw fotoalbum
+      password_forgotten: Nieuw wachtwoord
+  menu:
+    albums: Fotoalbums
+    albums_title: Het fotoalbums overzicht
+    home: Home
+    home_title: Naar de begin pagina
+    home_title_active: De begin pagina
+    news: Nieuwtjes
+    news_title: Het nieuwtjes overzicht
+    settings: Instellingen
+    settings_title: Uw persoonlijke instellingen
+    sign_out: Uitloggen
+    sign_out_title: De uitlog pagina
+  news:
+    add:
+      back: "« Terug naar het overzicht"
+      back_title: Keer terug naar het nieuwtjes overzicht
+      intro: Op deze pagina kunt u een nieuw nieuwtje aanmaken. Typ uw verhaal in
+        het tekstvak hieronder en druk op "Plaats nieuwtje". Uw verhaal zal bovenaan
+        de lijst met nieuwtjes worden geplaatst.
+      placeholder: Hier uw tekst
+      submit: Plaats nieuwtje
+    add_comment:
+      back: "« Terug naar het nieuwtje"
+      back_title: Keer terug naar het nieuwtje waarop u wilde reageren
+      intro: Op deze pagina kunt u een nieuwe reactie aanmaken. Typ uw reactie in
+        het tekstvak hieronder en druk op "Reactie plaatsen". Uw reactie zal bovenaan
+        de lijst met reacties worden geplaatst.
+      placeholder: Hier uw reactie
+      submit: Reactie plaatsen
+    edit:
+      back: "« Terug naar het overzicht"
+      back_title: Keer terug naar het nieuwtjes overzicht
+      intro: Op deze pagina kunt u een reeds eerder aangemaakt nieuwtje aanpassen.
+        Vergeet niet op de knop "Wijzigingen opslaan..." te klikken zodat uw wijzigen
+        ook daadwerkelijk doorgevoerd worden.
+      submit: Wijzigingen opslaan...
+    edit_comment:
+      back: "« Terug naar het nieuwtje"
+      back_title: Keer terug naar het nieuwtje waar u deze reactie bij heeft geplaatst
+      intro: Op deze pagina kunt u een door u geplaatste reactie aanpassen. Verander
+        uw reactie en druk op "Aanpassen". Uw aanpassingen worden direct doorgevoerd."
+      submit: Aanpassen
+    index:
+      add: Nieuwtje toevoegen »
+      add_title: Plaats een nieuw nieuwtje
+      edit: 'Aanpassen » '
+      edit_title: Pas dit bericht aan
+      intro: Bij het nieuwtjes overzicht kunt u door alle geplaatste nieuwtjes bladeren.
+        De nieuwtjes zijn gesorteerd op datum, waarbij de nieuwste berichten altijd
+        bovenaan staan. Via de pagina navigatie (rechts onder deze tekst) kunt u ook
+        oudere berichten terug zien. Via de link "Nieuwtje toevoegen" (links onder
+        deze tekst), kunt u naar het scherm gaan om een nieuw bericht te plaatsen.
+      remove: 'Verwijderen » '
+      remove_title: Verwijder dit complete bericht
+      view_comments: Bekijk/plaats reacties (%{count}) »
+      view_comments_title: Bekijk het hele bericht en lees/schrijf reacties
+    remove:
+      cancel: Nee, niet verwijderen
+      confirm: Ja, verwijderen
+      confirmation: Weet u zeker dat u dit nieuwtje wilt verwijderen?
+    remove_comment:
+      cancel: Nee, niet verwijderen
+      confirm: Ja, verwijderen
+      confirmation: Weet u zeker dat u deze reactie wilt verwijderen?
+    view:
+      add_comment: Reactie plaatsen »
+      add_comment_title: Plaats een reactie op dit bericht
+      back: "« Terug naar het overzicht"
+      back_title: Keer terug naar het nieuwtjes overzicht
+      edit: 'Aanpassen » '
+      edit_comment: Aanpassen »
+      edit_comment_title: Pas deze reactie aan
+      edit_title: Pas dit bericht aan
+      intro: Op deze pagina bekijkt u een nieuwtje, inclusief alle bijhorende reacties.
+        Hier kunt u zelf ook reacties plaatsen bij een nieuwtje, dit doet u door op
+        "Reactie plaatsen" te klikken. Wanneer u weer terug wilt keren naar het nieuwtjes
+        overzicht kunt u dit doen door op "Terug naar het overzicht" te klikken of
+        in het hoofd menu "Nieuwtjes" aan te klikken.
+      remove: 'Verwijderen » '
+      remove_comment: Verwijderen »
+      remove_comment_title: Verwijder deze reactie
+      remove_title: Verwijder dit complete bericht
+  page_titles:
+    albums_comment_add: Reactie op fotoalbum plaatsen
+    albums_comment_edit: Reactie op fotoalbum aanpassen
+    albums_comment_remove: Reactie op fotoalbum verwijderen
+    albums_edit: Fotoalbum aanpassen
+    albums_index: Fotoalbums overzicht
+    albums_manage_pictures: Foto's beheren
+    albums_new: Fotoalbum aanmaken
+    albums_remove: Fotoalbum verwijderen
+    albums_view: Fotoalbum bekijken
+    home: Home
+    news_add: Nieuwtje toevoegen
+    news_comment_add: Reactie op nieuwtje plaatsen
+    news_comment_edit: Reactie op nieuwtje aanpassen
+    news_comment_remove: Reactie op nieuwtje verwijderen
+    news_edit: Nieuwtje aanpassen
+    news_index: Nieuwtjes overzicht
+    news_remove: Nieuwtje verwijderen
+    news_view: Nieuwtje bekijken
+    password_forgotten: Wachtwoord vergeten
+    settings: Instellingen
+    sign_in: Inloggen
+    sign_out: Uitloggen
+    users: Gebruikers
+  photo_album_comments:
+    edit:
+      back: "« Terug naar de fotoalbum"
+      back_title: Keer terug naar het nieuwtje waarop u wilde reageren
+      intro: Op deze pagina kunt u een door u geplaatste reactie aanpassen. Verander
+        uw reactie en druk op "Aanpassen". Uw aanpassingen worden direct doorgevoerd."
+      submit: Aanpassen
+    new:
+      back: "« Terug naar de fotoalbum"
+      back_title: Keer terug naar het nieuwtje waarop u wilde reageren
+      intro: Op deze pagina kunt u een nieuwe reactie aanmaken. Typ uw reactie in
+        het tekstvak hieronder en druk op "Reactie plaatsen". Uw reactie zal bovenaan
+        de lijst met reacties worden geplaatst.
+      placeholder: Hier uw reactie
+      submit: Reactie plaatsen
+    remove:
+      cancel: Nee, niet verwijderen
+      confirm: Ja, verwijderen
+      confirmation: Weet u zeker dat u deze reactie wilt verwijderen?
+  photo_album_pictures:
+    pictures_list:
+      remove_selected: Remove selected
+    show:
+      back: Back
+      back_to_albums: Terug naar het overzicht
+      submit: Create
+  photo_albums:
+    edit:
+      back: "« Terug naar het overzicht"
+      current_preview_picture: 'Huidige voorbeeld afbeelding:'
+      intro: Op deze pagina kunt u de gegevens van uw fotoalbum aanpassen.
+      submit: Aanpassingen opslaan
+    index:
+      add: Fotoalbum toevoegen »
+      intro: 'Bij het fotoalbums overzicht kunt u door alle geplaatste fotoalbums
+        bladeren. Net als de nieuwtjes zijn ook de fotoalbums gesorteerd op datum
+        en zult u van boven naar beneden steeds oudere fotoalbums tegenkomen. Wilt
+        u zelf een fotoalbum toevoegen klik dan op de link: "Fotoalbum toevoegen".'
+    manage_pictures:
+      add_pictures_label: 'Foto''s toevoegen:'
+      back: "« Terug naar het overzicht"
+      intro: Op deze pagina kunt u foto's toevoegen en verwijderen aan een fotoalbum.
+        Toevoegen doet u door één of meerdere foto's te selecteren (houd Ctrl/Cmd
+        ingedrukt om meerdere bestanden te kiezen) en vervolgens op de Geselecteerde
+        foto's uploaden knop te drukken. Het verwijderen van foto's doet u door foto's
+        te selecteren door ze aan te vinken en vervolgens op de knop Geselecteerde
+        foto's verwijderen te drukken.
+      remove_pictures_label: 'Foto''s verwijderen:'
+      remove_submit: Geselecteerde foto's verwijderen
+      upload_submit: Geselecteerde foto's uploaden
+    new:
+      back: "« Terug naar het overzicht"
+      intro: Op deze pagina kunt u een nieuw fotoalbum aanmaken. Vul een titel en
+        beschrijving in en selecteer alle foto's voor het album in één keer (houd
+        Ctrl/Cmd ingedrukt om meerdere bestanden te kiezen). De eerste foto wordt
+        automatisch gebruikt als voorbeeld afbeelding. Klik vervolgens op "Maak album
+        aan".
+      pictures_label: 'Foto''s:'
+      submit: Maak album aan
+    remove:
+      cancel: Nee, niet verwijderen
+      confirm: Ja, verwijderen
+      confirmation: Weet u zeker dat u deze foto album inclusief foto's wilt verwijderen?
+    show:
+      add_comment: Reactie plaatsen »
+      add_comment_title: Plaats een reactie bij dit album
+      back: "« Terug naar het overzicht"
+      edit: Aanpassen  »
+      edit_comment: Aanpassen »
+      edit_comment_title: Pas deze reactie aan
+      intro: Op deze pagina bekijkt u een fotoalbum, inclusief alle bijhorende reacties.
+        om een reactie te plaatsen klikt u op "Reactie plaatsen".   Wanneer u weer
+        terug wilt keren naar het fotoalbums overzicht kunt u dit doen door op "Terug
+        naar het overzicht" te klikken.
+      manage_pictures: Foto's beheren  »
+      remove: Verwijderen  »
+      remove_comment: Verwijderen »
+      remove_comment_title: Verwijder deze reactie
+  settings:
+    notifications:
+      intro: Deze pagina laat u instellen van welke gebeurtenissen u op de hoogte
+        wilt worden gesteld. Een vinkje zetten betekend ontvangen van mail.
+      submit: Opslaan
+    password:
+      intro: Als u uw wachtwoord wilt wijzigen kunt u dit hier doen. U moet uw huidge
+        wachtwoord en twee maal het nieuwe wachtwoord invoeren.
+      new_password_confirmation_label: 'Nieuw wachtwoord opnieuw:'
+      new_password_label: 'Nieuw wachtwoord:'
+      old_password_label: 'Huidig wachtwoord:'
+      submit: Wachtwoord wijzigen
+    profile:
+      intro: Op deze pagina kunt u uw profiel instellingen aanpassen, zoals uw naam
+        en email adres.
+      submit: Opslaan
+    settings_menu:
+      notifications: Notificaties
+      password: Wachtwoord
+      profile: Profiel
+  site:
+    logo_alt: Doedens Online
+    logo_title: Doedens Online
+    sub_title: Ditjes en datjes van oma Doed
+    title_suffix: Doedensonline.nl
+  users:
+    edit:
+      back: "« Terug naar het overzicht"
+      heading: Gebruiker aanpassen
+      show: Bekijken
+      submit: Opslaan
+    index:
+      confirm_destroy: Weet u het zeker?
+      destroy: Verwijderen
+      edit: Aanpassen
+      heading: Gebruikers overzicht
+      new_user: Gebruiker toevoegen
+      show: Bekijken
+    new:
+      back: "« Terug naar het overzicht"
+      heading: Gebruiker toevoegen
+      submit: Aanmaken
+    show:
+      back: "« Terug naar het overzicht"
+      edit: Aanpassen
+    sign_in:
+      back: "« Terug"
+      submit: Inloggen
