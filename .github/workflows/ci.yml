@@ -58,6 +58,11 @@ jobs:
           TAG: ${{ steps.tag.outputs.tag }}
         run: docker compose run --rm app bundle exec rubocop
 
+      - name: Run i18n-tasks
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: docker compose run --rm app bundle exec i18n-tasks health
+
       - name: Run tests
         env:
           TAG: ${{ steps.tag.outputs.tag }}
