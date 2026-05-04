@@ -1,4 +1,4 @@
-FROM ruby:1.9.3-p551
+FROM ruby:2.1.10
 
 WORKDIR /app
 CMD passenger start -p 8080
@@ -10,13 +10,9 @@ RUN printf 'deb http://archive.debian.org/debian jessie main\n' > /etc/apt/sourc
     && apt-get -o APT::Get::AllowUnauthenticated=true install -y --force-yes --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
+RUN gem install bundler -v 1.17.3 --no-document
+
 COPY Gemfile Gemfile.lock ./
-# Install precompiled binaries for gems whose C extensions segfault when built
-# from source against Ruby 1.9.3 with the base image's modern toolchain.
-RUN gem install json -v '1.8.6' \
-    && gem install sqlite3 -v '1.3.13' \
-    && gem install rack -v '1.4.7' \
-    && gem install passenger -v '5.3.7'
 RUN bundle install
 
 COPY . .

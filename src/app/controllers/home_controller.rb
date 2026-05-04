@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-  before_filter :redirect_to_home_if_signed_in, only: [:sign_in, :authenticate, :password_forgotten, :reset_password]
+  before_action :redirect_to_home_if_signed_in, only: [:sign_in, :authenticate, :password_forgotten, :reset_password]
 
   # GET /home
   def index

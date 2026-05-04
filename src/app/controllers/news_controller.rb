@@ -1,11 +1,11 @@
 class NewsController < ApplicationController
   include Paginatable
 
-  before_filter :current_user
-  before_filter :load_news_item,            only: [:edit, :update, :remove, :destroy]
-  before_filter :check_news_item_author,    only: [:edit, :update, :remove, :destroy]
-  before_filter :load_news_comment,         only: [:edit_comment, :update_comment, :remove_comment, :destroy_comment]
-  before_filter :check_news_comment_author, only: [:edit_comment, :update_comment, :remove_comment, :destroy_comment]
+  before_action :current_user
+  before_action :load_news_item,            only: [:edit, :update, :remove, :destroy]
+  before_action :check_news_item_author,    only: [:edit, :update, :remove, :destroy]
+  before_action :load_news_comment,         only: [:edit_comment, :update_comment, :remove_comment, :destroy_comment]
+  before_action :check_news_comment_author, only: [:edit_comment, :update_comment, :remove_comment, :destroy_comment]
 
   # GET /news/
   def index
@@ -25,7 +25,7 @@ class NewsController < ApplicationController
 
   # POST /news/create
   def create
-    @news_item = NewsItem.new(params[:news_item])
+    @news_item = NewsItem.new(news_item_params)
     @news_item.message = root_src_img_tag(@news_item.message)
     @news_item.user_id = current_user.id
 
@@ -47,8 +47,9 @@ class NewsController < ApplicationController
 
   # PUT /news/update
   def update
-    params[:news_item][:message] = root_src_img_tag(params[:news_item][:message])
-    if @news_item.update_attributes(params[:news_item])
+    attrs = news_item_params
+    attrs[:message] = root_src_img_tag(attrs[:message]) if attrs[:message]
+    if @news_item.update(attrs)
       flash[:notice] = t('flash.news.updated')
       redirect_to action: "index"
     else
@@ -78,7 +79,7 @@ class NewsController < ApplicationController
       flash[:error] = t('flash.news.item_not_found')
       redirect_to action: 'index'
     else
-      @news_comments = NewsComment.where("news_item_id = ?", @news_item.id).order('created_at ASC').all
+      @news_comments = NewsComment.where("news_item_id = ?", @news_item.id).order('created_at ASC').to_a
     end
   end
 
@@ -90,7 +91,7 @@ class NewsController < ApplicationController
 
   # POST /news/create_comment
   def create_comment
-    @news_comment = NewsComment.new(params[:news_comment])
+    @news_comment = NewsComment.new(news_comment_params)
     @news_comment.message = root_src_img_tag(@news_comment.message)
     @news_comment.user_id = current_user.id
 
@@ -109,8 +110,9 @@ class NewsController < ApplicationController
 
   # PUT /news/update_comment
   def update_comment
-    params[:news_comment][:message] = root_src_img_tag(params[:news_comment][:message])
-    if @news_comment.update_attributes(params[:news_comment])
+    attrs = news_comment_params
+    attrs[:message] = root_src_img_tag(attrs[:message]) if attrs[:message]
+    if @news_comment.update(attrs)
       flash[:notice] = t('flash.news.comment_updated')
       redirect_to action: 'view', id: @news_comment.news_item.id
     else
@@ -133,9 +135,17 @@ class NewsController < ApplicationController
 
   private
 
+  def news_item_params
+    params.require(:news_item).permit(:message)
+  end
+
+  def news_comment_params
+    params.require(:news_comment).permit(:message, :news_item_id)
+  end
+
   def load_news_item
     id = params[:id] || (params[:news_item] && params[:news_item][:id])
-    @news_item = NewsItem.find_by_id(id)
+    @news_item = NewsItem.find_by(id: id)
     unless @news_item
       flash[:error] = t('flash.news.item_not_found')
       redirect_to action: 'index'
@@ -148,7 +158,7 @@ class NewsController < ApplicationController
 
   def load_news_comment
     id = params[:id] || (params[:news_comment] && params[:news_comment][:id])
-    @news_comment = NewsComment.find_by_id(id)
+    @news_comment = NewsComment.find_by(id: id)
     unless @news_comment
       flash[:error] = t('flash.news.comment_not_found')
       redirect_to action: 'index'

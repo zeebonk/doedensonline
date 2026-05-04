@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   layout 'default'
 
-  before_filter :return_to_home_if_user_not_admin
+  before_action :return_to_home_if_user_not_admin
 
   # GET /users
   def index
@@ -25,7 +25,7 @@ class UsersController < ApplicationController
 
   # POST /users
   def create
-    @user = User.new(params[:user], as: :admin)
+    @user = User.new(user_admin_params)
 
     if @user.save
       flash[:notice] = t('flash.users.created')
@@ -39,7 +39,7 @@ class UsersController < ApplicationController
   def update
     @user = User.find(params[:id])
 
-    if @user.update_attributes(params[:user], as: :admin)
+    if @user.update(user_admin_params)
       flash[:notice] = t('flash.users.updated')
       redirect_to(@user)
     else
@@ -53,5 +53,15 @@ class UsersController < ApplicationController
     @user.destroy
 
     redirect_to(users_url)
+  end
+
+  private
+
+  def user_admin_params
+    params.require(:user).permit(
+      :first_name, :last_name, :email,
+      :notify_news, :notify_photo_album,
+      :password, :isadmin
+    )
   end
 end

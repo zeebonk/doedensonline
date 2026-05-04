@@ -15,6 +15,10 @@ terraform {
       source  = "integrations/github"
       version = "~> 6.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
   }
 }
 
@@ -571,6 +575,7 @@ locals {
     DEV_SMTP_HOST       = "email-smtp.${local.region}.amazonaws.com"
     DEV_SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
     DEV_SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
+    DEV_SECRET_KEY_BASE = random_id.dev_secret_key_base.hex
   }
 
   github_actions_prod_secrets = {
@@ -579,7 +584,19 @@ locals {
     PROD_SMTP_HOST       = "email-smtp.${local.region}.amazonaws.com"
     PROD_SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
     PROD_SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
+    PROD_SECRET_KEY_BASE = random_id.prod_secret_key_base.hex
   }
+}
+
+# Rails 4.0 secret_key_base for the production and development
+# environments. 64 random bytes → 128 hex chars, the same length the
+# Rails generator produces.
+resource "random_id" "prod_secret_key_base" {
+  byte_length = 64
+}
+
+resource "random_id" "dev_secret_key_base" {
+  byte_length = 64
 }
 
 resource "github_actions_secret" "dev_deploy" {

@@ -91,12 +91,12 @@ class SettingsControllerTest < ActionController::TestCase
     assert_equal false, @user.reload.notify_news
   end
 
-  test "update_notifications re-renders notifications on invalid input" do
+  test "update_notifications ignores params outside the notification scope" do
+    original_email = @user.email
     put :update_notifications, user: { email: 'not-an-email' }
 
-    assert_response :success
-    assert_template 'notifications'
-    assert assigns(:user).errors[:email].present?
+    assert_redirected_to controller: 'settings', action: 'notifications'
+    assert_equal original_email, @user.reload.email
   end
 
   # PUT /settings/update_password
