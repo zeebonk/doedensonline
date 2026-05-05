@@ -517,7 +517,8 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "dev" {
 
   config {
     ingress_rule {
-      service = "http://localhost:8080"
+      hostname = "dev.${local.domain}"
+      service  = "http://localhost:8080"
     }
     ingress_rule {
       service = "http_status:404"
