@@ -316,6 +316,7 @@ resource "local_file" "inventory" {
           "smtp_host" : "email-smtp.${local.region}.amazonaws.com",
           "smtp_username" : module.iam_user_doedensonline_ses.access_key_id,
           "smtp_password" : module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4,
+          "cloudflared_tunnel_token" : cloudflare_zero_trust_tunnel_cloudflared.prod.tunnel_token,
         },
       }
     },
@@ -466,10 +467,24 @@ resource "cloudflare_zone" "doedensonline" {
 resource "cloudflare_record" "doedensonline" {
   zone_id = cloudflare_zone.doedensonline.id
   name    = local.domain
-  type    = "A"
-  content = aws_eip.doedensonline.public_ip
-  ttl     = 60
-  proxied = false
+  type    = "CNAME"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.prod.id}.cfargotunnel.com"
+  # Cloudflare ignores TTL for proxied records but still requires a value;
+  # `1` means "auto" in their API.
+  ttl     = 1
+  proxied = true
+}
+
+# www.doedensonline.nl exists only so Cloudflare's edge can intercept
+# requests and apply the redirect ruleset below — the tunnel never sees
+# this hostname.
+resource "cloudflare_record" "doedensonline_www" {
+  zone_id = cloudflare_zone.doedensonline.id
+  name    = "www.${local.domain}"
+  type    = "CNAME"
+  content = local.domain
+  ttl     = 1
+  proxied = true
 }
 
 resource "cloudflare_record" "doedensonline_dev" {
@@ -524,6 +539,58 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "dev" {
     }
     ingress_rule {
       service = "http_status:404"
+    }
+  }
+}
+
+resource "random_id" "prod_tunnel_secret" {
+  byte_length = 32
+}
+
+resource "cloudflare_zero_trust_tunnel_cloudflared" "prod" {
+  account_id = var.cloudflare_account_id
+  name       = "doedensonline-prod"
+  secret     = random_id.prod_tunnel_secret.b64_std
+}
+
+resource "cloudflare_zero_trust_tunnel_cloudflared_config" "prod" {
+  account_id = var.cloudflare_account_id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.prod.id
+
+  config {
+    ingress_rule {
+      hostname = local.domain
+      service  = "http://localhost:8080"
+    }
+    ingress_rule {
+      service = "http_status:404"
+    }
+  }
+}
+
+# Strip a leading `www.` from any hostname in the zone and redirect to
+# the bare hostname. Handled at the Cloudflare edge — the tunnel never
+# sees `www.*` traffic.
+resource "cloudflare_ruleset" "redirect_www_to_apex" {
+  zone_id = cloudflare_zone.doedensonline.id
+  name    = "Redirect www.* to apex"
+  kind    = "zone"
+  phase   = "http_request_dynamic_redirect"
+
+  rules {
+    action      = "redirect"
+    expression  = "starts_with(http.host, \"www.\")"
+    description = "Redirect www.* to apex"
+    enabled     = true
+
+    action_parameters {
+      from_value {
+        status_code = 301
+        target_url {
+          expression = "concat(\"https://\", wildcard_replace(http.host, \"www.*\", \"$${1}\"), http.request.uri.path)"
+        }
+        preserve_query_string = true
+      }
     }
   }
 }
