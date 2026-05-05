@@ -455,47 +455,6 @@ resource "aws_ses_domain_dkim" "doedensonline" {
   domain = aws_ses_domain_identity.doedensonline.domain
 }
 
-resource "aws_route53_record" "doedensonline_dkim_record" {
-  for_each = toset(aws_ses_domain_dkim.doedensonline.dkim_tokens)
-  zone_id  = aws_route53_zone.doedensonline.zone_id
-  name     = "${each.key}._domainkey"
-  type     = "CNAME"
-  ttl      = "60"
-  records  = ["${each.key}.dkim.amazonses.com"]
-}
-
-resource "aws_route53_record" "doedensonline_amazonses_verification_record" {
-  zone_id = aws_route53_zone.doedensonline.zone_id
-  name    = "_amazonses.${local.domain}"
-  type    = "TXT"
-  ttl     = "60"
-  records = [aws_ses_domain_identity.doedensonline.verification_token]
-}
-
-
-# Route53
-
-resource "aws_route53_zone" "doedensonline" {
-  name = local.domain
-}
-
-resource "aws_route53_record" "doedensonline" {
-  zone_id = aws_route53_zone.doedensonline.zone_id
-  name    = local.domain
-  type    = "A"
-  ttl     = 60
-  records = [aws_eip.doedensonline.public_ip]
-}
-
-resource "aws_route53_record" "doedensonline_dev" {
-  zone_id = aws_route53_zone.doedensonline.zone_id
-  name    = "dev.${local.domain}"
-  type    = "A"
-  ttl     = 60
-  records = [hcloud_server.doedensonline.ipv4_address]
-}
-
-
 # Cloudflare
 
 resource "cloudflare_zone" "doedensonline" {
