@@ -290,7 +290,7 @@ module "security_group_doedensonline_webserver" {
   vpc_id = aws_default_subnet.doedensonline.vpc_id
 
   ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_rules       = ["http-80-tcp", "https-443-tcp", "ssh-tcp", "all-icmp"]
+  ingress_rules       = ["ssh-tcp", "all-icmp"]
 
   egress_rules = ["all-all"]
 }
@@ -304,8 +304,6 @@ resource "local_file" "inventory" {
     "prod" : {
       "vars" : {
         "rails_env" : "production",
-        "domain" : "doedensonline.nl",
-        "extra_domains" : ["www.doedensonline.nl"],
         "app_state_path" : "/app-state",
         "app_state_device" : "/dev/sdf",
       },
@@ -323,8 +321,6 @@ resource "local_file" "inventory" {
     "dev" : {
       "vars" : {
         "rails_env" : "development",
-        "domain" : "dev.doedensonline.nl",
-        "extra_domains" : [],
         "app_state_path" : "/app-state/dev",
       },
       "hosts" : {
@@ -397,20 +393,6 @@ resource "hcloud_firewall" "doedensonline" {
     direction  = "in"
     protocol   = "tcp"
     port       = "22"
-    source_ips = ["0.0.0.0/0"]
-  }
-
-  rule {
-    direction  = "in"
-    protocol   = "tcp"
-    port       = "80"
-    source_ips = ["0.0.0.0/0"]
-  }
-
-  rule {
-    direction  = "in"
-    protocol   = "tcp"
-    port       = "443"
     source_ips = ["0.0.0.0/0"]
   }
 }

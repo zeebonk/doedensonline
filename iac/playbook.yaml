@@ -155,31 +155,6 @@
          RAILS_ENV: "{{ rails_env }}"
      when: rails_env == 'development'
 
-   - name: Ensure proxy configuration is present
-     ansible.builtin.template:
-       src: ./nginx.conf.j2
-       dest: ~/nginx.conf
-       owner: root
-       group: root
-       mode: '0777'  # TODO: better permissions
-     notify:
-       - Restart proxy
-
-   - name: Ensure the proxy is running
-     community.docker.docker_container:
-       name: proxy
-       image: nginx
-       restart_policy: always
-       published_ports:
-        - 0.0.0.0:80:8080
-        - 0.0.0.0:443:443
-       volumes:
-        - /root/nginx.conf:/etc/nginx/nginx.conf
-        - "/etc/letsencrypt/live/{{ domain }}/fullchain.pem:/app/doedensonline-certificate.pem"
-        - "/etc/letsencrypt/live/{{ domain }}/privkey.pem:/app/doedensonline-certificate-key.pem"
-       etc_hosts:
-        host.docker.internal: host-gateway
-
    - name: Ensure cloudflared tunnel is running
      community.docker.docker_container:
        name: cloudflared
@@ -192,25 +167,16 @@
      tags:
        - cloudflared
 
-   - name: Ensure certificate renewal is scheduled
+   - name: Ensure the legacy nginx proxy is removed
+     community.docker.docker_container:
+       name: proxy
+       state: absent
+     tags:
+       - cleanup
+
+   - name: Ensure the legacy certbot renewal cron is removed
      ansible.builtin.cron:
        name: "Renew certificates"
-       hour: 2
-       minute: 0
-       job: >
-         docker stop proxy
-         &&
-         docker run --rm --name certbot
-         -v "/etc/letsencrypt:/etc/letsencrypt"
-         -v "/var/lib/letsencrypt:/var/lib/letsencrypt"
-         -p 80:80
-         certbot/certbot certonly -d {{ ([domain] + extra_domains) | join(',') }} --standalone -n
-         &&
-         docker start proxy
-
-  handlers:
-    - name: Restart proxy
-      community.docker.docker_container:
-        name: proxy
-        image: nginx
-        restart: yes
+       state: absent
+     tags:
+       - cleanup
