@@ -164,19 +164,3 @@
        command: tunnel --no-autoupdate run --token {{ cloudflared_tunnel_token }}
      when: cloudflared_tunnel_token is defined
      no_log: true
-     tags:
-       - cloudflared
-
-   - name: Ensure the legacy nginx proxy is removed
-     community.docker.docker_container:
-       name: proxy
-       state: absent
-     tags:
-       - cleanup
-
-   - name: Ensure the legacy certbot renewal cron is removed
-     ansible.builtin.cron:
-       name: "Renew certificates"
-       state: absent
-     tags:
-       - cleanup
