@@ -446,6 +446,14 @@ resource "cloudflare_zone" "doedensonline" {
   zone       = local.domain
 }
 
+resource "cloudflare_zone_settings_override" "doedensonline" {
+  zone_id = cloudflare_zone.doedensonline.id
+
+  settings {
+    always_use_https = "on"
+  }
+}
+
 resource "cloudflare_record" "doedensonline" {
   zone_id = cloudflare_zone.doedensonline.id
   name    = local.domain
