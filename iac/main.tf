@@ -475,10 +475,12 @@ resource "cloudflare_record" "doedensonline" {
 resource "cloudflare_record" "doedensonline_dev" {
   zone_id = cloudflare_zone.doedensonline.id
   name    = "dev.${local.domain}"
-  type    = "A"
-  content = hcloud_server.doedensonline.ipv4_address
-  ttl     = 60
-  proxied = false
+  type    = "CNAME"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.dev.id}.cfargotunnel.com"
+  # Cloudflare ignores TTL for proxied records but still requires a value;
+  # `1` means "auto" in their API.
+  ttl     = 1
+  proxied = true
 }
 
 resource "cloudflare_record" "doedensonline_dkim_record" {

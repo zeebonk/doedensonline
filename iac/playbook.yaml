@@ -189,6 +189,8 @@
        command: tunnel --no-autoupdate run --token {{ cloudflared_tunnel_token }}
      when: cloudflared_tunnel_token is defined
      no_log: true
+     tags:
+       - cloudflared
 
    - name: Ensure certificate renewal is scheduled
      ansible.builtin.cron:
