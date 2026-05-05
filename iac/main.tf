@@ -335,6 +335,7 @@ resource "local_file" "inventory" {
           "smtp_password" : module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4,
           "ecr_access_key_id" : aws_iam_access_key.doedensonline_dev.id,
           "ecr_secret_access_key" : aws_iam_access_key.doedensonline_dev.secret,
+          "cloudflared_tunnel_token" : cloudflare_zero_trust_tunnel_cloudflared.dev.tunnel_token,
         },
       }
     },
@@ -474,10 +475,12 @@ resource "cloudflare_record" "doedensonline" {
 resource "cloudflare_record" "doedensonline_dev" {
   zone_id = cloudflare_zone.doedensonline.id
   name    = "dev.${local.domain}"
-  type    = "A"
-  content = hcloud_server.doedensonline.ipv4_address
-  ttl     = 60
-  proxied = false
+  type    = "CNAME"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.dev.id}.cfargotunnel.com"
+  # Cloudflare ignores TTL for proxied records but still requires a value;
+  # `1` means "auto" in their API.
+  ttl     = 1
+  proxied = true
 }
 
 resource "cloudflare_record" "doedensonline_dkim_record" {
@@ -497,6 +500,32 @@ resource "cloudflare_record" "doedensonline_amazonses_verification_record" {
   content = aws_ses_domain_identity.doedensonline.verification_token
   ttl     = 60
   proxied = false
+}
+
+# 32 random bytes, base64-encoded — what `cloudflared` expects for a tunnel secret.
+resource "random_id" "dev_tunnel_secret" {
+  byte_length = 32
+}
+
+resource "cloudflare_zero_trust_tunnel_cloudflared" "dev" {
+  account_id = var.cloudflare_account_id
+  name       = "doedensonline-dev"
+  secret     = random_id.dev_tunnel_secret.b64_std
+}
+
+resource "cloudflare_zero_trust_tunnel_cloudflared_config" "dev" {
+  account_id = var.cloudflare_account_id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.dev.id
+
+  config {
+    ingress_rule {
+      hostname = "dev.${local.domain}"
+      service  = "http://localhost:8080"
+    }
+    ingress_rule {
+      service = "http_status:404"
+    }
+  }
 }
 
 # Backup

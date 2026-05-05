@@ -180,6 +180,18 @@
        etc_hosts:
         host.docker.internal: host-gateway
 
+   - name: Ensure cloudflared tunnel is running
+     community.docker.docker_container:
+       name: cloudflared
+       image: cloudflare/cloudflared:latest
+       restart_policy: always
+       network_mode: host
+       command: tunnel --no-autoupdate run --token {{ cloudflared_tunnel_token }}
+     when: cloudflared_tunnel_token is defined
+     no_log: true
+     tags:
+       - cloudflared
+
    - name: Ensure certificate renewal is scheduled
      ansible.builtin.cron:
        name: "Renew certificates"
