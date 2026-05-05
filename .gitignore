@@ -2,6 +2,7 @@
 .venv
 inventory.yaml
 iac/terraform.tfvars
+*.tfplan
 designs/
 src/public/images/large/*
 src/public/images/medium/*
