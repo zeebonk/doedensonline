@@ -19,6 +19,10 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.6"
     }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 4.0"
+    }
   }
 }
 
@@ -45,6 +49,20 @@ provider "hcloud" {
 
 provider "github" {
   owner = "zeebonk"
+}
+
+variable "cloudflare_api_token" {
+  type      = string
+  sensitive = true
+}
+
+variable "cloudflare_account_id" {
+  type      = string
+  sensitive = true
+}
+
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token
 }
 
 resource "aws_default_subnet" "doedensonline" {
@@ -475,6 +493,51 @@ resource "aws_route53_record" "doedensonline_dev" {
   type    = "A"
   ttl     = 60
   records = [hcloud_server.doedensonline.ipv4_address]
+}
+
+
+# Cloudflare
+
+resource "cloudflare_zone" "doedensonline" {
+  account_id = var.cloudflare_account_id
+  zone       = local.domain
+}
+
+resource "cloudflare_record" "doedensonline" {
+  zone_id = cloudflare_zone.doedensonline.id
+  name    = local.domain
+  type    = "A"
+  content = aws_eip.doedensonline.public_ip
+  ttl     = 60
+  proxied = false
+}
+
+resource "cloudflare_record" "doedensonline_dev" {
+  zone_id = cloudflare_zone.doedensonline.id
+  name    = "dev.${local.domain}"
+  type    = "A"
+  content = hcloud_server.doedensonline.ipv4_address
+  ttl     = 60
+  proxied = false
+}
+
+resource "cloudflare_record" "doedensonline_dkim_record" {
+  for_each = toset(aws_ses_domain_dkim.doedensonline.dkim_tokens)
+  zone_id  = cloudflare_zone.doedensonline.id
+  name     = "${each.key}._domainkey"
+  type     = "CNAME"
+  content  = "${each.key}.dkim.amazonses.com"
+  ttl      = 60
+  proxied  = false
+}
+
+resource "cloudflare_record" "doedensonline_amazonses_verification_record" {
+  zone_id = cloudflare_zone.doedensonline.id
+  name    = "_amazonses.${local.domain}"
+  type    = "TXT"
+  content = aws_ses_domain_identity.doedensonline.verification_token
+  ttl     = 60
+  proxied = false
 }
 
 # Backup
