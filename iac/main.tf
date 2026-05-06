@@ -304,17 +304,18 @@ resource "local_file" "inventory" {
     "prod" : {
       "vars" : {
         "rails_env" : "production",
-        "app_state_path" : "/app-state",
-        "app_state_device" : "/dev/sdf",
-        "host_ports" : [8080, 8081],
+        "app_state_path" : "/app-state/prod",
+        "host_ports" : [8081],
       },
       "hosts" : {
         "prod-webserver" : {
-          "ansible_host" : aws_eip.doedensonline.public_ip,
-          "ansible_user" : "ec2-user",
+          "ansible_host" : hcloud_server.doedensonline.ipv4_address,
+          "ansible_user" : "root",
           "smtp_host" : "email-smtp.${local.region}.amazonaws.com",
           "smtp_username" : module.iam_user_doedensonline_ses.access_key_id,
           "smtp_password" : module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4,
+          "ecr_access_key_id" : aws_iam_access_key.doedensonline_dev.id,
+          "ecr_secret_access_key" : aws_iam_access_key.doedensonline_dev.secret,
           "cloudflared_tunnel_token" : cloudflare_zero_trust_tunnel_cloudflared.prod.tunnel_token,
         },
       }
@@ -359,6 +360,8 @@ resource "hcloud_ssh_key" "github_actions" {
   public_key = trimspace(tls_private_key.github_actions_dev.public_key_openssh)
 }
 
+# Retained until the AWS prod decommission step so the previous prod deploy
+# path remains available as a rollback option during the Hetzner cutover.
 resource "tls_private_key" "github_actions_prod" {
   algorithm = "ED25519"
 }
@@ -689,8 +692,8 @@ locals {
   }
 
   github_actions_prod_secrets = {
-    PROD_SSH_HOST        = aws_eip.doedensonline.public_ip
-    PROD_SSH_PRIVATE_KEY = tls_private_key.github_actions_prod.private_key_openssh
+    PROD_SSH_HOST        = hcloud_server.doedensonline.ipv4_address
+    PROD_SSH_PRIVATE_KEY = tls_private_key.github_actions_dev.private_key_openssh
     PROD_SMTP_HOST       = "email-smtp.${local.region}.amazonaws.com"
     PROD_SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
     PROD_SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
