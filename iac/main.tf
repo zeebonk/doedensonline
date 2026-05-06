@@ -306,6 +306,7 @@ resource "local_file" "inventory" {
         "rails_env" : "production",
         "app_state_path" : "/app-state",
         "app_state_device" : "/dev/sdf",
+        "host_ports" : [8080, 8081],
       },
       "hosts" : {
         "prod-webserver" : {
@@ -322,6 +323,7 @@ resource "local_file" "inventory" {
       "vars" : {
         "rails_env" : "development",
         "app_state_path" : "/app-state/dev",
+        "host_ports" : [8080],
       },
       "hosts" : {
         "dev-webserver" : {
@@ -550,7 +552,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "prod" {
   config {
     ingress_rule {
       hostname = local.domain
-      service  = "http://localhost:8080"
+      service  = "http://localhost:8081"
     }
     ingress_rule {
       service = "http_status:404"
