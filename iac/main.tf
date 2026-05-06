@@ -303,6 +303,7 @@ resource "local_file" "inventory" {
   content = yamlencode({
     "prod" : {
       "vars" : {
+        "instance" : "prod",
         "rails_env" : "production",
         "app_state_path" : "/app-state/prod",
         "host_ports" : [8081],
@@ -322,6 +323,7 @@ resource "local_file" "inventory" {
     },
     "dev" : {
       "vars" : {
+        "instance" : "dev",
         "rails_env" : "development",
         "app_state_path" : "/app-state/dev",
         "host_ports" : [8080],

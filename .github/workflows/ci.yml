@@ -151,9 +151,9 @@ jobs:
           IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}:${TAG}"
 
           docker pull "\${IMAGE}"
-          docker rm -f doedensonline 2>/dev/null || true
+          docker rm -f doedensonline doedensonline-dev 2>/dev/null || true
           docker run -d \\
-            --name doedensonline \\
+            --name doedensonline-dev \\
             --restart always \\
             -p 0.0.0.0:8080:8080 \\
             -e RAILS_ENV=development \\
@@ -168,8 +168,8 @@ jobs:
             -v '${APP_STATE_PATH}/large/:/app/public/images/large/' \\
             "\${IMAGE}"
 
-          docker exec -e RAILS_ENV=development doedensonline rake db:migrate
-          docker exec -e RAILS_ENV=development doedensonline rake db:seed
+          docker exec -e RAILS_ENV=development doedensonline-dev rake db:migrate
+          docker exec -e RAILS_ENV=development doedensonline-dev rake db:seed
           REMOTE
 
   deploy-prod:
