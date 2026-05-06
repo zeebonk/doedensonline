@@ -125,8 +125,7 @@
        name: doedensonline
        image: "313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:{{ image_tag | mandatory }}"
        restart_policy: always
-       published_ports:
-        - 0.0.0.0:8080:8080
+       published_ports: "{{ host_ports | map('regex_replace', '^(.*)$', '0.0.0.0:\\1:8080') | list }}"
        env:
          RAILS_ENV: "{{ rails_env }}"
          DO_SMTP_HOST: "{{ smtp_host }}"
