@@ -28,7 +28,6 @@ terraform {
 
 locals {
   region                  = "eu-west-1"
-  availability_zone       = "eu-west-1a"
   domain                  = "doedensonline.nl"
   gijs_macbook_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhQZ/xpYhLpKddmIe0X3Cpi2YXXze/PqVYxMBn0+zmd7mVwI5Ki9eS9pA7AVsEpdKQDg4SV941xoVcJ9Jpe+ua0aKlSEJjBfgxH6V0zRSV5cN776uA3c37BAwaL9KzweHL0O4u79+JkAB+ergrDHpDz2WNpVKPgTJe0FzH7r4NT02zrbHMJVDX9gZlQwUNKLdJLpHrbuks2kjFzOuF3nMAqpPqgMM4EtZWhMgJ++2i4/m6Kub4F+mJxJpB2r3kYHO7vkaxWMp4Uhb/S8Y50KXVThkoZftFTXYex4zFRCuT8GiROZuzy9CirRdWA/TWWTz0n47KPzwYzkVKrzWfYLEJ gijs@gbox.local"
 }
@@ -65,10 +64,6 @@ provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
 
-resource "aws_default_subnet" "doedensonline" {
-  availability_zone = local.availability_zone
-}
-
 resource "aws_kms_key" "doedensonline" {
   description = "doedensonline"
 }
@@ -85,24 +80,6 @@ resource "aws_ecr_repository" "doedensonline" {
   encryption_configuration {
     encryption_type = "KMS"
     kms_key         = aws_kms_key.doedensonline.arn
-  }
-}
-
-module "key_pair_gijs_macbook" {
-  source = "terraform-aws-modules/key-pair/aws"
-
-  key_name   = "gijs-macbook"
-  public_key = local.gijs_macbook_public_key
-}
-
-resource "aws_ebs_volume" "persistent" {
-  availability_zone = local.availability_zone
-  type              = "gp3"
-  size              = 1
-  encrypted         = true
-  kms_key_id        = aws_kms_key.doedensonline.arn
-  tags = {
-    Snapshot = "true"
   }
 }
 
@@ -213,92 +190,6 @@ resource "aws_iam_access_key" "doedensonline_dev" {
   user = aws_iam_user.doedensonline_dev.name
 }
 
-moved {
-  from = module.iam_assumable_role_webserver
-  to   = module.iam_role_webserver
-}
-
-module "iam_role_webserver" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-role"
-
-  name = "webserver"
-
-  trust_policy_permissions = {
-    AllowAssumeRole = {
-      actions = ["sts:AssumeRole"]
-      principals = [
-        {
-          type        = "AWS"
-          identifiers = ["313336455033"]
-        },
-        {
-          type        = "Service"
-          identifiers = ["ec2.amazonaws.com"]
-        }
-      ]
-    }
-  }
-
-  policies = {
-    ECRReadOnly = module.ecr_read_only_policy.arn
-  }
-}
-
-resource "aws_iam_instance_profile" "webserver" {
-  name = "webserver"
-  role = module.iam_role_webserver.name
-}
-
-module "ec2_instance_doedensonline" {
-  source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "~> 6.0"
-
-  name                   = "doedensonline"
-  ami                    = "ami-0fe0b2cf0e1f25c8a" # Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
-  instance_type          = "t3a.nano"
-  subnet_id              = aws_default_subnet.doedensonline.id
-  key_name               = "gijs-macbook"
-  vpc_security_group_ids = [module.security_group_doedensonline_webserver.security_group_id]
-  iam_instance_profile   = aws_iam_instance_profile.webserver.name
-
-  ebs_optimized = true
-  root_block_device = {
-    volume_type = "gp3"
-    volume_size = 10
-    encrypted   = true
-    kms_key_id  = aws_kms_key.doedensonline.arn
-  }
-
-  tags = {
-    Snapshot = "true"
-  }
-  volume_tags = {
-    Snapshot = "true"
-  }
-}
-
-resource "aws_volume_attachment" "persistent" {
-  device_name = "/dev/sdf"
-  volume_id   = aws_ebs_volume.persistent.id
-  instance_id = module.ec2_instance_doedensonline.id
-}
-
-module "security_group_doedensonline_webserver" {
-  source = "terraform-aws-modules/security-group/aws"
-
-  name   = "doedensonline-webserver"
-  vpc_id = aws_default_subnet.doedensonline.vpc_id
-
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_rules       = ["ssh-tcp", "all-icmp"]
-
-  egress_rules = ["all-all"]
-}
-
-resource "aws_eip" "doedensonline" {
-  instance = module.ec2_instance_doedensonline.id
-}
-
 resource "local_file" "inventory" {
   content = yamlencode({
     "prod" : {
@@ -360,19 +251,6 @@ resource "tls_private_key" "github_actions_dev" {
 resource "hcloud_ssh_key" "github_actions" {
   name       = "github-actions"
   public_key = trimspace(tls_private_key.github_actions_dev.public_key_openssh)
-}
-
-# Retained until the AWS prod decommission step so the previous prod deploy
-# path remains available as a rollback option during the Hetzner cutover.
-resource "tls_private_key" "github_actions_prod" {
-  algorithm = "ED25519"
-}
-
-module "key_pair_github_actions_prod" {
-  source = "terraform-aws-modules/key-pair/aws"
-
-  key_name   = "github-actions"
-  public_key = trimspace(tls_private_key.github_actions_prod.public_key_openssh)
 }
 
 resource "hcloud_server" "doedensonline" {
@@ -592,95 +470,6 @@ resource "cloudflare_ruleset" "redirect_www_to_apex" {
   }
 }
 
-# Backup
-#
-data "aws_iam_policy_document" "dlm_lifecycle" {
-  statement {
-    actions = [
-      "ec2:CreateSnapshot",
-      "ec2:CreateSnapshots",
-      "ec2:DeleteSnapshot",
-      "ec2:DescribeInstances",
-      "ec2:DescribeVolumes",
-      "ec2:DescribeSnapshots",
-    ]
-    resources = ["*"]
-  }
-
-  statement {
-    actions = [
-      "ec2:CreateTags",
-    ]
-    resources = ["arn:aws:ec2:*::snapshot/*"]
-  }
-}
-
-module "iam_policy_dlm_lifecycle" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-policy"
-
-  name = "DLMLifecycle"
-  path = "/"
-
-  policy = data.aws_iam_policy_document.dlm_lifecycle.json
-}
-
-moved {
-  from = module.iam_assumable_role_dlm_lifecycle
-  to   = module.iam_role_dlm_lifecycle
-}
-
-module "iam_role_dlm_lifecycle" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-role"
-
-  name = "dlm-lifecycle"
-
-  trust_policy_permissions = {
-    AllowAssumeRole = {
-      actions = ["sts:AssumeRole"]
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["dlm.amazonaws.com"]
-        }
-      ]
-    }
-  }
-
-  policies = {
-    DLMLifecycle = module.iam_policy_dlm_lifecycle.arn
-  }
-}
-
-resource "aws_dlm_lifecycle_policy" "doedensonline" {
-  description        = "Doedensonline"
-  execution_role_arn = module.iam_role_dlm_lifecycle.arn
-  state              = "ENABLED"
-
-  policy_details {
-    resource_types = ["VOLUME"]
-
-    schedule {
-      name = "3 months of daily snapshots"
-
-      create_rule {
-        interval      = "24"
-        interval_unit = "HOURS"
-      }
-
-      retain_rule {
-        interval      = "3"
-        interval_unit = "MONTHS"
-      }
-
-      copy_tags = false
-    }
-
-    target_tags = {
-      Snapshot = "true"
-    }
-  }
-}
-
 # GitHub Actions secrets for the dev deploy job
 
 locals {
@@ -730,11 +519,6 @@ resource "github_actions_secret" "prod_deploy" {
 
 
 # Outputs
-
-output "prod_ip" {
-  description = "Prod server public IPv4"
-  value       = aws_eip.doedensonline.public_ip
-}
 
 output "dev_ip" {
   description = "Dev server public IPv4"

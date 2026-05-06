@@ -21,21 +21,6 @@
        state: present
      when: ansible_os_family == 'Debian'
 
-   - name: Ensure app state volume is xfs
-     community.general.filesystem:
-       fstype: xfs
-       dev: "{{ app_state_device }}"
-     when: app_state_device is defined
-
-   - name: Ensure app state volume is mounted
-     ansible.posix.mount:
-       path: /app-state
-       src: "{{ app_state_device }}"
-       fstype: xfs
-       opts: defaults,nofail
-       state: mounted
-     when: app_state_device is defined
-
    - name: Ensure /app-state has the right permissions
      ansible.builtin.file:
        path: /app-state
