@@ -8,6 +8,7 @@
         - htop
         - vim
         - amazon-ecr-credential-helper
+        - python3-requests  # Required by the Docker module
        state: present
 
    - name: Ensure /app-state has the right permissions
@@ -62,11 +63,6 @@
        owner: root
        group: root
        mode: '0777'  # TODO: better permissions
-
-   - name: Ensure python3-requests is installed  # Required by the Docker module
-     ansible.builtin.apt:
-       name: python3-requests
-       state: present
 
    - name: Ensure ~/.aws/ exists
      ansible.builtin.file:
