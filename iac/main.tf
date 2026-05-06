@@ -360,6 +360,19 @@ resource "hcloud_ssh_key" "github_actions" {
   public_key = trimspace(tls_private_key.github_actions_dev.public_key_openssh)
 }
 
+# Retained until the AWS prod decommission step so the previous prod deploy
+# path remains available as a rollback option during the Hetzner cutover.
+resource "tls_private_key" "github_actions_prod" {
+  algorithm = "ED25519"
+}
+
+module "key_pair_github_actions_prod" {
+  source = "terraform-aws-modules/key-pair/aws"
+
+  key_name   = "github-actions"
+  public_key = trimspace(tls_private_key.github_actions_prod.public_key_openssh)
+}
+
 resource "hcloud_server" "doedensonline" {
   name        = "doedensonline"
   server_type = "cx23"
