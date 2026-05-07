@@ -7,6 +7,7 @@ DoedensOnline::Application.configure do
   config.action_controller.perform_caching = false
 
   config.assets.debug = true
+  config.assets.raise_runtime_errors = true
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
