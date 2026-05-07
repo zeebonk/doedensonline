@@ -27,14 +27,34 @@ docker compose run --rm app bundle exec rubocop --auto-correct
 
 ## Install or update gems
 
-After editing `Gemfile`, rebuild the image so `bundle install` runs against the
-new dependencies (gems are baked into the image, not stored on a host volume):
+The Dockerfile bakes `bundle install` into the image, so a `Gemfile` change
+that breaks the existing `Gemfile.lock` (e.g. bumping `rails`) will fail the
+build. Regenerate the lockfile **before** rebuilding:
 
-```
-docker compose build app
-```
+1. Make sure the image is already built against the *old* Gemfile/Gemfile.lock
+   pair. On a fresh checkout this means `docker compose build app` first,
+   *before* editing the Gemfile.
+2. Edit `Gemfile`.
+3. Regenerate the lockfile from inside the container — the `.:/app` bind mount
+   means bundler reads the host's edited `Gemfile` and writes the new
+   `Gemfile.lock` back to the host:
 
-For ad-hoc bundler commands:
+   ```
+   docker compose run --rm app bundle lock --update=<gem> [<gem>...]
+   ```
+
+   Pass every gem that needs to move (for a Rails minor bump that's `rails`
+   plus all rails component gems with `=` pins, plus tightly-constrained
+   transitives like `arel` and `minitest`). `bundle lock` only resolves and
+   writes the lockfile — it doesn't install. For broader updates use
+   `bundle update <gem>...`.
+4. Rebuild the image so the new gems get baked in:
+
+   ```
+   docker compose build app
+   ```
+
+For other ad-hoc bundler commands:
 
 ```
 docker compose run --rm app bundle <command>
@@ -60,8 +80,11 @@ docker compose run --rm app <any command>
 
 - Don't run `bundle`, `rake`, `rails`, `rspec`, `rubocop`, or any Ruby tooling
   directly on the host — the host has no compatible Ruby toolchain.
-- Don't add gems to a local `Gemfile.lock` outside the container; let
-  `docker compose build app` regenerate it.
+- Don't hand-edit `Gemfile.lock`; regenerate it via `bundle lock` inside the
+  container as described above.
+- Don't expect `docker compose build app` to fix an out-of-sync `Gemfile.lock`
+  — the bake step runs `bundle install`, which errors on Gemfile/lockfile
+  conflicts instead of resolving them.
 
 
 # Infrastructure: Terraform → Ansible handoff
