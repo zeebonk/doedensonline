@@ -42,6 +42,12 @@ jobs:
             echo "tag=$(echo "${BRANCH}" | tr '/' '-').$(git rev-parse --short "${SHA}")" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Register mise's docker-compose as a Docker CLI plugin
+        run: |
+          mkdir -p ~/.docker/cli-plugins
+          ln -sf "$(mise where docker-compose)/docker-cli-plugin-docker-compose" \
+            ~/.docker/cli-plugins/docker-compose
+
       # The ruby:1.9.3-p551 base image still uses Docker Schema 1, which
       # containerd v2+ refuses by default. Re-enable it on the daemon.
       - name: Enable Schema 1 image pulls
@@ -55,22 +61,22 @@ jobs:
       - name: Build app image
         env:
           TAG: ${{ steps.tag.outputs.tag }}
-        run: docker-compose build
+        run: docker compose build
 
       - name: Run RuboCop
         env:
           TAG: ${{ steps.tag.outputs.tag }}
-        run: docker-compose run --rm app bundle exec rubocop
+        run: docker compose run --rm app bundle exec rubocop
 
       - name: Run i18n-tasks
         env:
           TAG: ${{ steps.tag.outputs.tag }}
-        run: docker-compose run --rm app bundle exec i18n-tasks health
+        run: docker compose run --rm app bundle exec i18n-tasks health
 
       - name: Run tests
         env:
           TAG: ${{ steps.tag.outputs.tag }}
-        run: docker-compose run --rm -e RAILS_ENV=test app bundle exec rake db:migrate test
+        run: docker compose run --rm -e RAILS_ENV=test app bundle exec rake db:migrate test
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
