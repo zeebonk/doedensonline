@@ -4,7 +4,6 @@
 ## Run locally
 
 ```
-cd src
 docker compose up
 ```
 
@@ -14,7 +13,6 @@ The application will be available at http://127.0.0.1:8080.
 ## Run tests
 
 ```
-cd src
 docker compose run --rm -e RAILS_ENV=test app rake test
 ```
 
@@ -22,7 +20,6 @@ docker compose run --rm -e RAILS_ENV=test app rake test
 ## Run RuboCop
 
 ```
-cd src
 docker compose run --rm app bundle exec rubocop
 ```
 
@@ -72,10 +69,9 @@ tofu apply
 ## Push latest image to ECR
 
 ```
-cd src
 docker buildx build --push \
     -t 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:TAG \
-    --platform=linux/amd64 .
+    --platform=linux/amd64 ./src
 ```
 
 

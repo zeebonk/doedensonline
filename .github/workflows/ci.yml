@@ -13,9 +13,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    defaults:
-      run:
-        working-directory: src
     env:
       ECR_REGISTRY: 313336455033.dkr.ecr.eu-west-1.amazonaws.com
       ECR_REPOSITORY: doedensonline
