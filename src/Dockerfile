@@ -1,7 +1,7 @@
 FROM ruby:2.1.10
 
 WORKDIR /app
-CMD passenger start -p 8080
+CMD bundle exec puma -C config/puma.rb
 
 # Install nodejs for the asset pipeline's JavaScript runtime (uglifier/execjs).
 # The base image ships with Debian jessie sources that now 404; point apt at the archive.
