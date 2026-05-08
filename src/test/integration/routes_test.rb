@@ -57,8 +57,8 @@ class RoutesTest < ActionDispatch::IntegrationTest
                    controller: 'news', action: 'create')
   end
 
-  test "PUT /news/update" do
-    assert_routing({ method: :put, path: '/news/update' },
+  test "PATCH /news/update" do
+    assert_routing({ method: :patch, path: '/news/update' },
                    controller: 'news', action: 'update')
   end
 
@@ -72,8 +72,8 @@ class RoutesTest < ActionDispatch::IntegrationTest
                    controller: 'news', action: 'create_comment')
   end
 
-  test "PUT /news/update_comment" do
-    assert_routing({ method: :put, path: '/news/update_comment' },
+  test "PATCH /news/update_comment" do
+    assert_routing({ method: :patch, path: '/news/update_comment' },
                    controller: 'news', action: 'update_comment')
   end
 
@@ -162,18 +162,18 @@ class RoutesTest < ActionDispatch::IntegrationTest
     assert_routing '/settings/notifications', controller: 'settings', action: 'notifications'
   end
 
-  test "PUT /settings/update_profile" do
-    assert_routing({ method: :put, path: '/settings/update_profile' },
+  test "PATCH /settings/update_profile" do
+    assert_routing({ method: :patch, path: '/settings/update_profile' },
                    controller: 'settings', action: 'update_profile')
   end
 
-  test "PUT /settings/update_password" do
-    assert_routing({ method: :put, path: '/settings/update_password' },
+  test "PATCH /settings/update_password" do
+    assert_routing({ method: :patch, path: '/settings/update_password' },
                    controller: 'settings', action: 'update_password')
   end
 
-  test "PUT /settings/update_notifications" do
-    assert_routing({ method: :put, path: '/settings/update_notifications' },
+  test "PATCH /settings/update_notifications" do
+    assert_routing({ method: :patch, path: '/settings/update_notifications' },
                    controller: 'settings', action: 'update_notifications')
   end
 
