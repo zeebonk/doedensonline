@@ -9,20 +9,20 @@ Always `cd src` first, then use one of the patterns below.
 ## Run the app
 
 ```
-docker compose up
+docker-compose up
 ```
 
 ## Run the test suite
 
 ```
-docker compose run --rm -e RAILS_ENV=test app rake test
+docker-compose run --rm -e RAILS_ENV=test app rake test
 ```
 
 ## Run RuboCop
 
 ```
-docker compose run --rm app bundle exec rubocop
-docker compose run --rm app bundle exec rubocop --auto-correct
+docker-compose run --rm app bundle exec rubocop
+docker-compose run --rm app bundle exec rubocop --auto-correct
 ```
 
 ## Install or update gems
@@ -32,7 +32,7 @@ that breaks the existing `Gemfile.lock` (e.g. bumping `rails`) will fail the
 build. Regenerate the lockfile **before** rebuilding:
 
 1. Make sure the image is already built against the *old* Gemfile/Gemfile.lock
-   pair. On a fresh checkout this means `docker compose build app` first,
+   pair. On a fresh checkout this means `docker-compose build app` first,
    *before* editing the Gemfile.
 2. Edit `Gemfile`.
 3. Regenerate the lockfile from inside the container — the `.:/app` bind mount
@@ -40,7 +40,7 @@ build. Regenerate the lockfile **before** rebuilding:
    `Gemfile.lock` back to the host:
 
    ```
-   docker compose run --rm app bundle lock --update=<gem> [<gem>...]
+   docker-compose run --rm app bundle lock --update=<gem> [<gem>...]
    ```
 
    Pass every gem that needs to move (for a Rails minor bump that's `rails`
@@ -51,20 +51,20 @@ build. Regenerate the lockfile **before** rebuilding:
 4. Rebuild the image so the new gems get baked in:
 
    ```
-   docker compose build app
+   docker-compose build app
    ```
 
 For other ad-hoc bundler commands:
 
 ```
-docker compose run --rm app bundle <command>
+docker-compose run --rm app bundle <command>
 ```
 
 ## Run database migrations / rake tasks
 
 ```
-docker compose run --rm app rake db:migrate
-docker compose run --rm app rake <task>
+docker-compose run --rm app rake db:migrate
+docker-compose run --rm app rake <task>
 ```
 
 For the test database use `-e RAILS_ENV=test`.
@@ -72,8 +72,8 @@ For the test database use `-e RAILS_ENV=test`.
 ## Rails console / one-off commands
 
 ```
-docker compose run --rm app script/console
-docker compose run --rm app <any command>
+docker-compose run --rm app script/console
+docker-compose run --rm app <any command>
 ```
 
 ## Don't
@@ -82,7 +82,7 @@ docker compose run --rm app <any command>
   directly on the host — the host has no compatible Ruby toolchain.
 - Don't hand-edit `Gemfile.lock`; regenerate it via `bundle lock` inside the
   container as described above.
-- Don't expect `docker compose build app` to fix an out-of-sync `Gemfile.lock`
+- Don't expect `docker-compose build app` to fix an out-of-sync `Gemfile.lock`
   — the bake step runs `bundle install`, which errors on Gemfile/lockfile
   conflicts instead of resolving them.
 

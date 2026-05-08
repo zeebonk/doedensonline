@@ -24,6 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - uses: jdx/mise-action@v2
+
       - name: Compute image tag
         id: tag
         env:
@@ -51,22 +53,22 @@ jobs:
       - name: Build app image
         env:
           TAG: ${{ steps.tag.outputs.tag }}
-        run: docker compose build
+        run: docker-compose build
 
       - name: Run RuboCop
         env:
           TAG: ${{ steps.tag.outputs.tag }}
-        run: docker compose run --rm app bundle exec rubocop
+        run: docker-compose run --rm app bundle exec rubocop
 
       - name: Run i18n-tasks
         env:
           TAG: ${{ steps.tag.outputs.tag }}
-        run: docker compose run --rm app bundle exec i18n-tasks health
+        run: docker-compose run --rm app bundle exec i18n-tasks health
 
       - name: Run tests
         env:
           TAG: ${{ steps.tag.outputs.tag }}
-        run: docker compose run --rm -e RAILS_ENV=test app bundle exec rake db:migrate test
+        run: docker-compose run --rm -e RAILS_ENV=test app bundle exec rake db:migrate test
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
@@ -90,7 +92,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: opentofu/setup-opentofu@v2
+      - uses: jdx/mise-action@v2
 
       - name: Check OpenTofu formatting
         run: tofu fmt -check -recursive
@@ -103,7 +105,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: astral-sh/setup-uv@v7
+      - uses: jdx/mise-action@v2
 
       - name: Install dependencies
         run: uv sync --all-groups

@@ -5,7 +5,7 @@
 
 ```
 cd src
-docker compose up
+docker-compose up
 ```
 
 The application will be available at http://127.0.0.1:8080.
@@ -15,7 +15,7 @@ The application will be available at http://127.0.0.1:8080.
 
 ```
 cd src
-docker compose run --rm -e RAILS_ENV=test app rake test
+docker-compose run --rm -e RAILS_ENV=test app rake test
 ```
 
 
@@ -23,13 +23,13 @@ docker compose run --rm -e RAILS_ENV=test app rake test
 
 ```
 cd src
-docker compose run --rm app bundle exec rubocop
+docker-compose run --rm app bundle exec rubocop
 ```
 
 To auto-correct fixable offences:
 
 ```
-docker compose run --rm app bundle exec rubocop --auto-correct
+docker-compose run --rm app bundle exec rubocop --auto-correct
 ```
 
 
