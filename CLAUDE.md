@@ -4,7 +4,8 @@ The Rails app lives in `src/` and is developed and run exclusively through
 Docker Compose. Ruby, Bundler, and gems are not installed on the host — every
 Ruby/Rails command must run inside the `app` service container.
 
-Always `cd src` first, then use one of the patterns below.
+Run all Docker Compose commands from the repo root, where `docker-compose.yml`
+and `.env` live; the compose service mounts `./src` into the container.
 
 ## Run the app
 
@@ -35,8 +36,8 @@ build. Regenerate the lockfile **before** rebuilding:
    pair. On a fresh checkout this means `docker compose build app` first,
    *before* editing the Gemfile.
 2. Edit `Gemfile`.
-3. Regenerate the lockfile from inside the container — the `.:/app` bind mount
-   means bundler reads the host's edited `Gemfile` and writes the new
+3. Regenerate the lockfile from inside the container — the `./src:/app` bind
+   mount means bundler reads the host's edited `Gemfile` and writes the new
    `Gemfile.lock` back to the host:
 
    ```

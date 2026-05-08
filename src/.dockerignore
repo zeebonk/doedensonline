@@ -1,9 +1,11 @@
 public/images/small/*
 public/images/medium/*
 public/images/large/*
-logs/
+log/
 db/*.sqlite3
+db/*.sqlite3-journal
 passenger.*.pid
 passenger.*.pid.lock
 core
 core.*
+tmp
