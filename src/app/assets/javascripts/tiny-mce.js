@@ -1,4 +1,4 @@
-$(document).on('page:change', function() {
+$(document).on('turbolinks:load', function() {
   tinymce.init({
     selector: 'textarea',
     language: 'nl',
@@ -12,6 +12,6 @@ $(document).on('page:change', function() {
   });
 });
 
-$(document).on('page:before-change', function() {
+$(document).on('turbolinks:before-cache', function() {
   tinymce.remove();
 });

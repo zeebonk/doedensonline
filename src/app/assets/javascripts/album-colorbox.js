@@ -1,7 +1,7 @@
-$(document).on('page:change', function() {
+$(document).on('turbolinks:load', function() {
   $("a[rel='album']").colorbox({maxWidth:"85%", maxHeight:"85%"});
 });
 
-$(document).on('page:before-change', function() {
+$(document).on('turbolinks:before-cache', function() {
   $.colorbox.remove()
 });

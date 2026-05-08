@@ -1,4 +1,4 @@
-$(document).on('page:change', function() {
+$(document).on('turbolinks:load', function() {
 
 	$("#pictures-wrapper a").filter(function() {
 		return $(this).siblings("input.checkbox").length > 0;
