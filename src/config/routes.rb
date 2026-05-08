@@ -19,11 +19,11 @@ DoedensOnline::Application.routes.draw do
 
   get  'news/add',                      to: 'news#add'
   post 'news/create',                   to: 'news#create'
-  put  'news/update',                   to: 'news#update'
+  patch 'news/update',                  to: 'news#update'
   post 'news/destroy',                  to: 'news#destroy'
 
   post 'news/create_comment',           to: 'news#create_comment'
-  put  'news/update_comment',           to: 'news#update_comment'
+  patch 'news/update_comment',          to: 'news#update_comment'
   post 'news/destroy_comment',          to: 'news#destroy_comment'
 
   get  'news/:id/remove',               to: 'news#remove'
@@ -47,9 +47,9 @@ DoedensOnline::Application.routes.draw do
   get  'settings/profile',              to: 'settings#profile'
   get  'settings/password',             to: 'settings#password'
   get  'settings/notifications',        to: 'settings#notifications'
-  put  'settings/update_profile',       to: 'settings#update_profile'
-  put  'settings/update_password',      to: 'settings#update_password'
-  put  'settings/update_notifications', to: 'settings#update_notifications'
+  patch 'settings/update_profile',      to: 'settings#update_profile'
+  patch 'settings/update_password',     to: 'settings#update_password'
+  patch 'settings/update_notifications', to: 'settings#update_notifications'
 
   root to: 'home#index'
 end
