@@ -1,0 +1,5 @@
+[tools]
+python = "3.12.13"
+uv = "0.9.16"
+opentofu = "1.7.10"
+docker-compose = "5.0.0"
