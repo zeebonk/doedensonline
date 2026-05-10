@@ -1,9 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
 <head>
-
-  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta charset="UTF-8">
+  <%= csrf_meta_tags %>
 
   <title><%= yield(:page_title) %> - <%= t('site.title_suffix') %></title>
 
@@ -19,7 +18,6 @@
           integrity="sha384-MiuiPDrnIKG1EsaEPM0JvPlp2RAJDBvaaLbuWAX7ME7Z6/tBptQ0KEFSqEnPUpZB"
           crossorigin="anonymous"
           referrerpolicy="origin"></script>
-
 </head>
 <body>
 
