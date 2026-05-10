@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class HomeControllerTest < ActionController::TestCase
+class HomeControllerTest < ActionDispatch::IntegrationTest
   def setup
     ActionMailer::Base.delivery_method = :test
     ActionMailer::Base.perform_deliveries = true
@@ -21,20 +21,16 @@ class HomeControllerTest < ActionController::TestCase
     )
   end
 
-  def sign_in_as(user)
-    @request.session[:user_id] = user.id
-  end
-
   # GET /home
 
   test "index redirects to sign_in when not signed in" do
-    get :index
+    get '/'
     assert_redirected_to controller: 'home', action: 'sign_in'
   end
 
   test "index renders when signed in" do
     sign_in_as @user
-    get :index
+    get '/'
     assert_response :success
     assert_not_nil assigns(:news_items)
   end
@@ -42,46 +38,49 @@ class HomeControllerTest < ActionController::TestCase
   # GET /home/sign_in
 
   test "sign_in is accessible without authentication" do
-    get :sign_in
+    get '/sign_in'
     assert_response :success
   end
 
   test "sign_in redirects to index when already signed in" do
     sign_in_as @user
-    get :sign_in
+    get '/sign_in'
     assert_redirected_to controller: 'home', action: 'index'
   end
 
   # POST /home/authenticate
 
   test "authenticate signs in user with valid credentials" do
-    post :authenticate, first_name: 'Alice', password: 'secret'
+    post '/home/authenticate', first_name: 'Alice', password: 'secret'
     assert_equal @user.id, session[:user_id]
     assert_redirected_to controller: 'home', action: 'index'
     assert_equal 'U bent succesvol ingelogd!', flash[:notice]
   end
 
   test "authenticate is case-insensitive for first_name" do
-    post :authenticate, first_name: 'alice', password: 'secret'
+    post '/home/authenticate', first_name: 'alice', password: 'secret'
     assert_equal @user.id, session[:user_id]
   end
 
   test "authenticate redirects back to stored request after login" do
-    @request.session[:request] = '/news'
-    post :authenticate, first_name: 'Alice', password: 'secret'
+    # Visiting a protected page while signed-out stores the path in the session.
+    get '/news'
+    assert_equal '/news', session[:request]
+
+    post '/home/authenticate', first_name: 'Alice', password: 'secret'
     assert_redirected_to '/news'
     assert_nil session[:request]
   end
 
   test "authenticate rejects wrong password" do
-    post :authenticate, first_name: 'Alice', password: 'wrong'
+    post '/home/authenticate', first_name: 'Alice', password: 'wrong'
     assert_nil session[:user_id]
     assert_redirected_to controller: 'home', action: 'sign_in'
     assert_equal 'U heeft een ongeldige voornaam/wachtwoord combinatie ingevuld!', flash[:error]
   end
 
   test "authenticate rejects unknown first_name" do
-    post :authenticate, first_name: 'Nobody', password: 'secret'
+    post '/home/authenticate', first_name: 'Nobody', password: 'secret'
     assert_nil session[:user_id]
     assert_redirected_to controller: 'home', action: 'sign_in'
   end
@@ -89,13 +88,13 @@ class HomeControllerTest < ActionController::TestCase
   # GET /home/sign_out
 
   test "sign_out redirects to sign_in when not signed in" do
-    get :sign_out
+    get '/sign_out'
     assert_redirected_to controller: 'home', action: 'sign_in'
   end
 
   test "sign_out renders when signed in" do
     sign_in_as @user
-    get :sign_out
+    get '/sign_out'
     assert_response :success
   end
 
@@ -103,7 +102,7 @@ class HomeControllerTest < ActionController::TestCase
 
   test "destroy_session clears session when confirmed" do
     sign_in_as @user
-    post :destroy_session, commit: 'Ja, log mij uit!'
+    post '/home/destroy_session', commit: 'Ja, log mij uit!'
     assert_nil session[:user_id]
     assert_redirected_to controller: 'home', action: 'sign_in'
     assert_equal 'U bent succesvol uitgelogd!', flash[:notice]
@@ -111,7 +110,7 @@ class HomeControllerTest < ActionController::TestCase
 
   test "destroy_session keeps session when not confirmed" do
     sign_in_as @user
-    post :destroy_session, commit: 'Cancel'
+    post '/home/destroy_session', commit: 'Cancel'
     assert_equal @user.id, session[:user_id]
     assert_redirected_to controller: 'home', action: 'index'
   end
@@ -119,13 +118,13 @@ class HomeControllerTest < ActionController::TestCase
   # GET /home/password_forgotten
 
   test "password_forgotten is accessible without authentication" do
-    get :password_forgotten
+    get '/home/password_forgotten'
     assert_response :success
   end
 
   test "password_forgotten redirects to index when signed in" do
     sign_in_as @user
-    get :password_forgotten
+    get '/home/password_forgotten'
     assert_redirected_to controller: 'home', action: 'index'
   end
 
@@ -133,7 +132,7 @@ class HomeControllerTest < ActionController::TestCase
 
   test "reset_password resets password and sends email for matching user" do
     original_password = @user.password
-    post :reset_password, first_name: 'Alice', email: 'alice@example.com'
+    post '/home/reset_password', first_name: 'Alice', email: 'alice@example.com'
 
     assert_redirected_to controller: 'home', action: 'sign_in'
     assert_not_equal original_password, @user.reload.password
@@ -143,7 +142,7 @@ class HomeControllerTest < ActionController::TestCase
 
   test "reset_password does nothing when no user matches" do
     original_password = @user.password
-    post :reset_password, first_name: 'Nobody', email: 'nobody@example.com'
+    post '/home/reset_password', first_name: 'Nobody', email: 'nobody@example.com'
 
     assert_redirected_to controller: 'home', action: 'password_forgotten'
     assert_equal original_password, @user.reload.password

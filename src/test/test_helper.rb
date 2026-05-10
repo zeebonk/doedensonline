@@ -11,3 +11,9 @@ class ActiveSupport::TestCase
     User.create!(attrs)
   end
 end
+
+class ActionDispatch::IntegrationTest
+  def sign_in_as(user, password = 'secret')
+    post '/home/authenticate', first_name: user.first_name, password: password
+  end
+end
