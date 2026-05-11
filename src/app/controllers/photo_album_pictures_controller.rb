@@ -1,55 +1,71 @@
 class PhotoAlbumPicturesController < ApplicationController
   layout 'default'
 
-  # GET /photo_album_pictures/1
-  def show
-    @photo_album = PhotoAlbum.find(params[:id])
-    @photo_album_picture = PhotoAlbumPicture.new
-    @photo_album_picture.photo_album_id = @photo_album.id
+  before_action :load_photo_album
+  before_action :check_photo_album_author, only: [:create, :destroy_many]
+
+  # GET /photo_albums/:photo_album_id/pictures
+  def index
   end
 
-  # POST /photo_album_pictures
+  # POST /photo_albums/:photo_album_id/pictures
   def create
-    attrs = photo_album_picture_params
-    @photo_album_picture = PhotoAlbumPicture.new(attrs)
+    files = Array(params['file']).reject(&:blank?)
 
-    # Picture upload
-    unless attrs[:filename].nil?
-      begin
-        picture = UploadPicture.new(attrs[:filename])
-        create_images picture
-        @photo_album_picture.filename = picture.filename
-      rescue
-        @photo_album_picture.errors.add(:filename, t('flash.photo_albums_errors.unsupported_image'))
-      end
-   end
+    if files.empty?
+      flash[:error] = t('flash.photo_albums.no_pictures_selected_upload')
+      return render action: 'index'
+    end
 
-    if @photo_album_picture.errors.empty? && @photo_album_picture.save
-      redirect_to action: 'show', id: @photo_album_picture.photo_album_id
-    else
-      @photo_album = @photo_album_picture.photo_album
-      render action: 'show', id: @photo_album_picture.photo_album_id
+    written_filenames = []
+    begin
+      PhotoAlbumPicture.transaction do
+        files.each do |file|
+          picture = UploadPicture.new(file)
+          create_images picture
+          written_filenames << picture.filename
+          PhotoAlbumPicture.create!(
+            photo_album_id: @photo_album.id,
+            filename: picture.filename
+          )
+        end
       end
+      flash[:notice] = t('flash.photo_albums.pictures_added')
+    rescue UploadPicture::InvalidUpload, ActiveRecord::ActiveRecordError, StandardError
+      written_filenames.each { |fn| remove_images fn }
+      flash[:error] = t('flash.photo_albums.some_pictures_failed')
+    end
+
+    render action: 'index'
   end
 
-  # POST /photo_album_pictures/destory_many
+  # POST /photo_albums/:photo_album_id/pictures/destroy_many
   def destroy_many
-    @photo_album = PhotoAlbum.find_by(id: params[:album])
-
-    if params[:delete]
-      for picture_id in params[:delete]
+    if params[:selected]
+      params[:selected].each do |picture_id|
         picture = PhotoAlbumPicture.find(picture_id)
         remove_images picture.filename
         picture.destroy
       end
+      flash[:notice] = t('flash.photo_albums.pictures_destroyed')
+    else
+      flash[:error] = t('flash.photo_albums.no_pictures_selected_destroy')
     end
 
-    redirect_to action: 'show', id: @photo_album.id
+    render action: 'index'
   end
 
   private
 
-  def photo_album_picture_params
-    params.require(:photo_album_picture).permit(:filename, :photo_album_id)
+  def load_photo_album
+    @photo_album = PhotoAlbum.find_by(id: params[:photo_album_id])
+    unless @photo_album
+      flash[:error] = t('flash.photo_albums.album_not_found')
+      redirect_to photo_albums_path
+    end
+  end
+
+  def check_photo_album_author
+    user_is_author @photo_album
   end
 end

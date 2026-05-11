@@ -1,0 +1,9 @@
+<% content_for :page_title, t('page_titles.news_comments_remove') %>
+
+<p class="intro"><strong><%= t('.confirmation') %></strong></p>
+
+<%= form_tag news_item_news_comment_path(@news_comment.news_item, @news_comment), method: :delete do %>
+  <p>
+    <%= submit_tag t('.confirm') %><%= submit_tag t('.cancel') %>
+  </p>
+<% end %>

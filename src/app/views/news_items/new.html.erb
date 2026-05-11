@@ -1,9 +1,9 @@
-<% content_for :page_title, t('page_titles.news_add') %>
+<% content_for :page_title, t('page_titles.news_items_new') %>
 
 <p class="intro"><%= t('.intro') %></p>
 
 <div id="edit-form">
-<%= form_for @news_item, :url => { :action => "create" } do |f| %>
+<%= form_for @news_item, :url => news_items_path do |f| %>
   <%= f.error_messages %>
   <p>
     <%= f.label :message %><br />
@@ -14,4 +14,4 @@
   </p>
 <% end %>
 </div>
-<%= link_to t('.back'), {:action => 'index'}, :title => t('.back_title'), :class=>'back' %>
+<%= link_to t('.back'), news_items_path, :title => t('.back_title'), :class=>'back' %>

@@ -1,10 +1,10 @@
-<% content_for :page_title, t('page_titles.news_view') %>
+<% content_for :page_title, t('page_titles.news_items_show') %>
 
 <p class="intro"><%= t('.intro') %></p>
 
 <div class="news-index-actions">
-  <%= link_to t('.back'), {:action => 'index'}, :title => t('.back_title') %>
-  <%= link_to t('.add_comment'), {:action => 'add_comment', :id => @news_item.id}, :title => t('.add_comment_title'), :class=>'next' %>
+  <%= link_to t('.back'), news_items_path, :title => t('.back_title') %>
+  <%= link_to t('.add_comment'), new_news_item_news_comment_path(@news_item), :title => t('.add_comment_title'), :class=>'next' %>
 </div>
 
 <div class="balloon-wrapper even">
@@ -23,8 +23,8 @@
       <% if @news_item.user_id == @current_user.id %>
       <div class="balloon-actions">
 
-          <%= link_to t('.remove'), {:action => 'remove', :id => @news_item.id}, :class=>'edit', :title => t('.remove_title') %>
-          <%= link_to t('.edit'), {:action => 'edit', :id => @news_item.id}, :class=>'edit', :title => t('.edit_title') %>
+          <%= link_to t('.remove'), remove_news_item_path(@news_item), :class=>'edit', :title => t('.remove_title') %>
+          <%= link_to t('.edit'), edit_news_item_path(@news_item), :class=>'edit', :title => t('.edit_title') %>
 
         <br class="clear"/>
       </div>
@@ -47,8 +47,8 @@
       <% if news_comment.user.id == @current_user.id %>
       <div class="balloon-actions">
 
-          <%= link_to t('.remove_comment'), {:action => 'remove_comment', :id => news_comment.id}, :class=>'edit', :title => t('.remove_comment_title') %>
-          <%= link_to t('.edit_comment'), {:action => 'edit_comment', :id => news_comment.id}, :class=>'edit', :title => t('.edit_comment_title') %>
+          <%= link_to t('.remove_comment'), remove_news_item_news_comment_path(@news_item, news_comment), :class=>'edit', :title => t('.remove_comment_title') %>
+          <%= link_to t('.edit_comment'), edit_news_item_news_comment_path(@news_item, news_comment), :class=>'edit', :title => t('.edit_comment_title') %>
 
         <br class="clear"/>
       </div>

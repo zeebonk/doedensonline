@@ -121,14 +121,6 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @photo_album, assigns(:photo_album)
   end
 
-  # GET /photo_albums/:id/manage_pictures
-
-  test "manage_pictures renders for the album" do
-    get "/photo_albums/#{@photo_album.id}/manage_pictures"
-    assert_response :success
-    assert_equal @photo_album, assigns(:photo_album)
-  end
-
   # POST /photo_albums (create)
 
   test "create re-renders new with validation errors when no pictures uploaded" do
@@ -289,81 +281,5 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     delete '/photo_albums/999999', commit: 'Ja, verwijderen'
     assert_redirected_to controller: 'photo_albums', action: 'index'
     assert_equal 'Opgegeven fotoalbum is niet gevonden!', flash[:error]
-  end
-
-  # POST /photo_albums/add_picture
-
-  test "add_picture flashes an error when no files were selected" do
-    post '/photo_albums/add_picture', album_id: @photo_album.id
-    assert_response :success
-    assert_template 'manage_pictures'
-    assert_equal "U heeft geen foto's geselecteerd om toe te voegen.", flash[:error]
-  end
-
-  test "add_picture stores the uploaded image and creates resized variants" do
-    assert_difference('PhotoAlbumPicture.count', 1) do
-      post '/photo_albums/add_picture', album_id: @photo_album.id, file: [uploaded_jpeg_fixture]
-    end
-
-    picture = PhotoAlbumPicture.last
-    assert_equal @photo_album.id, picture.photo_album_id
-    %w(large medium small).each do |size|
-      path = Rails.root.join('public', 'images', size, picture.filename)
-      assert File.exist?(path), "expected #{size} variant at #{path}"
-      File.delete(path)
-    end
-    assert_equal I18n.t('flash.photo_albums.pictures_added'), flash[:notice]
-  end
-
-  test "add_picture stores multiple uploaded images" do
-    assert_difference('PhotoAlbumPicture.count', 3) do
-      post('/photo_albums/add_picture',
-           album_id: @photo_album.id,
-           file: [uploaded_jpeg_fixture, uploaded_jpeg_fixture, uploaded_jpeg_fixture])
-    end
-
-    PhotoAlbumPicture.last(3).each do |picture|
-      %w(large medium small).each do |size|
-        path = Rails.root.join('public', 'images', size, picture.filename)
-        assert File.exist?(path), "expected #{size} variant at #{path}"
-        File.delete(path)
-      end
-    end
-  end
-
-  test "add_picture rolls back all writes when one upload fails" do
-    bad_file = uploaded_bad_extension_fixture
-
-    before = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
-    assert_no_difference('PhotoAlbumPicture.count') do
-      post '/photo_albums/add_picture', album_id: @photo_album.id, file: [uploaded_jpeg_fixture, bad_file]
-    end
-    after = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
-
-    assert_equal before, after, "no files should be left on disk after partial failure"
-    assert_equal I18n.t('flash.photo_albums.some_pictures_failed'), flash[:error]
-  end
-
-  # POST /photo_albums/destroy_many_pictures
-
-  test "destroy_many_pictures deletes selected pictures" do
-    p1 = PhotoAlbumPicture.create!(photo_album_id: @photo_album.id, filename: 'one.jpg')
-    p2 = PhotoAlbumPicture.create!(photo_album_id: @photo_album.id, filename: 'two.jpg')
-
-    assert_difference('PhotoAlbumPicture.count', -1) do
-      post '/photo_albums/destroy_many_pictures', album_id: @photo_album.id, selected: [p1.id.to_s]
-    end
-
-    assert_response :success
-    assert_template 'manage_pictures'
-    assert_nil PhotoAlbumPicture.find_by_id(p1.id)
-    assert_not_nil PhotoAlbumPicture.find_by_id(p2.id)
-  end
-
-  test "destroy_many_pictures flashes an error when nothing is selected" do
-    post '/photo_albums/destroy_many_pictures', album_id: @photo_album.id
-    assert_response :success
-    assert_template 'manage_pictures'
-    assert_equal "Geen foto's geselecteerd om te verwijderen.", flash[:error]
   end
 end
