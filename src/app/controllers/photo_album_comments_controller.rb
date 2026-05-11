@@ -2,65 +2,66 @@ class PhotoAlbumCommentsController < ApplicationController
   before_action :load_photo_album_comment,         only: [:edit, :update, :remove, :destroy]
   before_action :check_photo_album_comment_author, only: [:edit, :update, :remove, :destroy]
 
-  # GET /photo_album_comments/new/1
+  # GET /photo_albums/:photo_album_id/comments/new
   def new
     @photo_album_comment = PhotoAlbumComment.new
 
-    if photo_album_from_id(params[:id])
-      @photo_album_comment.photo_album_id = params[:id]
+    if photo_album_from_id(params[:photo_album_id])
+      @photo_album_comment.photo_album_id = params[:photo_album_id]
     else
       flash[:error] = t('flash.photo_album_comments.album_not_found')
-      redirect_to controller: 'photo_albums'
+      redirect_to photo_albums_path
     end
   end
 
-  # GET /photo_album_comments/1/edit
+  # GET /photo_albums/:photo_album_id/comments/:id/edit
   def edit
   end
 
-  # POST /photo_album_comments
+  # POST /photo_albums/:photo_album_id/comments
   def create
     @photo_album_comment = PhotoAlbumComment.new(photo_album_comment_params)
+    @photo_album_comment.photo_album_id = params[:photo_album_id]
     @photo_album_comment.message = root_src_img_tag(@photo_album_comment.message)
     @photo_album_comment.user_id = current_user.id
 
     if @photo_album_comment.save
       flash[:notice] = t('flash.photo_album_comments.created')
-      redirect_to controller: 'photo_albums', action: 'show', id: @photo_album_comment.photo_album_id
+      redirect_to photo_album_path(@photo_album_comment.photo_album_id)
     else
       render action: "new"
     end
   end
 
-  # PUT /photo_album_comments/1
+  # PATCH /photo_albums/:photo_album_id/comments/:id
   def update
     attrs = photo_album_comment_params
     attrs[:message] = root_src_img_tag(attrs[:message]) if attrs[:message]
     if @photo_album_comment.update(attrs)
       flash[:notice] = t('flash.photo_album_comments.updated')
-      redirect_to controller: 'photo_albums', action: 'show', id: @photo_album_comment.photo_album.id
+      redirect_to photo_album_path(@photo_album_comment.photo_album.id)
     else
       render action: "edit"
     end
   end
 
-  # GET /photo_album_comments/remove/:id
+  # GET /photo_albums/:photo_album_id/comments/:id/remove
   def remove
   end
 
-  # DELETE /photo_album_comments/1
+  # DELETE /photo_albums/:photo_album_id/comments/:id
   def destroy
-    return redirect_to controller: 'photo_albums', action: 'show', id: @photo_album_comment.photo_album_id if params[:commit] == t('photo_album_comments.remove.cancel')
+    return redirect_to photo_album_path(@photo_album_comment.photo_album_id) if params[:commit] == t('photo_album_comments.remove.cancel')
     photo_album_id = @photo_album_comment.photo_album.id
     @photo_album_comment.destroy
     flash[:notice] = t('flash.photo_album_comments.destroyed')
-    redirect_to controller: 'photo_albums', action: 'show', id: photo_album_id
+    redirect_to photo_album_path(photo_album_id)
   end
 
   private
 
   def photo_album_comment_params
-    params.require(:photo_album_comment).permit(:message, :photo_album_id)
+    params.require(:photo_album_comment).permit(:message)
   end
 
   def photo_album_from_id(id)
@@ -70,11 +71,10 @@ class PhotoAlbumCommentsController < ApplicationController
   end
 
   def load_photo_album_comment
-    id = params[:id] || (params[:photo_album_comment] && params[:photo_album_comment][:id])
-    @photo_album_comment = PhotoAlbumComment.find_by(id: id)
+    @photo_album_comment = PhotoAlbumComment.find_by(id: params[:id])
     unless @photo_album_comment
       flash[:error] = t('flash.photo_album_comments.comment_not_found')
-      redirect_to controller: 'photo_albums', action: 'index'
+      redirect_to photo_albums_path
     end
   end
 

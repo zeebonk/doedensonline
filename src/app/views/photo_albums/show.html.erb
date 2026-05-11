@@ -6,7 +6,7 @@
 
 <div class="news-index-actions">
 	<%= link_to t('.back'), photo_albums_path %>
-	<%= link_to t('.add_comment'), {:controller => 'photo_album_comments', :action => 'new', :id => @photo_album.id}, :title => t('.add_comment_title'), :class=>'next' %>
+	<%= link_to t('.add_comment'), new_photo_album_comment_path(@photo_album), :title => t('.add_comment_title'), :class=>'next' %>
 </div>
 
 <div class="balloon-wrapper even">
@@ -27,8 +27,8 @@
 
       <% if @photo_album.user_id == @current_user.id %>
         <div class="balloon-actions">
-					<%= link_to t('.remove'), {:action => 'remove', :id => @photo_album.id }, :class => "edit" %>
-          <%= link_to t('.manage_pictures'), {:action => 'manage_pictures', :id => @photo_album.id }, :class => "edit" %>
+					<%= link_to t('.remove'), remove_photo_album_path(@photo_album), :class => "edit" %>
+          <%= link_to t('.manage_pictures'), photo_album_pictures_path(@photo_album), :class => "edit" %>
           <%= link_to t('.edit'), edit_photo_album_path(@photo_album), :class => "edit" %>
           <br class="clear"/>
         </div>
@@ -64,8 +64,8 @@
       <% if photo_album_comment.user.id == @current_user.id %>
       <div class="balloon-actions">
 
-          <%= link_to t('.remove_comment'), {:controller => 'photo_album_comments', :action => 'remove', :id => photo_album_comment.id}, :class=>'edit', :title => t('.remove_comment_title') %>
-          <%= link_to t('.edit_comment'), {:controller => 'photo_album_comments', :action => 'edit', :id => photo_album_comment.id}, :class=>'edit', :title => t('.edit_comment_title') %>
+          <%= link_to t('.remove_comment'), remove_photo_album_comment_path(@photo_album, photo_album_comment), :class=>'edit', :title => t('.remove_comment_title') %>
+          <%= link_to t('.edit_comment'), edit_photo_album_comment_path(@photo_album, photo_album_comment), :class=>'edit', :title => t('.edit_comment_title') %>
 
         <br class="clear"/>
       </div>

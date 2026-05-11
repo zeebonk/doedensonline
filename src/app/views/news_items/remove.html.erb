@@ -1,8 +1,8 @@
-<% content_for :page_title, t('page_titles.albums_remove') %>
+<% content_for :page_title, t('page_titles.news_items_remove') %>
 
 <p class="intro"><strong><%= t('.confirmation') %></strong></p>
 
-<%= form_tag photo_album_path(@photo_album), method: :delete do %>
+<%= form_tag news_item_path(@news_item), method: :delete do %>
   <p>
     <%= submit_tag t('.confirm') %><%= submit_tag t('.cancel') %>
   </p>

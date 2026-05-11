@@ -1,8 +1,8 @@
 class PhotoAlbumsController < ApplicationController
   include Paginatable
 
-  before_action :load_photo_album,         only: [:show, :edit, :remove, :manage_pictures, :update, :destroy, :add_picture, :destroy_many_pictures]
-  before_action :check_photo_album_author, only: [:update, :destroy, :add_picture, :destroy_many_pictures]
+  before_action :load_photo_album,         only: [:show, :edit, :remove, :update, :destroy]
+  before_action :check_photo_album_author, only: [:update, :destroy]
 
   # GET /photo_albums
   def index
@@ -32,57 +32,6 @@ class PhotoAlbumsController < ApplicationController
 
   # GET /photo_albums/1/remove
   def remove
-  end
-
-  # GET /photo_albums/1/manage_pictures
-  def manage_pictures
-  end
-
-  # POST /photo_albums/add_picture
-  def add_picture
-    files = Array(params['file']).reject(&:blank?)
-
-    if files.empty?
-      flash[:error] = t('flash.photo_albums.no_pictures_selected_upload')
-      return render action: 'manage_pictures', id: @photo_album.id
-    end
-
-    written_filenames = []
-    begin
-      PhotoAlbumPicture.transaction do
-        files.each do |file|
-          picture = UploadPicture.new(file)
-          create_images picture
-          written_filenames << picture.filename
-          PhotoAlbumPicture.create!(
-            photo_album_id: @photo_album.id,
-            filename: picture.filename
-          )
-        end
-      end
-      flash[:notice] = t('flash.photo_albums.pictures_added')
-    rescue UploadPicture::InvalidUpload, ActiveRecord::ActiveRecordError, StandardError
-      written_filenames.each { |fn| remove_images fn }
-      flash[:error] = t('flash.photo_albums.some_pictures_failed')
-    end
-
-    render action: 'manage_pictures', id: @photo_album.id
-  end
-
-  # POST /photo_albums/destroy_many_pictures
-  def destroy_many_pictures
-    if params[:selected]
-      for picture_id in params[:selected]
-        picture = PhotoAlbumPicture.find(picture_id)
-        remove_images picture.filename
-        picture.destroy
-        flash[:notice] = t('flash.photo_albums.pictures_destroyed')
-      end
-    else
-      flash[:error] = t('flash.photo_albums.no_pictures_selected_destroy')
-    end
-
-    render action: 'manage_pictures', id: @photo_album.id
   end
 
   # POST /photo_albums
@@ -177,8 +126,7 @@ class PhotoAlbumsController < ApplicationController
   end
 
   def load_photo_album
-    id = params[:id] || params[:album_id]
-    @photo_album = PhotoAlbum.find_by(id: id)
+    @photo_album = PhotoAlbum.find_by(id: params[:id])
     unless @photo_album
       flash[:error] = t('flash.photo_albums.album_not_found')
       redirect_to action: 'index'

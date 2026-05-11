@@ -1,24 +1,27 @@
-<% content_for :page_title, t('page_titles.albums_manage_pictures') %>
+<% content_for :page_title, t('page_titles.photo_album_pictures_index') %>
 
 <p class="intro">
 	<%= t('.intro') %>
 </p>
 
+<h3>
+	<%=h @photo_album.title %>
+</h3>
+
 <div id="edit-form">
-	<%= form_tag('/photo_albums/add_picture', :multipart => true) do %>
+	<%= form_tag photo_album_pictures_path(@photo_album), :multipart => true do %>
 		<p>
 			<label><%= t('.add_pictures_label') %></label>
 		<p>
 			<%= file_field_tag 'file[]', multiple: true %>
 		</p>
 		<p>
-			<%= hidden_field_tag 'album_id', @photo_album.id %>
 			<%= submit_tag t('.upload_submit') %>
 		</p>
 	<% end %>
 
 	<% if @photo_album.photo_album_pictures.count > 0 %>
-	<%= form_tag('/photo_albums/destroy_many_pictures') do %>
+	<%= form_tag destroy_many_photo_album_pictures_path(@photo_album) do %>
 		<p>
 			<label><%= t('.remove_pictures_label') %></label>
 		</p>
@@ -36,13 +39,12 @@
 			</ul>
 			</div>
 			<br class="clear">
-			<%= hidden_field_tag 'album_id', @photo_album.id %>
 		</p>
 		<p>
 			<%= submit_tag t('.remove_submit') %>
 		</p>
 	<% end %>
-	<%end%>
+	<% end %>
 </div>
 
-<%= link_to t('.back'), photo_albums_path, :class=>'back' %>
+<%= link_to t('.back'), photo_album_path(@photo_album), :class=>'back' %>

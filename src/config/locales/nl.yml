@@ -203,16 +203,14 @@ nl:
     settings_title: Uw persoonlijke instellingen
     sign_out: Uitloggen
     sign_out_title: De uitlog pagina
-  news:
-    add:
-      back: "« Terug naar het overzicht"
-      back_title: Keer terug naar het nieuwtjes overzicht
-      intro: Op deze pagina kunt u een nieuw nieuwtje aanmaken. Typ uw verhaal in
-        het tekstvak hieronder en druk op "Plaats nieuwtje". Uw verhaal zal bovenaan
-        de lijst met nieuwtjes worden geplaatst.
-      placeholder: Hier uw tekst
-      submit: Plaats nieuwtje
-    add_comment:
+  news_comments:
+    edit:
+      back: "« Terug naar het nieuwtje"
+      back_title: Keer terug naar het nieuwtje waar u deze reactie bij heeft geplaatst
+      intro: Op deze pagina kunt u een door u geplaatste reactie aanpassen. Verander
+        uw reactie en druk op "Aanpassen". Uw aanpassingen worden direct doorgevoerd."
+      submit: Aanpassen
+    new:
       back: "« Terug naar het nieuwtje"
       back_title: Keer terug naar het nieuwtje waarop u wilde reageren
       intro: Op deze pagina kunt u een nieuwe reactie aanmaken. Typ uw reactie in
@@ -220,6 +218,11 @@ nl:
         de lijst met reacties worden geplaatst.
       placeholder: Hier uw reactie
       submit: Reactie plaatsen
+    remove:
+      cancel: Nee, niet verwijderen
+      confirm: Ja, verwijderen
+      confirmation: Weet u zeker dat u deze reactie wilt verwijderen?
+  news_items:
     edit:
       back: "« Terug naar het overzicht"
       back_title: Keer terug naar het nieuwtjes overzicht
@@ -227,12 +230,6 @@ nl:
         Vergeet niet op de knop "Wijzigingen opslaan..." te klikken zodat uw wijzigen
         ook daadwerkelijk doorgevoerd worden.
       submit: Wijzigingen opslaan...
-    edit_comment:
-      back: "« Terug naar het nieuwtje"
-      back_title: Keer terug naar het nieuwtje waar u deze reactie bij heeft geplaatst
-      intro: Op deze pagina kunt u een door u geplaatste reactie aanpassen. Verander
-        uw reactie en druk op "Aanpassen". Uw aanpassingen worden direct doorgevoerd."
-      submit: Aanpassen
     index:
       add: Nieuwtje toevoegen »
       add_title: Plaats een nieuw nieuwtje
@@ -247,15 +244,19 @@ nl:
       remove_title: Verwijder dit complete bericht
       view_comments: Bekijk/plaats reacties (%{count}) »
       view_comments_title: Bekijk het hele bericht en lees/schrijf reacties
+    new:
+      back: "« Terug naar het overzicht"
+      back_title: Keer terug naar het nieuwtjes overzicht
+      intro: Op deze pagina kunt u een nieuw nieuwtje aanmaken. Typ uw verhaal in
+        het tekstvak hieronder en druk op "Plaats nieuwtje". Uw verhaal zal bovenaan
+        de lijst met nieuwtjes worden geplaatst.
+      placeholder: Hier uw tekst
+      submit: Plaats nieuwtje
     remove:
       cancel: Nee, niet verwijderen
       confirm: Ja, verwijderen
       confirmation: Weet u zeker dat u dit nieuwtje wilt verwijderen?
-    remove_comment:
-      cancel: Nee, niet verwijderen
-      confirm: Ja, verwijderen
-      confirmation: Weet u zeker dat u deze reactie wilt verwijderen?
-    view:
+    show:
       add_comment: Reactie plaatsen »
       add_comment_title: Plaats een reactie op dit bericht
       back: "« Terug naar het overzicht"
@@ -279,20 +280,20 @@ nl:
     albums_comment_remove: Reactie op fotoalbum verwijderen
     albums_edit: Fotoalbum aanpassen
     albums_index: Fotoalbums overzicht
-    albums_manage_pictures: Foto's beheren
     albums_new: Fotoalbum aanmaken
     albums_remove: Fotoalbum verwijderen
     albums_view: Fotoalbum bekijken
     home: Home
-    news_add: Nieuwtje toevoegen
-    news_comment_add: Reactie op nieuwtje plaatsen
-    news_comment_edit: Reactie op nieuwtje aanpassen
-    news_comment_remove: Reactie op nieuwtje verwijderen
-    news_edit: Nieuwtje aanpassen
-    news_index: Nieuwtjes overzicht
-    news_remove: Nieuwtje verwijderen
-    news_view: Nieuwtje bekijken
+    news_comments_edit: Reactie op nieuwtje aanpassen
+    news_comments_new: Reactie op nieuwtje plaatsen
+    news_comments_remove: Reactie op nieuwtje verwijderen
+    news_items_edit: Nieuwtje aanpassen
+    news_items_index: Nieuwtjes overzicht
+    news_items_new: Nieuwtje toevoegen
+    news_items_remove: Nieuwtje verwijderen
+    news_items_show: Nieuwtje bekijken
     password_forgotten: Wachtwoord vergeten
+    photo_album_pictures_index: Foto's beheren
     settings: Instellingen
     sign_in: Inloggen
     sign_out: Uitloggen
@@ -317,12 +318,18 @@ nl:
       confirm: Ja, verwijderen
       confirmation: Weet u zeker dat u deze reactie wilt verwijderen?
   photo_album_pictures:
-    pictures_list:
-      remove_selected: Remove selected
-    show:
-      back: Back
-      back_to_albums: Terug naar het overzicht
-      submit: Create
+    index:
+      add_pictures_label: 'Foto''s toevoegen:'
+      back: "« Terug naar het album"
+      intro: Op deze pagina kunt u foto's toevoegen en verwijderen aan een fotoalbum.
+        Toevoegen doet u door één of meerdere foto's te selecteren (houd Ctrl/Cmd
+        ingedrukt om meerdere bestanden te kiezen) en vervolgens op de Geselecteerde
+        foto's uploaden knop te drukken. Het verwijderen van foto's doet u door foto's
+        te selecteren door ze aan te vinken en vervolgens op de knop Geselecteerde
+        foto's verwijderen te drukken.
+      remove_pictures_label: 'Foto''s verwijderen:'
+      remove_submit: Geselecteerde foto's verwijderen
+      upload_submit: Geselecteerde foto's uploaden
   photo_albums:
     edit:
       back: "« Terug naar het overzicht"
@@ -335,18 +342,6 @@ nl:
         bladeren. Net als de nieuwtjes zijn ook de fotoalbums gesorteerd op datum
         en zult u van boven naar beneden steeds oudere fotoalbums tegenkomen. Wilt
         u zelf een fotoalbum toevoegen klik dan op de link: "Fotoalbum toevoegen".'
-    manage_pictures:
-      add_pictures_label: 'Foto''s toevoegen:'
-      back: "« Terug naar het overzicht"
-      intro: Op deze pagina kunt u foto's toevoegen en verwijderen aan een fotoalbum.
-        Toevoegen doet u door één of meerdere foto's te selecteren (houd Ctrl/Cmd
-        ingedrukt om meerdere bestanden te kiezen) en vervolgens op de Geselecteerde
-        foto's uploaden knop te drukken. Het verwijderen van foto's doet u door foto's
-        te selecteren door ze aan te vinken en vervolgens op de knop Geselecteerde
-        foto's verwijderen te drukken.
-      remove_pictures_label: 'Foto''s verwijderen:'
-      remove_submit: Geselecteerde foto's verwijderen
-      upload_submit: Geselecteerde foto's uploaden
     new:
       back: "« Terug naar het overzicht"
       intro: Op deze pagina kunt u een nieuw fotoalbum aanmaken. Vul een titel en

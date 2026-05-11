@@ -1,8 +1,8 @@
-<% content_for :page_title, t('page_titles.news_index') %>
+<% content_for :page_title, t('page_titles.news_items_index') %>
 
 <p class="intro"><%= t('.intro') %></p>
 
-<div class="news-index-actions"><%= page_navigation %><%= link_to t('.add'), {:action => 'add'}, :title => t('.add_title'), :class=>'add' %></div>
+<div class="news-index-actions"><%= page_navigation %><%= link_to t('.add'), new_news_item_path, :title => t('.add_title'), :class=>'add' %></div>
 
 <% @news_items.each_with_index do |news_item, index| %>
 
@@ -27,10 +27,10 @@
         </div>
         <%= news_item.message.html_safe %>
         <div class="balloon-actions">
-          <%= link_to t('.view_comments', :count => news_item.news_comments.size), {:action => 'view', :id => news_item.id}, :title => t('.view_comments_title') %>
+          <%= link_to t('.view_comments', :count => news_item.news_comments.size), news_item_path(news_item), :title => t('.view_comments_title') %>
           <% if news_item.user_id == @current_user.id %>
-            <%= link_to t('.remove'), {:action => 'remove', :id => news_item.id}, :class=>'edit', :title => t('.remove_title') %>
-            <%= link_to t('.edit'), {:action => 'edit', :id => news_item.id}, :class=>'edit', :title => t('.edit_title') %>
+            <%= link_to t('.remove'), remove_news_item_path(news_item), :class=>'edit', :title => t('.remove_title') %>
+            <%= link_to t('.edit'), edit_news_item_path(news_item), :class=>'edit', :title => t('.edit_title') %>
           <% end %>
           <br class="clear"/>
         </div>
@@ -43,5 +43,5 @@
 
 <div class="news-index-actions bottom">
   <%= page_navigation %>
-  <%= link_to t('.add'), {:action => 'add'}, :title => t('.add_title'), :class=>'add' %>
+  <%= link_to t('.add'), new_news_item_path, :title => t('.add_title'), :class=>'add' %>
 </div>

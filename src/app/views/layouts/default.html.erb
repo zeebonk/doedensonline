@@ -31,10 +31,10 @@
       <% end %>
     </li>
     <li>
-      <% if controller.controller_name == 'news' %>
-        <%= link_to t('menu.news'), {:controller => 'news'}, :class => 'active', :title => t('menu.news_title') %>
+      <% if ['news_items', 'news_comments'].include?(controller.controller_name) %>
+        <%= link_to t('menu.news'), news_items_path, :class => 'active', :title => t('menu.news_title') %>
       <% else %>
-        <%= link_to t('menu.news'), {:controller => 'news'}, :title => t('menu.news_title') %>
+        <%= link_to t('menu.news'), news_items_path, :title => t('menu.news_title') %>
       <% end %>
     </li>
     <li>
