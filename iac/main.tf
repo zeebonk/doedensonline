@@ -83,6 +83,48 @@ resource "aws_ecr_repository" "doedensonline" {
   }
 }
 
+resource "aws_ecr_lifecycle_policy" "doedensonline" {
+  repository = aws_ecr_repository.doedensonline.name
+
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Retain release tags (X.Y.Z) indefinitely"
+        selection = {
+          tagStatus      = "tagged"
+          tagPatternList = ["*.*.*"]
+          countType      = "imageCountMoreThan"
+          countNumber    = 999999
+        }
+        action = { type = "expire" }
+      },
+      {
+        rulePriority = 2
+        description  = "Retain the last 50 master.* images"
+        selection = {
+          tagStatus      = "tagged"
+          tagPatternList = ["master.*"]
+          countType      = "imageCountMoreThan"
+          countNumber    = 50
+        }
+        action = { type = "expire" }
+      },
+      {
+        rulePriority = 3
+        description  = "Expire everything else after 7 days"
+        selection = {
+          tagStatus   = "any"
+          countType   = "sinceImagePushed"
+          countUnit   = "days"
+          countNumber = 7
+        }
+        action = { type = "expire" }
+      },
+    ]
+  })
+}
+
 data "aws_iam_policy_document" "ecr_read_only_policy_document" {
   statement {
     sid = "AllowECRReadOnly"
