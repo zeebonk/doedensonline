@@ -1,6 +1,6 @@
 class PhotoAlbumCommentsController < ApplicationController
-  before_action :load_photo_album_comment,         only: [:edit, :update, :remove, :destroy]
-  before_action :check_photo_album_comment_author, only: [:edit, :update, :remove, :destroy]
+  before_action :load_photo_album_comment,         only: %i[edit update remove destroy]
+  before_action :check_photo_album_comment_author, only: %i[edit update remove destroy]
 
   # GET /photo_albums/:photo_album_id/comments/new
   def new
@@ -15,8 +15,7 @@ class PhotoAlbumCommentsController < ApplicationController
   end
 
   # GET /photo_albums/:photo_album_id/comments/:id/edit
-  def edit
-  end
+  def edit; end
 
   # POST /photo_albums/:photo_album_id/comments
   def create
@@ -46,12 +45,12 @@ class PhotoAlbumCommentsController < ApplicationController
   end
 
   # GET /photo_albums/:photo_album_id/comments/:id/remove
-  def remove
-  end
+  def remove; end
 
   # DELETE /photo_albums/:photo_album_id/comments/:id
   def destroy
     return redirect_to photo_album_path(@photo_album_comment.photo_album_id) if params[:commit] == t('photo_album_comments.remove.cancel')
+
     photo_album_id = @photo_album_comment.photo_album.id
     @photo_album_comment.destroy
     flash[:notice] = t('flash.photo_album_comments.destroyed')

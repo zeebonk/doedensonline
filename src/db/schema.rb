@@ -13,12 +13,12 @@
 
 ActiveRecord::Schema.define(version: 20260511130000) do
 
-  create_table "mailers", force: true do |t|
+  create_table "mailers", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "news_comments", force: true do |t|
+  create_table "news_comments", force: :cascade do |t|
     t.text     "message"
     t.integer  "news_item_id"
     t.integer  "user_id"
@@ -26,42 +26,42 @@ ActiveRecord::Schema.define(version: 20260511130000) do
     t.datetime "updated_at"
   end
 
-  create_table "news_items", force: true do |t|
+  create_table "news_items", force: :cascade do |t|
     t.text     "message"
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "photo_album_comments", force: true do |t|
-    t.string   "message"
+  create_table "photo_album_comments", force: :cascade do |t|
+    t.string   "message",        limit: 255
     t.integer  "photo_album_id"
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "photo_album_pictures", force: true do |t|
+  create_table "photo_album_pictures", force: :cascade do |t|
     t.integer  "photo_album_id"
-    t.string   "filename"
+    t.string   "filename",       limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "position"
   end
 
-  create_table "photo_albums", force: true do |t|
-    t.string   "title"
+  create_table "photo_albums", force: :cascade do |t|
+    t.string   "title",       limit: 255
     t.text     "description"
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "users", force: true do |t|
-    t.string   "first_name"
-    t.string   "last_name"
-    t.string   "email"
-    t.string   "password"
+  create_table "users", force: :cascade do |t|
+    t.string   "first_name",         limit: 255
+    t.string   "last_name",          limit: 255
+    t.string   "email",              limit: 255
+    t.string   "password",           limit: 255
     t.boolean  "notify_news"
     t.datetime "created_at"
     t.datetime "updated_at"

@@ -15,10 +15,10 @@ DoedensOnline::Application.configure do
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address: ENV["DO_SMTP_HOST"],
+    address: ENV.fetch("DO_SMTP_HOST", nil),
     port: 587,
-    user_name: ENV["DO_SMTP_USERNAME"],
-    password: ENV["DO_SMTP_PASSWORD"],
+    user_name: ENV.fetch("DO_SMTP_USERNAME", nil),
+    password: ENV.fetch("DO_SMTP_PASSWORD", nil),
     authentication: :plain,
     enable_starttls_auto: true,
     domain: 'doedensonline.nl'

@@ -2,11 +2,10 @@ class PhotoAlbumPicturesController < ApplicationController
   layout 'default'
 
   before_action :load_photo_album
-  before_action :check_photo_album_author, only: [:create, :destroy_many]
+  before_action :check_photo_album_author, only: %i[create destroy_many]
 
   # GET /photo_albums/:photo_album_id/pictures
-  def index
-  end
+  def index; end
 
   # POST /photo_albums/:photo_album_id/pictures
   def create

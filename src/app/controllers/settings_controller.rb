@@ -50,12 +50,8 @@ class SettingsController < ApplicationController
     @user = current_user
     # Try to authenticate the username and old password
     if User.authenticate(@user.first_name, params[:old_password])
-      if params[:password].to_s.size < 3
-        @user.errors.add(:base, t('flash.settings.password_too_short'))
-      end
-      if params[:password] != params[:password_confirmation]
-        @user.errors.add(:base, t('flash.settings.password_mismatch'))
-      end
+      @user.errors.add(:base, t('flash.settings.password_too_short')) if params[:password].to_s.size < 3
+      @user.errors.add(:base, t('flash.settings.password_mismatch')) if params[:password] != params[:password_confirmation]
       if @user.errors.empty? && @user.update_attribute(:password, params[:password])
         flash[:settings] = t('flash.settings.password_updated')
         redirect_to action: 'password'

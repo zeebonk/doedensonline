@@ -29,11 +29,11 @@ class User < ActiveRecord::Base
 
   def generate_new_password
     # Generate a random new password (from: http://snippets.dzone.com/posts/show/491, by: sprsquish, at: 24/11/2008, original by: ?)
-    new_password = Array.new(6) { rand(256) }.pack('C*').unpack('H*').first
+    new_password = Array.new(6) { rand(256) }.pack('C*').unpack1('H*')
     # Set the news password for the user
     update_attribute(:password, new_password)
     # Send the user his new password trough email
-    Mailer.password_forgotten(self, new_password).deliver
+    Mailer.password_forgotten(self, new_password).deliver_now
   end
 
   private
@@ -41,7 +41,7 @@ class User < ActiveRecord::Base
   # Method to create an hash for a password and salt combination
   def self.encrypted_password(password)
     # Create string to hash
-    string_to_hash = "doe" + password + "dens"
+    string_to_hash = "doe#{password}dens"
     # Create and return SHA1 hash for string
     Digest::SHA1.hexdigest(string_to_hash)
   end

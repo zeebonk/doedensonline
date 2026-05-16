@@ -1,8 +1,7 @@
-
 require 'mini_magick'
 
 class UploadPicture
-  ALLOWED_EXTENSIONS = %w(.jpg .jpeg .png .gif).freeze
+  ALLOWED_EXTENSIONS = %w[.jpg .jpeg .png .gif].freeze
   MAX_SIZE_BYTES = 10 * 1024 * 1024
 
   attr_accessor :filename, :source_image, :error
@@ -48,9 +47,7 @@ class UploadPicture
 
     name = upload.respond_to?(:original_filename) ? upload.original_filename.to_s : ''
     extension = File.extname(name).downcase
-    unless ALLOWED_EXTENSIONS.include?(extension)
-      raise InvalidUpload, "unsupported extension: #{extension.inspect}"
-    end
+    raise InvalidUpload, "unsupported extension: #{extension.inspect}" unless ALLOWED_EXTENSIONS.include?(extension)
 
     size =
       if upload.respond_to?(:size)
@@ -73,8 +70,8 @@ class UploadPicture
     small_image = @source_image
 
     # Calculate position
-    top  = (small_image[:height] < height) ? (height - small_image[:height]) / 2 : 0
-    left = (small_image[:width] < width) ? (width - small_image[:width]) / 2 : 0
+    top  = small_image[:height] < height ? (height - small_image[:height]) / 2 : 0
+    left = small_image[:width] < width ? (width - small_image[:width]) / 2 : 0
 
     # Draw the thumb on the image and save it
     canvas.draw "image Over #{left},#{top} 0,0 '#{small_image.path}'"

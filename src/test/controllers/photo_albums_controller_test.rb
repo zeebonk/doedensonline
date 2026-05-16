@@ -12,9 +12,10 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     User.delete_all
 
     # Clean up any image files leaked by prior tests in the suite.
-    %w(small medium large).each do |size|
+    %w[small medium large].each do |size|
       Dir.glob(Rails.root.join('public', 'images', size, '*')).each do |path|
-        next if %w(temp.bmp preview.jpg).include?(File.basename(path))
+        next if %w[temp.bmp preview.jpg].include?(File.basename(path))
+
         File.delete(path)
       end
     end
@@ -162,7 +163,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 2, album.photo_album_pictures.count
 
     album.photo_album_pictures.each do |picture|
-      %w(large medium small).each do |size|
+      %w[large medium small].each do |size|
         path = Rails.root.join('public', 'images', size, picture.filename)
         assert File.exist?(path), "expected #{size} variant at #{path}"
         File.delete(path)
@@ -183,7 +184,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     assert_equal ['bob@example.com'], ActionMailer::Base.deliveries.first.to
 
     PhotoAlbumPicture.where(photo_album_id: album.id).each do |picture|
-      %w(large medium small).each do |size|
+      %w[large medium small].each do |size|
         path = Rails.root.join('public', 'images', size, picture.filename)
         File.delete(path) if File.exist?(path)
       end
@@ -204,7 +205,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     assert_equal ['bob@example.com'], ActionMailer::Base.deliveries.first.to
 
     PhotoAlbumPicture.where(photo_album_id: album.id).each do |picture|
-      %w(large medium small).each do |size|
+      %w[large medium small].each do |size|
         path = Rails.root.join('public', 'images', size, picture.filename)
         File.delete(path) if File.exist?(path)
       end

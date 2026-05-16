@@ -1,11 +1,12 @@
 require 'test_helper'
 
 class UploadPictureTest < ActiveSupport::TestCase
-  FIXTURE_PATH = File.expand_path('../../fixtures/files/sample.jpg', __FILE__)
+  FIXTURE_PATH = File.expand_path('../fixtures/files/sample.jpg', __dir__)
 
   def teardown
     return unless @uploader
-    %w(large medium small).each do |size|
+
+    %w[large medium small].each do |size|
       path = Rails.root.join('public', 'images', size, @uploader.filename)
       File.delete(path) if File.exist?(path)
     end
@@ -31,7 +32,7 @@ class UploadPictureTest < ActiveSupport::TestCase
     @uploader.create_medium_image
     @uploader.create_small_image
 
-    %w(large medium small).each do |size|
+    %w[large medium small].each do |size|
       path = Rails.root.join('public', 'images', size, @uploader.filename)
       assert File.exist?(path), "expected #{size} variant to be written to #{path}"
     end
