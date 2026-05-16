@@ -6,12 +6,12 @@ class PhotoAlbumsController < ApplicationController
 
   # GET /photo_albums
   def index
-    @photo_albums = paginate(PhotoAlbum, per_page: 6)
+    @photo_albums = paginate(PhotoAlbum.includes(:photo_album_pictures), per_page: 6)
   end
 
   # GET /photo_albums/page/:page_number
   def page
-    @photo_albums = paginate(PhotoAlbum, per_page: 6)
+    @photo_albums = paginate(PhotoAlbum.includes(:photo_album_pictures), per_page: 6)
     render action: 'index'
   end
 
@@ -43,35 +43,38 @@ class PhotoAlbumsController < ApplicationController
     files = Array(album_params[:pictures]).reject(&:blank?)
 
     @photo_album.valid?
-    @photo_album.errors.delete(:preview_picture)
     if files.empty?
       @photo_album.errors.add(:pictures, t('flash.photo_albums_errors.no_pictures_selected'))
     end
 
+    success = false
     written_filenames = []
+
     if @photo_album.errors.empty?
-      begin
-        PhotoAlbum.transaction do
-          files.each_with_index do |file, index|
+      PhotoAlbum.transaction do
+        begin
+          @photo_album.save!
+          files.each do |file|
             picture = UploadPicture.new(file)
             create_images picture
             written_filenames << picture.filename
-            @photo_album.preview_picture = picture.filename if index == 0
+            PhotoAlbumPicture.create!(
+              photo_album_id: @photo_album.id,
+              filename: picture.filename
+            )
           end
-          @photo_album.save!
-          written_filenames.each do |fn|
-            PhotoAlbumPicture.create!(photo_album_id: @photo_album.id, filename: fn)
-          end
+          success = true
+        rescue UploadPicture::InvalidUpload
+          @photo_album.errors.add(:pictures, t('flash.photo_albums_errors.unsupported_image'))
+          raise ActiveRecord::Rollback
+        rescue ActiveRecord::ActiveRecordError
+          raise ActiveRecord::Rollback
         end
-      rescue UploadPicture::InvalidUpload
-        written_filenames.each { |fn| remove_images fn }
-        @photo_album.errors.add(:pictures, t('flash.photo_albums_errors.unsupported_image'))
-      rescue ActiveRecord::RecordInvalid, ActiveRecord::ActiveRecordError
-        written_filenames.each { |fn| remove_images fn }
       end
+      written_filenames.each { |fn| remove_images fn } unless success
     end
 
-    if @photo_album.errors.empty? && @photo_album.persisted?
+    if success
       flash[:notice] = t('flash.photo_albums.created')
       targets = User.where(notify_photo_album: true).where('id != ?', current_user.id)
       targets.each do |target|
@@ -79,30 +82,13 @@ class PhotoAlbumsController < ApplicationController
       end
       redirect_to(@photo_album)
     else
-      written_filenames.each { |fn| remove_images fn } unless @photo_album.persisted?
       render action: "new"
     end
   end
 
   # PUT /photo_albums/1
   def update
-    attrs = photo_album_params
-
-    if attrs[:preview_picture].present?
-      begin
-        @picture = UploadPicture.new(attrs[:preview_picture])
-        create_images @picture
-        remove_images @photo_album.preview_picture
-        attrs[:preview_picture] = @picture.filename
-      rescue
-        @photo_album.errors.add(:preview_picture, t('flash.photo_albums_errors.unsupported_image'))
-        attrs.delete(:preview_picture)
-      end
-    else
-      attrs.delete(:preview_picture)
-    end
-
-    if @photo_album.errors.count == 0 && @photo_album.update(attrs)
+    if @photo_album.update(photo_album_params)
       flash[:notice] = t('flash.photo_albums.updated')
       redirect_to(@photo_album)
     else
@@ -113,7 +99,6 @@ class PhotoAlbumsController < ApplicationController
   # DELETE /photo_albums/1
   def destroy
     return redirect_to action: 'index' if params[:commit] == t('photo_albums.remove.cancel')
-    remove_images @photo_album.preview_picture
     @photo_album.destroy
     flash[:notice] = t('flash.photo_albums.destroyed')
     redirect_to action: 'index'
@@ -122,7 +107,7 @@ class PhotoAlbumsController < ApplicationController
   private
 
   def photo_album_params
-    params.require(:photo_album).permit(:title, :description, :preview_picture)
+    params.require(:photo_album).permit(:title, :description)
   end
 
   def load_photo_album

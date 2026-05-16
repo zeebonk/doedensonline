@@ -18,7 +18,6 @@ class PhotoAlbumCommentsControllerTest < ActionDispatch::IntegrationTest
     @photo_album = PhotoAlbum.create!(
       title: 'Trip',
       description: 'Summer trip',
-      preview_picture: 'preview.jpg',
       user_id: @user.id
     )
     @comment = PhotoAlbumComment.create!(

@@ -25,7 +25,6 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
     @photo_album = PhotoAlbum.create!(
       title: 'Trip',
       description: 'Summer trip',
-      preview_picture: 'preview.jpg',
       user_id: @user.id
     )
 
@@ -139,5 +138,32 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_template 'index'
     assert_equal "Geen foto's geselecteerd om te verwijderen.", flash[:error]
+  end
+
+  test "destroy_many refuses to delete the last picture of an album" do
+    only = PhotoAlbumPicture.create!(photo_album_id: @photo_album.id, filename: 'only.jpg')
+
+    assert_no_difference('PhotoAlbumPicture.count') do
+      post "/photo_albums/#{@photo_album.id}/pictures/destroy_many", selected: [only.id.to_s]
+    end
+
+    assert_response :success
+    assert_template 'index'
+    assert_not_nil PhotoAlbumPicture.find_by_id(only.id)
+    assert_equal I18n.t('flash.photo_albums.cannot_destroy_last_picture'), flash[:error]
+  end
+
+  test "destroy_many refuses when selection would empty the album" do
+    p1 = PhotoAlbumPicture.create!(photo_album_id: @photo_album.id, filename: 'one.jpg')
+    p2 = PhotoAlbumPicture.create!(photo_album_id: @photo_album.id, filename: 'two.jpg')
+
+    assert_no_difference('PhotoAlbumPicture.count') do
+      post "/photo_albums/#{@photo_album.id}/pictures/destroy_many",
+           selected: [p1.id.to_s, p2.id.to_s]
+    end
+
+    assert_not_nil PhotoAlbumPicture.find_by_id(p1.id)
+    assert_not_nil PhotoAlbumPicture.find_by_id(p2.id)
+    assert_equal I18n.t('flash.photo_albums.cannot_destroy_last_picture'), flash[:error]
   end
 end

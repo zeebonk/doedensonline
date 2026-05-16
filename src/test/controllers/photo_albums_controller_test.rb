@@ -40,9 +40,9 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     @photo_album = PhotoAlbum.create!(
       title: 'Trip',
       description: 'Summer trip',
-      preview_picture: 'preview.jpg',
       user_id: @user.id
     )
+    PhotoAlbumPicture.create!(photo_album_id: @photo_album.id, filename: 'preview.jpg')
 
     sign_in_as @user
   end
@@ -145,7 +145,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     assert_equal before, after, "no files should orphan when validation fails"
   end
 
-  test "create saves the album with multiple pictures and uses first as preview" do
+  test "create saves the album with multiple pictures" do
     assert_difference('PhotoAlbum.count', 1) do
       assert_difference('PhotoAlbumPicture.count', 2) do
         post '/photo_albums', photo_album: {
@@ -161,10 +161,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @user.id, album.user_id
     assert_equal 2, album.photo_album_pictures.count
 
-    pictures = album.photo_album_pictures.order(:id).to_a
-    assert_equal pictures.first.filename, album.preview_picture
-
-    pictures.each do |picture|
+    album.photo_album_pictures.each do |picture|
       %w(large medium small).each do |size|
         path = Rails.root.join('public', 'images', size, picture.filename)
         assert File.exist?(path), "expected #{size} variant at #{path}"
@@ -243,7 +240,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
 
   # PATCH /photo_albums/:id (update)
 
-  test "update saves valid changes when no preview picture is uploaded" do
+  test "update saves valid changes" do
     patch "/photo_albums/#{@photo_album.id}",
           photo_album: { title: 'Updated', description: 'New desc' }
 
@@ -268,6 +265,16 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to controller: 'photo_albums', action: 'index'
     assert_equal 'Foto album succesvol verwijderd.', flash[:notice]
+  end
+
+  test "destroy cascades to the album's pictures" do
+    PhotoAlbumPicture.create!(photo_album_id: @photo_album.id, filename: 'two.jpg')
+
+    assert_difference('PhotoAlbum.count', -1) do
+      assert_difference('PhotoAlbumPicture.count', -2) do
+        delete "/photo_albums/#{@photo_album.id}", commit: 'Ja, verwijderen'
+      end
+    end
   end
 
   test "destroy is a no-op when cancelled" do

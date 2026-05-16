@@ -9,7 +9,6 @@ nl:
       photo_album:
         description: Beschrijving
         pictures: Foto's
-        preview_picture: Voorbeeld afbeelding
         title: Titel
       photo_album_comment:
         message: Reactie
@@ -39,8 +38,6 @@ nl:
         photo_album:
           attributes:
             description:
-              blank: moet worden ingevuld
-            preview_picture:
               blank: moet worden ingevuld
             title:
               blank: moet worden ingevuld
@@ -96,6 +93,7 @@ nl:
       updated: Uw reactie is succesvol aangepast.
     photo_albums:
       album_not_found: Opgegeven fotoalbum is niet gevonden!
+      cannot_destroy_last_picture: Er moet minstens 1 foto overblijven in een album.
       created: Fotoalbum is succesvol toegevoegd.
       destroyed: Foto album succesvol verwijderd.
       no_pictures_selected_destroy: Geen foto's geselecteerd om te verwijderen.
@@ -333,7 +331,6 @@ nl:
   photo_albums:
     edit:
       back: "« Terug naar het overzicht"
-      current_preview_picture: 'Huidige voorbeeld afbeelding:'
       intro: Op deze pagina kunt u de gegevens van uw fotoalbum aanpassen.
       submit: Aanpassingen opslaan
     index:

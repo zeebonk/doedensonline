@@ -41,15 +41,16 @@ class PhotoAlbumPicturesController < ApplicationController
 
   # POST /photo_albums/:photo_album_id/pictures/destroy_many
   def destroy_many
-    if params[:selected]
-      params[:selected].each do |picture_id|
-        picture = PhotoAlbumPicture.find(picture_id)
-        remove_images picture.filename
-        picture.destroy
-      end
-      flash[:notice] = t('flash.photo_albums.pictures_destroyed')
-    else
+    if params[:selected].blank?
       flash[:error] = t('flash.photo_albums.no_pictures_selected_destroy')
+    else
+      selected = @photo_album.photo_album_pictures.where(id: params[:selected])
+      if selected.count >= @photo_album.photo_album_pictures.count
+        flash[:error] = t('flash.photo_albums.cannot_destroy_last_picture')
+      else
+        selected.each(&:destroy)
+        flash[:notice] = t('flash.photo_albums.pictures_destroyed')
+      end
     end
 
     render action: 'index'
