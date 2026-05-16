@@ -1,7 +1,7 @@
 class PhotoAlbum < ActiveRecord::Base
-  validates_presence_of :title, :description, :preview_picture
+  validates :title, :description, presence: true
   belongs_to :user
-  has_many :photo_album_pictures
+  has_many :photo_album_pictures, -> { order(:position, :id) }, dependent: :destroy
   has_many :photo_album_comments
 
   def self.latest(limit, offset)
