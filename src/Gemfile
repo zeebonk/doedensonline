@@ -6,6 +6,7 @@ gem 'dynamic_form', '1.1.4'
 gem 'execjs', '2.7.0'
 gem 'i18n-tasks', '0.9.24', require: false
 gem 'jquery-rails', '4.6.0'
+gem 'kaminari', '1.2.2'
 gem 'mini_magick', '4.9.5'
 gem 'puma', '3.11.4'
 gem 'rails', '4.2.11.3'

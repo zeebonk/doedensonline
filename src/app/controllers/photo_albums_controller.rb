@@ -1,18 +1,13 @@
 class PhotoAlbumsController < ApplicationController
-  include Paginatable
-
   before_action :load_photo_album,         only: %i[show edit remove update destroy]
   before_action :check_photo_album_author, only: %i[update destroy]
 
   # GET /photo_albums
   def index
-    @photo_albums = paginate(PhotoAlbum.includes(:photo_album_pictures), per_page: 6)
-  end
-
-  # GET /photo_albums/page/:page_number
-  def page
-    @photo_albums = paginate(PhotoAlbum.includes(:photo_album_pictures), per_page: 6)
-    render action: 'index'
+    @photo_albums = PhotoAlbum.includes(:photo_album_pictures)
+                              .order(created_at: :desc)
+                              .page(params[:page])
+                              .per(6)
   end
 
   # GET /photo_albums/1

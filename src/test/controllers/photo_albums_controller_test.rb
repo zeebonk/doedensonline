@@ -74,16 +74,14 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     get '/photo_albums'
     assert_response :success
     assert assigns(:photo_albums).include?(@photo_album)
-    assert_equal 1, assigns(:paginator).current_page
+    assert_equal 1, assigns(:photo_albums).current_page
   end
 
-  # GET /photo_albums/page/:page_number
-
-  test "page renders index with requested page" do
-    get '/photo_albums/page/2'
+  test "index honors the page query parameter" do
+    get '/photo_albums', page: 2
     assert_response :success
     assert_template 'index'
-    assert_equal 2, assigns(:paginator).current_page
+    assert_equal 2, assigns(:photo_albums).current_page
   end
 
   # GET /photo_albums/:id
