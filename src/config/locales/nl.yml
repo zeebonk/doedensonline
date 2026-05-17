@@ -418,7 +418,7 @@ nl:
   views:
     pagination:
       first: "«"
-      last: »
-      next: ›
-      previous: ‹
+      last: "»"
+      next: "›"
+      previous: "‹"
       truncate: "…"
