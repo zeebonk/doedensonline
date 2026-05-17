@@ -1,5 +1,7 @@
 AllCops:
-  TargetRubyVersion: 2.1
+  TargetRubyVersion: 2.5
+  NewCops: enable
+  SuggestExtensions: false
   Exclude:
     - 'db/schema.rb'
     - 'db/migrate/**/*'
@@ -22,7 +24,7 @@ Metrics/ClassLength:
 Metrics/CyclomaticComplexity:
   Enabled: false
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 180
 
 Metrics/MethodLength:
@@ -42,7 +44,7 @@ Style/Documentation:
 Style/StringLiterals:
   Enabled: false
 
-# Frozen string literal magic comment is not available in Ruby 1.9.
+# Enabling would add `# frozen_string_literal: true` to every file; not worth the churn.
 Style/FrozenStringLiteralComment:
   Enabled: false
 
@@ -51,7 +53,7 @@ Style/For:
   Enabled: false
 
 # Existing controllers use non-predicate method names (e.g. `is_authorized`).
-Style/PredicateName:
+Naming/PredicateName:
   Enabled: false
 
 # Existing regex literals use `/.../`; no need to switch to `%r{}`.
@@ -81,9 +83,14 @@ Lint/IneffectiveAccessModifier:
   Enabled: false
 
 # `end` alignment on legacy `unless`/`if` blocks is inconsistent; refactor later.
-Lint/EndAlignment:
+Layout/EndAlignment:
   Enabled: false
 
 # Legacy controllers nest blocks deeper than 3 levels.
 Metrics/BlockNesting:
   Enabled: false
+
+# The routes DSL is a single big block by design.
+Metrics/BlockLength:
+  Exclude:
+    - 'config/routes.rb'

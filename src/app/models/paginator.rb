@@ -17,7 +17,7 @@ class Paginator
 
     result = []
     pages.each_with_index do |page, i|
-      result << GAP if i > 0 && page - pages[i - 1] > 1
+      result << GAP if i.positive? && page - pages[i - 1] > 1
       result << page
     end
     result

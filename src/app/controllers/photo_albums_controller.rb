@@ -1,8 +1,8 @@
 class PhotoAlbumsController < ApplicationController
   include Paginatable
 
-  before_action :load_photo_album,         only: [:show, :edit, :remove, :update, :destroy]
-  before_action :check_photo_album_author, only: [:update, :destroy]
+  before_action :load_photo_album,         only: %i[show edit remove update destroy]
+  before_action :check_photo_album_author, only: %i[update destroy]
 
   # GET /photo_albums
   def index
@@ -27,12 +27,10 @@ class PhotoAlbumsController < ApplicationController
   end
 
   # GET /photo_albums/1/edit
-  def edit
-  end
+  def edit; end
 
   # GET /photo_albums/1/remove
-  def remove
-  end
+  def remove; end
 
   # POST /photo_albums
   def create
@@ -43,33 +41,29 @@ class PhotoAlbumsController < ApplicationController
     files = Array(album_params[:pictures]).reject(&:blank?)
 
     @photo_album.valid?
-    if files.empty?
-      @photo_album.errors.add(:pictures, t('flash.photo_albums_errors.no_pictures_selected'))
-    end
+    @photo_album.errors.add(:pictures, t('flash.photo_albums_errors.no_pictures_selected')) if files.empty?
 
     success = false
     written_filenames = []
 
     if @photo_album.errors.empty?
       PhotoAlbum.transaction do
-        begin
-          @photo_album.save!
-          files.each do |file|
-            picture = UploadPicture.new(file)
-            create_images picture
-            written_filenames << picture.filename
-            PhotoAlbumPicture.create!(
-              photo_album_id: @photo_album.id,
-              filename: picture.filename
-            )
-          end
-          success = true
-        rescue UploadPicture::InvalidUpload
-          @photo_album.errors.add(:pictures, t('flash.photo_albums_errors.unsupported_image'))
-          raise ActiveRecord::Rollback
-        rescue ActiveRecord::ActiveRecordError
-          raise ActiveRecord::Rollback
+        @photo_album.save!
+        files.each do |file|
+          picture = UploadPicture.new(file)
+          create_images picture
+          written_filenames << picture.filename
+          PhotoAlbumPicture.create!(
+            photo_album_id: @photo_album.id,
+            filename: picture.filename
+          )
         end
+        success = true
+      rescue UploadPicture::InvalidUpload
+        @photo_album.errors.add(:pictures, t('flash.photo_albums_errors.unsupported_image'))
+        raise ActiveRecord::Rollback
+      rescue ActiveRecord::ActiveRecordError
+        raise ActiveRecord::Rollback
       end
       written_filenames.each { |fn| remove_images fn } unless success
     end
@@ -78,7 +72,7 @@ class PhotoAlbumsController < ApplicationController
       flash[:notice] = t('flash.photo_albums.created')
       targets = User.where(notify_photo_album: true).where('id != ?', current_user.id)
       targets.each do |target|
-        Mailer.notify_new_photo_album(target.email, @photo_album, current_user).deliver
+        Mailer.notify_new_photo_album(target.email, @photo_album, current_user).deliver_now
       end
       redirect_to(@photo_album)
     else
@@ -99,6 +93,7 @@ class PhotoAlbumsController < ApplicationController
   # DELETE /photo_albums/1
   def destroy
     return redirect_to action: 'index' if params[:commit] == t('photo_albums.remove.cancel')
+
     @photo_album.destroy
     flash[:notice] = t('flash.photo_albums.destroyed')
     redirect_to action: 'index'

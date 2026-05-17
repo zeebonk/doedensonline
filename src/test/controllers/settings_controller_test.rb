@@ -119,7 +119,7 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_template 'password'
-    assert assigns(:user).errors.full_messages.any? { |m| m =~ /Huidig wachtwoord/ }
+    assert(assigns(:user).errors.full_messages.any? { |m| m =~ /Huidig wachtwoord/ })
     assert_equal original_password, @user.reload.password
   end
 
@@ -132,7 +132,7 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_template 'password'
-    assert assigns(:user).errors.full_messages.any? { |m| m =~ /minimaal 3 tekens/ }
+    assert(assigns(:user).errors.full_messages.any? { |m| m =~ /minimaal 3 tekens/ })
     assert_equal original_password, @user.reload.password
   end
 
@@ -145,7 +145,7 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_template 'password'
-    assert assigns(:user).errors.full_messages.any? { |m| m =~ /niet aan elkaar gelijk/ }
+    assert(assigns(:user).errors.full_messages.any? { |m| m =~ /niet aan elkaar gelijk/ })
     assert_equal original_password, @user.reload.password
   end
 end

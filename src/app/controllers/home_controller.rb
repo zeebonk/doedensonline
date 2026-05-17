@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-  before_action :redirect_to_home_if_signed_in, only: [:sign_in, :authenticate, :password_forgotten, :reset_password]
+  before_action :redirect_to_home_if_signed_in, only: %i[sign_in authenticate password_forgotten reset_password]
 
   # GET /home
   def index
@@ -7,8 +7,7 @@ class HomeController < ApplicationController
   end
 
   # GET /home/sign_in
-  def sign_in
-  end
+  def sign_in; end
 
   # POST /home/authenticate
   def authenticate
@@ -30,8 +29,7 @@ class HomeController < ApplicationController
   end
 
   # GET /home/sign_out
-  def sign_out
-  end
+  def sign_out; end
 
   # POST /home/session_destroy
   def destroy_session
@@ -45,8 +43,7 @@ class HomeController < ApplicationController
   end
 
   # GET /home/password_forgotten
-  def password_forgotten
-  end
+  def password_forgotten; end
 
   # POST /home/reset_password
   def reset_password

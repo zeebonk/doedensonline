@@ -10,8 +10,7 @@ class ApplicationController < ActionController::Base
 
   def root_src_img_tag(input)
     input = input.gsub('../../', '/')
-    input = input.gsub('../', '/')
-    input
+    input.gsub('../', '/')
   end
 
   def create_images(image)
@@ -27,10 +26,10 @@ class ApplicationController < ActionController::Base
   end
 
   def is_authorized
-    if controller_name == 'home'
-      return if action_name == 'sign_in'        || action_name == 'destroy_session'    ||
-                action_name == 'authenticate'   || action_name == 'password_forgotten' ||
-                action_name == 'reset_password'
+    if controller_name == 'home' && (action_name == 'sign_in' || action_name == 'destroy_session' ||
+                action_name == 'authenticate' || action_name == 'password_forgotten' ||
+                action_name == 'reset_password')
+      return
     end
 
     unless session[:user_id]

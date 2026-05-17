@@ -6,10 +6,10 @@ DoedensOnline::Application.routes.draw do
     member do
       get :remove
     end
-    resources :comments, controller: 'photo_album_comments', only: [:new, :create, :edit, :update, :destroy] do
+    resources :comments, controller: 'photo_album_comments', only: %i[new create edit update destroy] do
       get :remove, on: :member
     end
-    resources :pictures, controller: 'photo_album_pictures', only: [:index, :create] do
+    resources :pictures, controller: 'photo_album_pictures', only: %i[index create] do
       post :destroy_many, on: :collection
     end
   end
@@ -30,7 +30,7 @@ DoedensOnline::Application.routes.draw do
     member do
       get :remove
     end
-    resources :news_comments, path: 'comments', only: [:new, :create, :edit, :update, :destroy] do
+    resources :news_comments, path: 'comments', only: %i[new create edit update destroy] do
       get :remove, on: :member
     end
   end

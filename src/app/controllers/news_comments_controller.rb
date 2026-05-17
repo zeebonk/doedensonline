@@ -1,7 +1,7 @@
 class NewsCommentsController < ApplicationController
   before_action :current_user
-  before_action :load_news_comment,         only: [:edit, :update, :remove, :destroy]
-  before_action :check_news_comment_author, only: [:edit, :update, :remove, :destroy]
+  before_action :load_news_comment,         only: %i[edit update remove destroy]
+  before_action :check_news_comment_author, only: %i[edit update remove destroy]
 
   # GET /news/:news_item_id/comments/new
   def new
@@ -26,8 +26,7 @@ class NewsCommentsController < ApplicationController
   end
 
   # GET /news/:news_item_id/comments/:id/edit
-  def edit
-  end
+  def edit; end
 
   # PATCH /news/:news_item_id/comments/:id
   def update
@@ -42,12 +41,12 @@ class NewsCommentsController < ApplicationController
   end
 
   # GET /news/:news_item_id/comments/:id/remove
-  def remove
-  end
+  def remove; end
 
   # DELETE /news/:news_item_id/comments/:id
   def destroy
     return redirect_to controller: 'news_items', action: 'show', id: @news_comment.news_item.id if params[:commit] == t('news_comments.remove.cancel')
+
     news_item_id = @news_comment.news_item.id
     @news_comment.destroy
     flash[:notice] = t('flash.news.comment_destroyed')

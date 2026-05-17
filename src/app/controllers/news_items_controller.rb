@@ -2,8 +2,8 @@ class NewsItemsController < ApplicationController
   include Paginatable
 
   before_action :current_user
-  before_action :load_news_item,         only: [:show, :edit, :update, :remove, :destroy]
-  before_action :check_news_item_author, only: [:edit, :update, :remove, :destroy]
+  before_action :load_news_item,         only: %i[show edit update remove destroy]
+  before_action :check_news_item_author, only: %i[edit update remove destroy]
 
   # GET /news
   def index
@@ -31,7 +31,7 @@ class NewsItemsController < ApplicationController
       flash[:notice] = t('flash.news.created')
       targets = User.where(notify_news: true).where('id != ?', current_user.id)
       targets.each do |target|
-        Mailer.notify_new_news(target.email, @news_item, current_user).deliver
+        Mailer.notify_new_news(target.email, @news_item, current_user).deliver_now
       end
       redirect_to action: 'index'
     else
@@ -45,8 +45,7 @@ class NewsItemsController < ApplicationController
   end
 
   # GET /news/:id/edit
-  def edit
-  end
+  def edit; end
 
   # PATCH /news/:id
   def update
@@ -61,12 +60,12 @@ class NewsItemsController < ApplicationController
   end
 
   # GET /news/:id/remove
-  def remove
-  end
+  def remove; end
 
   # DELETE /news/:id
   def destroy
     return redirect_to action: 'index' if params[:commit] == t('news_items.remove.cancel')
+
     for news_comment in @news_item.news_comments
       news_comment.destroy
     end
