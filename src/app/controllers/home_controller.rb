@@ -3,7 +3,7 @@ class HomeController < ApplicationController
 
   # GET /home
   def index
-    @news_items = NewsItem.latest(3, 0)
+    @news_items = NewsItem.order(created_at: :desc).limit(3)
   end
 
   # GET /home/sign_in

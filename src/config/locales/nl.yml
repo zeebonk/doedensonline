@@ -415,3 +415,10 @@ nl:
     sign_in:
       back: "« Terug"
       submit: Inloggen
+  views:
+    pagination:
+      first: "«"
+      last: »
+      next: ›
+      previous: ‹
+      truncate: "…"

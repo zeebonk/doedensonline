@@ -434,3 +434,12 @@ div.reaction div.balloon-actions
 {
   display: list-item;
 }
+
+.pagination {
+  display: inline
+}
+
+.pagination > span {
+  padding: 0px 2px;
+}
+

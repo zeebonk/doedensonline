@@ -1,8 +1,5 @@
 DoedensOnline::Application.routes.draw do
   resources :photo_albums do
-    collection do
-      get 'page/:page_number', action: :page
-    end
     member do
       get :remove
     end
@@ -24,9 +21,6 @@ DoedensOnline::Application.routes.draw do
   post 'home/reset_password',      to: 'home#reset_password'
 
   resources :news_items, path: 'news' do
-    collection do
-      get 'page/:page_number', action: :page
-    end
     member do
       get :remove
     end

@@ -1,19 +1,14 @@
 class NewsItemsController < ApplicationController
-  include Paginatable
-
   before_action :current_user
   before_action :load_news_item,         only: %i[show edit update remove destroy]
   before_action :check_news_item_author, only: %i[edit update remove destroy]
 
   # GET /news
   def index
-    @news_items = paginate(NewsItem, per_page: 10)
-  end
-
-  # GET /news/page/:page_number
-  def page
-    @news_items = paginate(NewsItem, per_page: 10)
-    render action: 'index'
+    @news_items = NewsItem.includes(:user, :news_comments)
+                          .order(created_at: :desc)
+                          .page(params[:page])
+                          .per(10)
   end
 
   # GET /news/new

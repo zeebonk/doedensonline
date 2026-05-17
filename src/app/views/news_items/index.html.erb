@@ -1,8 +1,10 @@
 <% content_for :page_title, t('page_titles.news_items_index') %>
 
+<% page_nav = paginate(@news_items, outer_window: 1) %>
+
 <p class="intro"><%= t('.intro') %></p>
 
-<div class="news-index-actions"><%= page_navigation %><%= link_to t('.add'), new_news_item_path, :title => t('.add_title'), :class=>'add' %></div>
+<div class="news-index-actions"><%= page_nav %><%= link_to t('.add'), new_news_item_path, :title => t('.add_title'), :class=>'add' %></div>
 
 <% @news_items.each_with_index do |news_item, index| %>
 
@@ -42,6 +44,6 @@
 <% end %>
 
 <div class="news-index-actions bottom">
-  <%= page_navigation %>
+  <%= page_nav %>
   <%= link_to t('.add'), new_news_item_path, :title => t('.add_title'), :class=>'add' %>
 </div>
