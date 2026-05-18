@@ -1,4 +1,9 @@
 class User < ActiveRecord::Base
+  has_many :news_items, dependent: :destroy
+  has_many :news_comments, dependent: :destroy
+  has_many :photo_albums, dependent: :destroy
+  has_many :photo_album_comments, dependent: :destroy
+
   validates_length_of :password, minimum: 4
   validates_length_of :first_name, minimum: 3
   validates_length_of :last_name, minimum: 3

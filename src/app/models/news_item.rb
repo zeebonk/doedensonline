@@ -1,6 +1,6 @@
 class NewsItem < ActiveRecord::Base
   belongs_to :user
-  has_many :news_comments
+  has_many :news_comments, dependent: :destroy
   validates_presence_of :message
 
   def preview(size)

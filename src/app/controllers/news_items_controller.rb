@@ -61,9 +61,6 @@ class NewsItemsController < ApplicationController
   def destroy
     return redirect_to action: 'index' if params[:commit] == t('news_items.remove.cancel')
 
-    for news_comment in @news_item.news_comments
-      news_comment.destroy
-    end
     @news_item.destroy
     flash[:notice] = t('flash.news.destroyed')
     redirect_to action: 'index'
