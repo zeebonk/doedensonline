@@ -1,6 +1,6 @@
 class PhotoAlbumPicture < ActiveRecord::Base
-  validates :filename, :photo_album_id, presence: true
-  belongs_to :photo_album
+  validates :filename, presence: true
+  belongs_to :photo_album, required: true
 
   before_create :assign_position
   after_destroy :remove_image_files

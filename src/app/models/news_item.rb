@@ -1,5 +1,5 @@
 class NewsItem < ActiveRecord::Base
-  belongs_to :user
+  belongs_to :user, required: true
   has_many :news_comments, dependent: :destroy
   validates_presence_of :message
 
