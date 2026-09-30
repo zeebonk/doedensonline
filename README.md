@@ -71,8 +71,12 @@ tofu apply
 ```
 docker buildx build --push \
     -t 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:TAG \
-    --platform=linux/amd64 ./src
+    --platform=linux/amd64,linux/arm64 ./src
 ```
+
+Local development (`docker compose`) builds for the host's native
+architecture. CI builds and tests the image natively on both amd64 and arm64
+runners and only tags the combined multi-arch image once both succeed.
 
 
 ## Deploy application
