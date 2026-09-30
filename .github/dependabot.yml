@@ -1,0 +1,38 @@
+version: 2
+
+# Not covered on purpose:
+# - bundler (src/): the app is pinned to Bundler 1.17.3, which Dependabot no
+#   longer supports. Gems are upgraded by hand (see CLAUDE.md).
+# - docker (src/Dockerfile): the only dependency is the ruby:2.5.9-slim base
+#   image. Ruby 2.5 is EOL, so no newer 2.5.x tags will appear, and any tag
+#   Dependabot could propose (ruby:3.x) is a Ruby upgrade that breaks the
+#   Gemfile's `ruby '2.5.9'` and Bundler 1.17.3. Add this back (ignoring
+#   major versions) once the app is on a supported Ruby.
+# - docker-compose: docker-compose.yml only references our own ECR image.
+# - mise.toml: Dependabot has no mise ecosystem, so the tool versions pinned
+#   there (python, uv, opentofu, docker-compose) are bumped by hand.
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: uv
+    directory: /iac
+    schedule:
+      interval: weekly
+    groups:
+      python:
+        patterns: ["*"]
+
+  - package-ecosystem: opentofu
+    directory: /iac
+    schedule:
+      interval: weekly
+    groups:
+      opentofu:
+        patterns: ["*"]
