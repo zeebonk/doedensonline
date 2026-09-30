@@ -9,7 +9,7 @@ on:
 
 jobs:
   # Builds, tests, and pushes the image for each platform on a native runner.
-  # Images are pushed by digest only (untagged); the `ci` job below tags them
+  # Images are pushed by digest only (untagged); the `release` job below tags them
   # together once every platform has succeeded, so a failure on one platform
   # never publishes a tag. Orphaned untagged digests are expired by the ECR
   # lifecycle policy.
@@ -102,11 +102,11 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  # Tags the per-platform digests as a single multi-arch image. Named `ci`
-  # because it is the required status check on master. It runs even when a
-  # build fails (a job skipped through `needs` would count as passing) and
-  # fails itself in that case, without tagging anything.
-  ci:
+  # Tags the per-platform digests as a single multi-arch image. It is the
+  # required status check on master, so it runs even when a build fails (a job
+  # skipped through `needs` would count as passing) and fails itself in that
+  # case, without tagging anything.
+  release:
     needs: [build]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
@@ -206,7 +206,7 @@ jobs:
           uv run ansible-playbook --syntax-check -i localhost, -e target=localhost playbook.yaml
 
   deploy-dev:
-    needs: [ci, tofu-fmt, ansible-lint]
+    needs: [release, tofu-fmt, ansible-lint]
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     env:
@@ -228,7 +228,7 @@ jobs:
       - name: Deploy to dev
         env:
           SSH_HOST: ${{ secrets.DEV_SSH_HOST }}
-          TAG: ${{ needs.ci.outputs.tag }}
+          TAG: ${{ needs.release.outputs.tag }}
           SMTP_HOST: ${{ secrets.DEV_SMTP_HOST }}
           SMTP_USERNAME: ${{ secrets.DEV_SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.DEV_SMTP_PASSWORD }}
@@ -262,7 +262,7 @@ jobs:
           REMOTE
 
   deploy-prod:
-    needs: [ci, tofu-fmt, ansible-lint]
+    needs: [release, tofu-fmt, ansible-lint]
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     env:
@@ -284,7 +284,7 @@ jobs:
       - name: Deploy to prod
         env:
           SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
-          TAG: ${{ needs.ci.outputs.tag }}
+          TAG: ${{ needs.release.outputs.tag }}
           SMTP_HOST: ${{ secrets.PROD_SMTP_HOST }}
           SMTP_USERNAME: ${{ secrets.PROD_SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.PROD_SMTP_PASSWORD }}
