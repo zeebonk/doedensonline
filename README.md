@@ -75,8 +75,8 @@ docker buildx build --push \
 ```
 
 Local development (`docker compose`) builds for the host's native
-architecture. CI builds, lints, and tests on amd64 and publishes both amd64
-and arm64 variants under the same tag.
+architecture. CI builds and tests the image natively on both amd64 and arm64
+runners and only tags the combined multi-arch image once both succeed.
 
 
 ## Deploy application
