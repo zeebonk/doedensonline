@@ -53,6 +53,16 @@ jobs:
           sudo systemctl daemon-reload
           sudo systemctl restart docker
 
+      # QEMU lets the amd64 runner build the arm64 variant of the image.
+      - uses: docker/setup-qemu-action@v3
+
+      # Set up (and switch to) a BuildKit builder so the amd64 layers built
+      # by `docker compose build` are reused by the multi-arch push below.
+      # This must come after the Docker daemon restart above.
+      - uses: docker/setup-buildx-action@v3
+
+      # Built for the runner's native platform (amd64) and loaded into the
+      # local Docker engine for the lint and test steps.
       - name: Build app image
         env:
           TAG: ${{ steps.tag.outputs.tag }}
@@ -82,10 +92,17 @@ jobs:
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Push image to ECR
-        env:
-          TAG: ${{ steps.tag.outputs.tag }}
-        run: docker push "${ECR_REGISTRY}/${ECR_REPOSITORY}:${TAG}"
+      # Publishes a multi-arch manifest under the tag. The amd64 variant comes
+      # from the builder cache of the tested image; arm64 is built under QEMU.
+      - name: Build and push multi-arch image to ECR
+        uses: docker/build-push-action@v6
+        with:
+          context: ./src
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.tag.outputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   tofu-fmt:
     runs-on: ubuntu-latest
