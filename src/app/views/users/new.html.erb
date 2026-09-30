@@ -3,7 +3,7 @@
 <h2><%= t('.heading') %></h2>
 
 <%= form_for(@user) do |f| %>
-  <%= f.error_messages %>
+  <%= error_messages_for(f.object) %>
 
   <p>
     <%= f.label :first_name %><br />

@@ -49,13 +49,15 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
   end
 
   def uploaded_jpeg_fixture
-    fixture_file_upload(Rails.root.join('test', 'fixtures', 'files', 'sample.jpg').to_s,
-                        'image/jpeg', :binary)
+    Rack::Test::UploadedFile.new(
+      Rails.root.join('test', 'fixtures', 'files', 'sample.jpg'), 'image/jpeg', true
+    )
   end
 
   def uploaded_bad_extension_fixture
-    upload = fixture_file_upload(Rails.root.join('test', 'fixtures', 'files', 'sample.jpg').to_s,
-                                 'application/octet-stream', :binary)
+    upload = Rack::Test::UploadedFile.new(
+      Rails.root.join('test', 'fixtures', 'files', 'sample.jpg'), 'application/octet-stream', true
+    )
     upload.instance_variable_set(:@original_filename, 'evil.exe')
     upload
   end
@@ -64,21 +66,21 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
 
   test "redirects to sign_in when not signed in" do
     reset!
-    get '/photo_albums'
+    get '/photo_albums', params: {}
     assert_redirected_to controller: 'home', action: 'sign_in'
   end
 
   # GET /photo_albums
 
   test "index renders paginated photo albums" do
-    get '/photo_albums'
+    get '/photo_albums', params: {}
     assert_response :success
     assert assigns(:photo_albums).include?(@photo_album)
     assert_equal 1, assigns(:photo_albums).current_page
   end
 
   test "index honors the page query parameter" do
-    get '/photo_albums', page: 2
+    get '/photo_albums', params: { page: 2 }
     assert_response :success
     assert_template 'index'
     assert_equal 2, assigns(:photo_albums).current_page
@@ -89,7 +91,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
   test "show renders the album with its comments" do
     PhotoAlbumComment.create!(message: 'Nice', photo_album_id: @photo_album.id, user_id: @user.id)
 
-    get "/photo_albums/#{@photo_album.id}"
+    get "/photo_albums/#{@photo_album.id}", params: {}
 
     assert_response :success
     assert_equal @photo_album, assigns(:photo_album)
@@ -99,7 +101,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
   # GET /photo_albums/new
 
   test "new renders the new album form" do
-    get '/photo_albums/new'
+    get '/photo_albums/new', params: {}
     assert_response :success
     assert assigns(:photo_album).new_record?
   end
@@ -107,7 +109,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
   # GET /photo_albums/:id/edit
 
   test "edit renders the edit form" do
-    get "/photo_albums/#{@photo_album.id}/edit"
+    get "/photo_albums/#{@photo_album.id}/edit", params: {}
     assert_response :success
     assert_equal @photo_album, assigns(:photo_album)
   end
@@ -115,7 +117,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
   # GET /photo_albums/:id/remove
 
   test "remove renders the removal confirmation" do
-    get "/photo_albums/#{@photo_album.id}/remove"
+    get "/photo_albums/#{@photo_album.id}/remove", params: {}
     assert_response :success
     assert_equal @photo_album, assigns(:photo_album)
   end
@@ -124,7 +126,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
 
   test "create re-renders new with validation errors when no pictures uploaded" do
     assert_no_difference('PhotoAlbum.count') do
-      post '/photo_albums', photo_album: { title: 'Title', description: 'Desc' }
+      post '/photo_albums', params: { photo_album: { title: 'Title', description: 'Desc' } }
     end
     assert_response :success
     assert_template 'new'
@@ -134,7 +136,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
   test "create re-renders new with validation errors when title and description blank" do
     before = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
     assert_no_difference('PhotoAlbum.count') do
-      post '/photo_albums', photo_album: { title: '', description: '', pictures: [uploaded_jpeg_fixture] }
+      post '/photo_albums', params: { photo_album: { title: '', description: '', pictures: [uploaded_jpeg_fixture] } }
     end
     after = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
 
@@ -147,11 +149,11 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
   test "create saves the album with multiple pictures" do
     assert_difference('PhotoAlbum.count', 1) do
       assert_difference('PhotoAlbumPicture.count', 2) do
-        post '/photo_albums', photo_album: {
+        post '/photo_albums', params: { photo_album: {
           title: 'New album',
           description: 'Holiday photos',
           pictures: [uploaded_jpeg_fixture, uploaded_jpeg_fixture]
-        }
+        } }
       end
     end
 
@@ -170,11 +172,11 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create notifies subscribers" do
-    post '/photo_albums', photo_album: {
+    post '/photo_albums', params: { photo_album: {
       title: 'New album',
       description: 'Holiday photos',
       pictures: [uploaded_jpeg_fixture]
-    }
+    } }
 
     album = PhotoAlbum.last
     assert_redirected_to album
@@ -184,7 +186,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     PhotoAlbumPicture.where(photo_album_id: album.id).each do |picture|
       %w[large medium small].each do |size|
         path = Rails.root.join('public', 'images', size, picture.filename)
-        File.delete(path) if File.exist?(path)
+        FileUtils.rm_f(path)
       end
     end
   end
@@ -192,11 +194,11 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
   test "create does not email the author even when they have notify_photo_album" do
     @user.update_attribute(:notify_photo_album, true)
 
-    post '/photo_albums', photo_album: {
+    post '/photo_albums', params: { photo_album: {
       title: 'New album',
       description: 'Holiday photos',
       pictures: [uploaded_jpeg_fixture]
-    }
+    } }
 
     album = PhotoAlbum.last
     assert_equal 1, ActionMailer::Base.deliveries.size
@@ -205,14 +207,14 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     PhotoAlbumPicture.where(photo_album_id: album.id).each do |picture|
       %w[large medium small].each do |size|
         path = Rails.root.join('public', 'images', size, picture.filename)
-        File.delete(path) if File.exist?(path)
+        FileUtils.rm_f(path)
       end
     end
   end
 
   test "create sends no email when validation fails" do
     assert_no_difference('PhotoAlbum.count') do
-      post '/photo_albums', photo_album: { title: 'Title', description: 'Desc' }
+      post '/photo_albums', params: { photo_album: { title: 'Title', description: 'Desc' } }
     end
 
     assert_equal 0, ActionMailer::Base.deliveries.size
@@ -223,11 +225,11 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
 
     before = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
     assert_no_difference('PhotoAlbum.count') do
-      post '/photo_albums', photo_album: {
+      post '/photo_albums', params: { photo_album: {
         title: 'New album',
         description: 'Holiday photos',
         pictures: [bad_file]
-      }
+      } }
     end
     after = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
 
@@ -240,8 +242,9 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
   # PATCH /photo_albums/:id (update)
 
   test "update saves valid changes" do
-    patch "/photo_albums/#{@photo_album.id}",
-          photo_album: { title: 'Updated', description: 'New desc' }
+    patch "/photo_albums/#{@photo_album.id}", params: {
+      photo_album: { title: 'Updated', description: 'New desc' }
+    }
 
     assert_redirected_to @photo_album
     assert_equal I18n.t('flash.photo_albums.updated'), flash[:notice]
@@ -249,8 +252,9 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "update re-renders edit on validation failure" do
-    patch "/photo_albums/#{@photo_album.id}",
-          photo_album: { title: '', description: '' }
+    patch "/photo_albums/#{@photo_album.id}", params: {
+      photo_album: { title: '', description: '' }
+    }
 
     assert_response :success
     assert_template 'edit'
@@ -260,7 +264,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
 
   test "destroy removes album when confirmed" do
     assert_difference('PhotoAlbum.count', -1) do
-      delete "/photo_albums/#{@photo_album.id}", commit: 'Ja, verwijderen'
+      delete "/photo_albums/#{@photo_album.id}", params: { commit: 'Ja, verwijderen' }
     end
     assert_redirected_to controller: 'photo_albums', action: 'index'
     assert_equal 'Foto album succesvol verwijderd.', flash[:notice]
@@ -271,20 +275,20 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
 
     assert_difference('PhotoAlbum.count', -1) do
       assert_difference('PhotoAlbumPicture.count', -2) do
-        delete "/photo_albums/#{@photo_album.id}", commit: 'Ja, verwijderen'
+        delete "/photo_albums/#{@photo_album.id}", params: { commit: 'Ja, verwijderen' }
       end
     end
   end
 
   test "destroy is a no-op when cancelled" do
     assert_no_difference('PhotoAlbum.count') do
-      delete "/photo_albums/#{@photo_album.id}", commit: 'Nee, niet verwijderen'
+      delete "/photo_albums/#{@photo_album.id}", params: { commit: 'Nee, niet verwijderen' }
     end
     assert_redirected_to controller: 'photo_albums', action: 'index'
   end
 
   test "destroy redirects with error when album does not exist" do
-    delete '/photo_albums/999999', commit: 'Ja, verwijderen'
+    delete '/photo_albums/999999', params: { commit: 'Ja, verwijderen' }
     assert_redirected_to controller: 'photo_albums', action: 'index'
     assert_equal 'Opgegeven fotoalbum is niet gevonden!', flash[:error]
   end

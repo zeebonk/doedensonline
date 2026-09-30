@@ -13,7 +13,7 @@ The application will be available at http://127.0.0.1:8080.
 ## Run tests
 
 ```
-docker compose run --rm -e RAILS_ENV=test app rake test
+docker compose run --rm -e RAILS_ENV=test app bundle exec rails test
 ```
 
 

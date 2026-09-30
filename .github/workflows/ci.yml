@@ -39,19 +39,8 @@ jobs:
           ln -sf "$(mise where docker-compose)/docker-cli-plugin-docker-compose" \
             ~/.docker/cli-plugins/docker-compose
 
-      # The ruby:1.9.3-p551 base image still uses Docker Schema 1, which
-      # containerd v2+ refuses by default. Re-enable it on the daemon.
-      - name: Enable Schema 1 image pulls
-        run: |
-          sudo mkdir -p /etc/systemd/system/docker.service.d
-          printf '[Service]\nEnvironment="CONTAINERD_ENABLE_DEPRECATED_PULL_SCHEMA_1_IMAGE=1"\n' \
-            | sudo tee /etc/systemd/system/docker.service.d/schema1.conf
-          sudo systemctl daemon-reload
-          sudo systemctl restart docker
-
       # Set up (and switch to) a BuildKit builder so the layers built by
-      # `docker compose build` are reused by the push below. This must come
-      # after the Docker daemon restart above.
+      # `docker compose build` are reused by the push below.
       - uses: docker/setup-buildx-action@v3
 
       # Built for the runner's native platform and loaded into the local
@@ -69,7 +58,7 @@ jobs:
         run: docker compose run --rm app bundle exec i18n-tasks health
 
       - name: Run tests
-        run: docker compose run --rm -e RAILS_ENV=test app bundle exec rake db:migrate test
+        run: docker compose run --rm -e RAILS_ENV=test app bundle exec rails db:migrate test
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
@@ -257,8 +246,8 @@ jobs:
             -v '${APP_STATE_PATH}/large/:/app/public/images/large/' \\
             "\${IMAGE}"
 
-          docker exec -e RAILS_ENV=development doedensonline-dev rake db:migrate
-          docker exec -e RAILS_ENV=development doedensonline-dev rake db:seed
+          docker exec -e RAILS_ENV=development doedensonline-dev bundle exec rails db:migrate
+          docker exec -e RAILS_ENV=development doedensonline-dev bundle exec rails db:seed
           REMOTE
 
   deploy-prod:
@@ -313,5 +302,5 @@ jobs:
             -v '${APP_STATE_PATH}/large/:/app/public/images/large/' \\
             "\${IMAGE}"
 
-          docker exec -e RAILS_ENV=production doedensonline-prod rake db:migrate
+          docker exec -e RAILS_ENV=production doedensonline-prod bundle exec rails db:migrate
           REMOTE

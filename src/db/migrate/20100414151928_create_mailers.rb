@@ -1,8 +1,8 @@
-class CreateMailers < ActiveRecord::Migration
+class CreateMailers < ActiveRecord::Migration[4.2]
   def self.up
     create_table :mailers do |t|
 
-      t.timestamps
+      t.timestamps null: true
     end
   end
 

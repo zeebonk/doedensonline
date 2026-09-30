@@ -33,13 +33,15 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
   end
 
   def uploaded_jpeg_fixture
-    fixture_file_upload(Rails.root.join('test', 'fixtures', 'files', 'sample.jpg').to_s,
-                        'image/jpeg', :binary)
+    Rack::Test::UploadedFile.new(
+      Rails.root.join('test', 'fixtures', 'files', 'sample.jpg'), 'image/jpeg', true
+    )
   end
 
   def uploaded_bad_extension_fixture
-    upload = fixture_file_upload(Rails.root.join('test', 'fixtures', 'files', 'sample.jpg').to_s,
-                                 'application/octet-stream', :binary)
+    upload = Rack::Test::UploadedFile.new(
+      Rails.root.join('test', 'fixtures', 'files', 'sample.jpg'), 'application/octet-stream', true
+    )
     upload.instance_variable_set(:@original_filename, 'evil.exe')
     upload
   end
@@ -48,20 +50,20 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
 
   test "redirects to sign_in when not signed in" do
     reset!
-    get "/photo_albums/#{@photo_album.id}/pictures"
+    get "/photo_albums/#{@photo_album.id}/pictures", params: {}
     assert_redirected_to controller: 'home', action: 'sign_in'
   end
 
   # GET /photo_albums/:photo_album_id/pictures
 
   test "index renders the manage page for the album" do
-    get "/photo_albums/#{@photo_album.id}/pictures"
+    get "/photo_albums/#{@photo_album.id}/pictures", params: {}
     assert_response :success
     assert_equal @photo_album, assigns(:photo_album)
   end
 
   test "index redirects when album does not exist" do
-    get '/photo_albums/999999/pictures'
+    get '/photo_albums/999999/pictures', params: {}
     assert_redirected_to '/photo_albums'
     assert_equal 'Opgegeven fotoalbum is niet gevonden!', flash[:error]
   end
@@ -69,7 +71,7 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
   # POST /photo_albums/:photo_album_id/pictures (create)
 
   test "create flashes an error when no files were selected" do
-    post "/photo_albums/#{@photo_album.id}/pictures"
+    post "/photo_albums/#{@photo_album.id}/pictures", params: {}
     assert_response :success
     assert_template 'index'
     assert_equal "U heeft geen foto's geselecteerd om toe te voegen.", flash[:error]
@@ -77,7 +79,7 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
 
   test "create stores the uploaded image and creates resized variants" do
     assert_difference('PhotoAlbumPicture.count', 1) do
-      post "/photo_albums/#{@photo_album.id}/pictures", file: [uploaded_jpeg_fixture]
+      post "/photo_albums/#{@photo_album.id}/pictures", params: { file: [uploaded_jpeg_fixture] }
     end
 
     picture = PhotoAlbumPicture.last
@@ -92,8 +94,9 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
 
   test "create stores multiple uploaded images" do
     assert_difference('PhotoAlbumPicture.count', 3) do
-      post("/photo_albums/#{@photo_album.id}/pictures",
-           file: [uploaded_jpeg_fixture, uploaded_jpeg_fixture, uploaded_jpeg_fixture])
+      post("/photo_albums/#{@photo_album.id}/pictures", params: {
+             file: [uploaded_jpeg_fixture, uploaded_jpeg_fixture, uploaded_jpeg_fixture]
+           })
     end
 
     PhotoAlbumPicture.last(3).each do |picture|
@@ -110,7 +113,7 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
 
     before = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
     assert_no_difference('PhotoAlbumPicture.count') do
-      post "/photo_albums/#{@photo_album.id}/pictures", file: [uploaded_jpeg_fixture, bad_file]
+      post "/photo_albums/#{@photo_album.id}/pictures", params: { file: [uploaded_jpeg_fixture, bad_file] }
     end
     after = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
 
@@ -125,7 +128,7 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
     p2 = PhotoAlbumPicture.create!(photo_album_id: @photo_album.id, filename: 'two.jpg')
 
     assert_difference('PhotoAlbumPicture.count', -1) do
-      post "/photo_albums/#{@photo_album.id}/pictures/destroy_many", selected: [p1.id.to_s]
+      post "/photo_albums/#{@photo_album.id}/pictures/destroy_many", params: { selected: [p1.id.to_s] }
     end
 
     assert_response :success
@@ -135,7 +138,7 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "destroy_many flashes an error when nothing is selected" do
-    post "/photo_albums/#{@photo_album.id}/pictures/destroy_many"
+    post "/photo_albums/#{@photo_album.id}/pictures/destroy_many", params: {}
     assert_response :success
     assert_template 'index'
     assert_equal "Geen foto's geselecteerd om te verwijderen.", flash[:error]
@@ -145,7 +148,7 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
     only = PhotoAlbumPicture.create!(photo_album_id: @photo_album.id, filename: 'only.jpg')
 
     assert_no_difference('PhotoAlbumPicture.count') do
-      post "/photo_albums/#{@photo_album.id}/pictures/destroy_many", selected: [only.id.to_s]
+      post "/photo_albums/#{@photo_album.id}/pictures/destroy_many", params: { selected: [only.id.to_s] }
     end
 
     assert_response :success
@@ -159,8 +162,9 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
     p2 = PhotoAlbumPicture.create!(photo_album_id: @photo_album.id, filename: 'two.jpg')
 
     assert_no_difference('PhotoAlbumPicture.count') do
-      post "/photo_albums/#{@photo_album.id}/pictures/destroy_many",
-           selected: [p1.id.to_s, p2.id.to_s]
+      post "/photo_albums/#{@photo_album.id}/pictures/destroy_many", params: {
+        selected: [p1.id.to_s, p2.id.to_s]
+      }
     end
 
     assert_not_nil PhotoAlbumPicture.find_by_id(p1.id)

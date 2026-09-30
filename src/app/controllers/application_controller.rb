@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
 
   before_action :is_authorized
-  protect_from_forgery
+  protect_from_forgery prepend: true
 
   layout 'default'
 

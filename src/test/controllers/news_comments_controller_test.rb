@@ -23,14 +23,14 @@ class NewsCommentsControllerTest < ActionDispatch::IntegrationTest
 
   test "redirects to sign_in when not signed in" do
     reset!
-    get "/news/#{@news_item.id}/comments/new"
+    get "/news/#{@news_item.id}/comments/new", params: {}
     assert_redirected_to controller: 'home', action: 'sign_in'
   end
 
   # GET /news/:news_item_id/comments/new
 
   test "new renders new comment form" do
-    get "/news/#{@news_item.id}/comments/new"
+    get "/news/#{@news_item.id}/comments/new", params: {}
     assert_response :success
     assert_not_nil assigns(:news_comment)
     assert_equal @news_item.id.to_s, assigns(:news_comment).news_item_id.to_s
@@ -40,7 +40,7 @@ class NewsCommentsControllerTest < ActionDispatch::IntegrationTest
 
   test "create saves valid comment" do
     assert_difference('NewsComment.count', 1) do
-      post "/news/#{@news_item.id}/comments", news_comment: { message: 'Nice' }
+      post "/news/#{@news_item.id}/comments", params: { news_comment: { message: 'Nice' } }
     end
 
     assert_redirected_to controller: 'news_items', action: 'show', id: @news_item.id
@@ -50,7 +50,7 @@ class NewsCommentsControllerTest < ActionDispatch::IntegrationTest
 
   test "create re-renders on validation failure" do
     assert_no_difference('NewsComment.count') do
-      post "/news/#{@news_item.id}/comments", news_comment: { message: '' }
+      post "/news/#{@news_item.id}/comments", params: { news_comment: { message: '' } }
     end
 
     assert_response :success
@@ -63,14 +63,14 @@ class NewsCommentsControllerTest < ActionDispatch::IntegrationTest
   test "edit renders form for author" do
     comment = NewsComment.create!(message: 'c', news_item_id: @news_item.id, user_id: @user.id)
 
-    get "/news/#{@news_item.id}/comments/#{comment.id}/edit"
+    get "/news/#{@news_item.id}/comments/#{comment.id}/edit", params: {}
 
     assert_response :success
     assert_equal comment, assigns(:news_comment)
   end
 
   test "edit redirects when comment does not exist" do
-    get "/news/#{@news_item.id}/comments/999999/edit"
+    get "/news/#{@news_item.id}/comments/999999/edit", params: {}
     assert_redirected_to controller: 'news_items', action: 'index'
     assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
@@ -80,7 +80,7 @@ class NewsCommentsControllerTest < ActionDispatch::IntegrationTest
   test "update saves valid changes" do
     comment = NewsComment.create!(message: 'old', news_item_id: @news_item.id, user_id: @user.id)
 
-    patch "/news/#{@news_item.id}/comments/#{comment.id}", news_comment: { message: 'new' }
+    patch "/news/#{@news_item.id}/comments/#{comment.id}", params: { news_comment: { message: 'new' } }
 
     assert_redirected_to controller: 'news_items', action: 'show', id: @news_item.id
     assert_equal 'Uw reactie is succesvol aangepast.', flash[:notice]
@@ -90,7 +90,7 @@ class NewsCommentsControllerTest < ActionDispatch::IntegrationTest
   test "update re-renders on validation failure" do
     comment = NewsComment.create!(message: 'old', news_item_id: @news_item.id, user_id: @user.id)
 
-    patch "/news/#{@news_item.id}/comments/#{comment.id}", news_comment: { message: '' }
+    patch "/news/#{@news_item.id}/comments/#{comment.id}", params: { news_comment: { message: '' } }
 
     assert_response :success
     assert_template 'edit'
@@ -98,7 +98,7 @@ class NewsCommentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "update redirects when comment does not exist" do
-    patch "/news/#{@news_item.id}/comments/999999", news_comment: { message: 'x' }
+    patch "/news/#{@news_item.id}/comments/999999", params: { news_comment: { message: 'x' } }
     assert_redirected_to controller: 'news_items', action: 'index'
     assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
@@ -108,14 +108,14 @@ class NewsCommentsControllerTest < ActionDispatch::IntegrationTest
   test "remove renders confirmation for author" do
     comment = NewsComment.create!(message: 'c', news_item_id: @news_item.id, user_id: @user.id)
 
-    get "/news/#{@news_item.id}/comments/#{comment.id}/remove"
+    get "/news/#{@news_item.id}/comments/#{comment.id}/remove", params: {}
 
     assert_response :success
     assert_equal comment, assigns(:news_comment)
   end
 
   test "remove redirects when comment does not exist" do
-    get "/news/#{@news_item.id}/comments/999999/remove"
+    get "/news/#{@news_item.id}/comments/999999/remove", params: {}
     assert_redirected_to controller: 'news_items', action: 'index'
     assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end
@@ -126,7 +126,7 @@ class NewsCommentsControllerTest < ActionDispatch::IntegrationTest
     comment = NewsComment.create!(message: 'c', news_item_id: @news_item.id, user_id: @user.id)
 
     assert_difference('NewsComment.count', -1) do
-      delete "/news/#{@news_item.id}/comments/#{comment.id}", commit: 'Ja, verwijderen'
+      delete "/news/#{@news_item.id}/comments/#{comment.id}", params: { commit: 'Ja, verwijderen' }
     end
 
     assert_redirected_to controller: 'news_items', action: 'show', id: @news_item.id
@@ -137,14 +137,14 @@ class NewsCommentsControllerTest < ActionDispatch::IntegrationTest
     comment = NewsComment.create!(message: 'c', news_item_id: @news_item.id, user_id: @user.id)
 
     assert_no_difference('NewsComment.count') do
-      delete "/news/#{@news_item.id}/comments/#{comment.id}", commit: 'Nee, niet verwijderen'
+      delete "/news/#{@news_item.id}/comments/#{comment.id}", params: { commit: 'Nee, niet verwijderen' }
     end
 
     assert_redirected_to controller: 'news_items', action: 'show', id: @news_item.id
   end
 
   test "destroy redirects when comment does not exist" do
-    delete "/news/#{@news_item.id}/comments/999999", commit: 'Ja, verwijderen'
+    delete "/news/#{@news_item.id}/comments/999999", params: { commit: 'Ja, verwijderen' }
     assert_redirected_to controller: 'news_items', action: 'index'
     assert_equal 'Opgegeven reactie is niet gevonden!', flash[:error]
   end

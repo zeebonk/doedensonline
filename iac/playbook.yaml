@@ -103,7 +103,7 @@
    - name: Ensure database schema is up to date
      community.docker.docker_container_exec:
        container: "doedensonline-{{ instance }}"
-       command: rake db:migrate
+       command: bundle exec rails db:migrate
        env:
          RAILS_ENV: "{{ rails_env }}"
      when: rails_env == 'development'
@@ -111,7 +111,7 @@
    - name: Ensure database is seeded
      community.docker.docker_container_exec:
        container: "doedensonline-{{ instance }}"
-       command: rake db:seed
+       command: bundle exec rails db:seed
        env:
          RAILS_ENV: "{{ rails_env }}"
      when: rails_env == 'development'

@@ -1,4 +1,4 @@
-class DropPreviewPictureFromPhotoAlbums < ActiveRecord::Migration
+class DropPreviewPictureFromPhotoAlbums < ActiveRecord::Migration[4.2]
   def self.up
     add_column :photo_album_pictures, :position, :integer
 

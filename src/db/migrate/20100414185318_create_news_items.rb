@@ -1,10 +1,10 @@
-class CreateNewsItems < ActiveRecord::Migration
+class CreateNewsItems < ActiveRecord::Migration[4.2]
   def self.up
     create_table :news_items do |t|
       t.text :message
       t.integer :user_id
 
-      t.timestamps
+      t.timestamps null: true
     end
   end
 

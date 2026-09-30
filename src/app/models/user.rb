@@ -1,4 +1,4 @@
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   has_many :news_items, dependent: :destroy
   has_many :news_comments, dependent: :destroy
   has_many :photo_albums, dependent: :destroy

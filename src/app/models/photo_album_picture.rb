@@ -1,4 +1,4 @@
-class PhotoAlbumPicture < ActiveRecord::Base
+class PhotoAlbumPicture < ApplicationRecord
   validates :filename, presence: true
   belongs_to :photo_album, required: true
 

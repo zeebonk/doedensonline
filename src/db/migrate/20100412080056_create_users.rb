@@ -1,4 +1,4 @@
-class CreateUsers < ActiveRecord::Migration
+class CreateUsers < ActiveRecord::Migration[4.2]
   def self.up
     create_table :users do |t|
       t.string :first_name
@@ -7,7 +7,7 @@ class CreateUsers < ActiveRecord::Migration
       t.string :password
       t.boolean :notify_news
 
-      t.timestamps
+      t.timestamps null: true
     end
   end
 

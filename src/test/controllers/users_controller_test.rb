@@ -40,14 +40,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test "redirects to home when no user is signed in" do
     reset!
-    get '/users'
+    get '/users', params: {}
     assert_redirected_to controller: 'home', action: 'sign_in'
   end
 
   test "redirects to home when signed in user is not an admin" do
     reset!
     sign_in_as @user
-    get '/users'
+    get '/users', params: {}
     assert_redirected_to controller: 'home', action: 'index'
     assert_equal 'Only admins allowed there', flash[:notice]
   end
@@ -55,7 +55,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   # GET /users
 
   test "should get index" do
-    get '/users'
+    get '/users', params: {}
     assert_response :success
     assert_not_nil assigns(:users)
     assert assigns(:users).include?(@user)
@@ -64,7 +64,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   # GET /users/:id
 
   test "should show user" do
-    get "/users/#{@user.id}"
+    get "/users/#{@user.id}", params: {}
     assert_response :success
     assert_equal @user, assigns(:user)
   end
@@ -72,7 +72,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   # GET /users/new
 
   test "should get new" do
-    get '/users/new'
+    get '/users/new', params: {}
     assert_response :success
     assert_not_nil assigns(:user)
     assert assigns(:user).new_record?
@@ -82,7 +82,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test "should create user with valid attributes" do
     assert_difference('User.count', 1) do
-      post '/users', user: valid_user_attributes
+      post '/users', params: { user: valid_user_attributes }
     end
 
     assert_redirected_to user_path(assigns(:user))
@@ -91,7 +91,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test "does not create user with invalid attributes and re-renders new" do
     assert_no_difference('User.count') do
-      post '/users', user: valid_user_attributes(email: 'not-an-email')
+      post '/users', params: { user: valid_user_attributes(email: 'not-an-email') }
     end
 
     assert_response :success
@@ -101,7 +101,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test "does not create user with blank password" do
     assert_no_difference('User.count') do
-      post '/users', user: valid_user_attributes(password: '')
+      post '/users', params: { user: valid_user_attributes(password: '') }
     end
 
     assert_response :success
@@ -111,7 +111,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   # GET /users/:id/edit
 
   test "should get edit" do
-    get "/users/#{@user.id}/edit"
+    get "/users/#{@user.id}/edit", params: {}
     assert_response :success
     assert_equal @user, assigns(:user)
   end
@@ -119,7 +119,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   # PATCH /users/:id
 
   test "should update user with valid attributes" do
-    patch "/users/#{@user.id}", user: { first_name: 'Updated' }
+    patch "/users/#{@user.id}", params: { user: { first_name: 'Updated' } }
 
     assert_redirected_to user_path(assigns(:user))
     assert_equal I18n.t('flash.users.updated'), flash[:notice]
@@ -127,7 +127,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "does not update user with invalid attributes and re-renders edit" do
-    patch "/users/#{@user.id}", user: { email: 'not-an-email' }
+    patch "/users/#{@user.id}", params: { user: { email: 'not-an-email' } }
 
     assert_response :success
     assert_template 'edit'
@@ -138,7 +138,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test "should destroy user" do
     assert_difference('User.count', -1) do
-      delete "/users/#{@user.id}"
+      delete "/users/#{@user.id}", params: {}
     end
 
     assert_redirected_to users_path
