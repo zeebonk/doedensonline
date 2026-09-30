@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -34,7 +33,7 @@ ActiveRecord::Schema.define(version: 20260511130000) do
   end
 
   create_table "photo_album_comments", force: :cascade do |t|
-    t.string   "message",        limit: 255
+    t.string   "message"
     t.integer  "photo_album_id"
     t.integer  "user_id"
     t.datetime "created_at"
@@ -43,14 +42,14 @@ ActiveRecord::Schema.define(version: 20260511130000) do
 
   create_table "photo_album_pictures", force: :cascade do |t|
     t.integer  "photo_album_id"
-    t.string   "filename",       limit: 255
+    t.string   "filename"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "position"
   end
 
   create_table "photo_albums", force: :cascade do |t|
-    t.string   "title",       limit: 255
+    t.string   "title"
     t.text     "description"
     t.integer  "user_id"
     t.datetime "created_at"
@@ -58,10 +57,10 @@ ActiveRecord::Schema.define(version: 20260511130000) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string   "first_name",         limit: 255
-    t.string   "last_name",          limit: 255
-    t.string   "email",              limit: 255
-    t.string   "password",           limit: 255
+    t.string   "first_name"
+    t.string   "last_name"
+    t.string   "email"
+    t.string   "password"
     t.boolean  "notify_news"
     t.datetime "created_at"
     t.datetime "updated_at"

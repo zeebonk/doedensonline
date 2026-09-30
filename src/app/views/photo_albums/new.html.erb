@@ -6,7 +6,7 @@
 
 <div id="edit-form">
 	<%= form_for(@photo_album,:html => { :multipart => true }) do |f| %>
-		<%= f.error_messages %>
+		<%= error_messages_for(f.object) %>
 		<p>
 			<%= f.label :title %>
 			<%= f.text_field :title, :class => 'text-box' %>

@@ -1,8 +1,8 @@
-require File.expand_path('boot', __dir__)
+require_relative 'boot'
 
 require 'rails/all'
 
-Bundler.require(*Rails.groups) if defined?(Bundler)
+Bundler.require(*Rails.groups)
 
 module DoedensOnline
   class Application < Rails::Application
@@ -13,7 +13,5 @@ module DoedensOnline
     config.filter_parameters += [:password]
 
     config.assets.enabled = true
-
-    config.active_record.raise_in_transactional_callbacks = true
   end
 end

@@ -17,11 +17,7 @@ class HomeController < ApplicationController
       session[:user_id] = @user.id
       req = session[:request]
       session[:request] = nil
-      if req
-        redirect_to req
-      else
-        redirect_to action: 'index'
-      end
+      redirect_to req || { action: 'index' }
     else
       flash[:error] = t('flash.home.invalid_credentials')
       redirect_to action: 'sign_in'

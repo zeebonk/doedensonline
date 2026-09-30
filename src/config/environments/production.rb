@@ -6,8 +6,9 @@ DoedensOnline::Application.configure do
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
 
-  config.serve_static_files = true
+  config.public_file_server.enabled = true
 
+  config.assets.js_compressor = :uglifier
   config.assets.compile = false
   config.assets.digest = true
 
@@ -27,4 +28,6 @@ DoedensOnline::Application.configure do
   config.action_mailer.default_url_options = { host: 'doedensonline.nl' }
 
   config.active_support.deprecation = :notify
+
+  config.active_record.dump_schema_after_migration = false
 end

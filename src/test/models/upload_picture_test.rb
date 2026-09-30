@@ -8,7 +8,7 @@ class UploadPictureTest < ActiveSupport::TestCase
 
     %w[large medium small].each do |size|
       path = Rails.root.join('public', 'images', size, @uploader.filename)
-      File.delete(path) if File.exist?(path)
+      FileUtils.rm_f(path)
     end
   end
 

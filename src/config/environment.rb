@@ -1,3 +1,3 @@
-require File.expand_path('../application', __FILE__)
+require_relative 'application'
 
-DoedensOnline::Application.initialize!
+Rails.application.initialize!

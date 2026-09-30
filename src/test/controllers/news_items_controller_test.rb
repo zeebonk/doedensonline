@@ -37,14 +37,14 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
 
   test "redirects to sign_in when not signed in" do
     reset!
-    get '/news'
+    get '/news', params: {}
     assert_redirected_to controller: 'home', action: 'sign_in'
   end
 
   # GET /news
 
   test "index renders paginated news" do
-    get '/news'
+    get '/news', params: {}
     assert_response :success
     assert_not_nil assigns(:news_items)
     assert assigns(:news_items).include?(@news_item)
@@ -52,7 +52,7 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index honors the page query parameter" do
-    get '/news', page: 2
+    get '/news', params: { page: 2 }
     assert_response :success
     assert_template 'index'
     assert_equal 2, assigns(:news_items).current_page
@@ -61,7 +61,7 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
   # GET /news/new
 
   test "new renders new news_item form" do
-    get '/news/new'
+    get '/news/new', params: {}
     assert_response :success
     assert_not_nil assigns(:news_item)
     assert assigns(:news_item).new_record?
@@ -71,7 +71,7 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
 
   test "create saves news_item and notifies subscribers" do
     assert_difference('NewsItem.count', 1) do
-      post '/news', news_item: { message: 'Hello world' }
+      post '/news', params: { news_item: { message: 'Hello world' } }
     end
 
     assert_redirected_to controller: 'news_items', action: 'index'
@@ -84,7 +84,7 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
   test "create does not email the author even when they have notify_news" do
     @user.update_attribute(:notify_news, true)
 
-    post '/news', news_item: { message: 'Hello again' }
+    post '/news', params: { news_item: { message: 'Hello again' } }
 
     assert_equal 1, ActionMailer::Base.deliveries.size
     assert_equal ['bob@example.com'], ActionMailer::Base.deliveries.first.to
@@ -92,7 +92,7 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
 
   test "create re-renders new on validation failure" do
     assert_no_difference('NewsItem.count') do
-      post '/news', news_item: { message: '' }
+      post '/news', params: { news_item: { message: '' } }
     end
 
     assert_response :success
@@ -106,7 +106,7 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
   test "show renders news_item with its comments" do
     NewsComment.create!(message: 'A comment', news_item_id: @news_item.id, user_id: @user.id)
 
-    get "/news/#{@news_item.id}"
+    get "/news/#{@news_item.id}", params: {}
 
     assert_response :success
     assert_equal @news_item, assigns(:news_item)
@@ -114,7 +114,7 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show redirects when news_item does not exist" do
-    get '/news/999999'
+    get '/news/999999', params: {}
     assert_redirected_to controller: 'news_items', action: 'index'
     assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
@@ -122,13 +122,13 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
   # GET /news/:id/edit
 
   test "edit renders form for author" do
-    get "/news/#{@news_item.id}/edit"
+    get "/news/#{@news_item.id}/edit", params: {}
     assert_response :success
     assert_equal @news_item, assigns(:news_item)
   end
 
   test "edit redirects when news_item does not exist" do
-    get '/news/999999/edit'
+    get '/news/999999/edit', params: {}
     assert_redirected_to controller: 'news_items', action: 'index'
     assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
@@ -136,7 +136,7 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
   # PATCH /news/:id
 
   test "update saves valid changes" do
-    patch "/news/#{@news_item.id}", news_item: { message: 'Updated message' }
+    patch "/news/#{@news_item.id}", params: { news_item: { message: 'Updated message' } }
 
     assert_redirected_to controller: 'news_items', action: 'index'
     assert_equal 'Het nieuwtje is succesvol aangepast.', flash[:notice]
@@ -144,7 +144,7 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "update re-renders edit on validation failure" do
-    patch "/news/#{@news_item.id}", news_item: { message: '' }
+    patch "/news/#{@news_item.id}", params: { news_item: { message: '' } }
 
     assert_response :success
     assert_template 'edit'
@@ -152,7 +152,7 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "update redirects when news_item does not exist" do
-    patch '/news/999999', news_item: { message: 'anything' }
+    patch '/news/999999', params: { news_item: { message: 'anything' } }
 
     assert_redirected_to controller: 'news_items', action: 'index'
     assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
@@ -161,13 +161,13 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
   # GET /news/:id/remove
 
   test "remove renders confirmation for author" do
-    get "/news/#{@news_item.id}/remove"
+    get "/news/#{@news_item.id}/remove", params: {}
     assert_response :success
     assert_equal @news_item, assigns(:news_item)
   end
 
   test "remove redirects when news_item does not exist" do
-    get '/news/999999/remove'
+    get '/news/999999/remove', params: {}
     assert_redirected_to controller: 'news_items', action: 'index'
     assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end
@@ -179,7 +179,7 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
 
     assert_difference('NewsItem.count', -1) do
       assert_difference('NewsComment.count', -1) do
-        delete "/news/#{@news_item.id}", commit: 'Ja, verwijderen'
+        delete "/news/#{@news_item.id}", params: { commit: 'Ja, verwijderen' }
       end
     end
 
@@ -189,14 +189,14 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
 
   test "destroy is a no-op when cancelled" do
     assert_no_difference('NewsItem.count') do
-      delete "/news/#{@news_item.id}", commit: 'Nee, niet verwijderen'
+      delete "/news/#{@news_item.id}", params: { commit: 'Nee, niet verwijderen' }
     end
 
     assert_redirected_to controller: 'news_items', action: 'index'
   end
 
   test "destroy redirects when news_item does not exist" do
-    delete '/news/999999', commit: 'Ja, verwijderen'
+    delete '/news/999999', params: { commit: 'Ja, verwijderen' }
     assert_redirected_to controller: 'news_items', action: 'index'
     assert_equal 'Opgegeven nieuwtje is niet gevonden!', flash[:error]
   end

@@ -16,7 +16,7 @@ docker compose up
 ## Run the test suite
 
 ```
-docker compose run --rm -e RAILS_ENV=test app rake test
+docker compose run --rm -e RAILS_ENV=test app bundle exec rails test
 ```
 
 ## Run RuboCop
@@ -64,7 +64,7 @@ docker compose run --rm app bundle <command>
 ## Run database migrations / rake tasks
 
 ```
-docker compose run --rm app rake db:migrate
+docker compose run --rm app bundle exec rails db:migrate
 docker compose run --rm app rake <task>
 ```
 
