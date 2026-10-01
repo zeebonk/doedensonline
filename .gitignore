@@ -18,5 +18,6 @@ src/public/assets/
 .DS_Store
 src/core
 src/core.*
-.claude/
+.claude/*
+!.claude/skills/
 .env
