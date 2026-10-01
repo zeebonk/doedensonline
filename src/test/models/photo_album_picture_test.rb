@@ -4,6 +4,6 @@ class PhotoAlbumPictureTest < ActiveSupport::TestCase
   test "requires a photo album" do
     picture = PhotoAlbumPicture.new(filename: 'picture.jpg')
     refute picture.valid?
-    assert picture.errors.added?(:photo_album, :required)
+    assert_includes picture.errors[:photo_album], I18n.t('errors.messages.required')
   end
 end
