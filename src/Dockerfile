@@ -19,7 +19,7 @@ RUN gem update --system 3.2.3 --no-document \
     && bundle config set --global build.sqlite3 --with-sqlite3-dir=/usr
 
 COPY Gemfile Gemfile.lock ./
-RUN bundle _2.4.22_ install
+RUN BUNDLE_FROZEN=true bundle _2.4.22_ install
 
 COPY . .
 
