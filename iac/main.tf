@@ -530,43 +530,6 @@ resource "cloudflare_ruleset" "redirect_www_to_apex" {
   ]
 }
 
-# Cloudflare provider v4 -> v5 migration. These can be removed once the
-# migration has been applied.
-
-moved {
-  from = cloudflare_record.doedensonline
-  to   = cloudflare_dns_record.doedensonline
-}
-
-moved {
-  from = cloudflare_record.doedensonline_www
-  to   = cloudflare_dns_record.doedensonline_www
-}
-
-moved {
-  from = cloudflare_record.doedensonline_dev
-  to   = cloudflare_dns_record.doedensonline_dev
-}
-
-moved {
-  from = cloudflare_record.doedensonline_dkim_record
-  to   = cloudflare_dns_record.doedensonline_dkim_record
-}
-
-moved {
-  from = cloudflare_record.doedensonline_amazonses_verification_record
-  to   = cloudflare_dns_record.doedensonline_amazonses_verification_record
-}
-
-# v5 has no `cloudflare_zone_settings_override`; adopt the existing setting
-# instead. The old state entry must be dropped by hand first, since v5 has no
-# schema to read it with:
-#   tofu state rm cloudflare_zone_settings_override.doedensonline
-import {
-  to = cloudflare_zone_setting.doedensonline_always_use_https
-  id = "${cloudflare_zone.doedensonline.id}/always_use_https"
-}
-
 # GitHub Actions secrets for the dev deploy job
 
 locals {
