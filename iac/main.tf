@@ -112,6 +112,17 @@ resource "aws_ecr_lifecycle_policy" "doedensonline" {
       },
       {
         rulePriority = 3
+        description  = "Retain the CI build cache (cache-*) indefinitely"
+        selection = {
+          tagStatus      = "tagged"
+          tagPatternList = ["cache-*"]
+          countType      = "imageCountMoreThan"
+          countNumber    = 999999
+        }
+        action = { type = "expire" }
+      },
+      {
+        rulePriority = 4
         description  = "Expire everything else after 7 days"
         selection = {
           tagStatus   = "any"
