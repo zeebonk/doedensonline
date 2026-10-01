@@ -18,54 +18,54 @@ ActiveRecord::Schema.define(version: 20260511130000) do
   end
 
   create_table "news_comments", force: :cascade do |t|
-    t.text     "message"
-    t.integer  "news_item_id"
-    t.integer  "user_id"
+    t.text "message"
+    t.integer "news_item_id"
+    t.integer "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "news_items", force: :cascade do |t|
-    t.text     "message"
-    t.integer  "user_id"
+    t.text "message"
+    t.integer "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "photo_album_comments", force: :cascade do |t|
-    t.string   "message"
-    t.integer  "photo_album_id"
-    t.integer  "user_id"
+    t.string "message"
+    t.integer "photo_album_id"
+    t.integer "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "photo_album_pictures", force: :cascade do |t|
-    t.integer  "photo_album_id"
-    t.string   "filename"
+    t.integer "photo_album_id"
+    t.string "filename"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "position"
+    t.integer "position"
   end
 
   create_table "photo_albums", force: :cascade do |t|
-    t.string   "title"
-    t.text     "description"
-    t.integer  "user_id"
+    t.string "title"
+    t.text "description"
+    t.integer "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "users", force: :cascade do |t|
-    t.string   "first_name"
-    t.string   "last_name"
-    t.string   "email"
-    t.string   "password"
-    t.boolean  "notify_news"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "email"
+    t.string "password"
+    t.boolean "notify_news"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "isadmin"
-    t.boolean  "notify_photo_album"
+    t.boolean "isadmin"
+    t.boolean "notify_photo_album"
   end
 
 end
