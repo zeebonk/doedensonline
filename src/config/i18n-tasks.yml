@@ -25,5 +25,7 @@ ignore_unused:
   - 'activerecord.errors.template.*'
   # Format strings used by the i18n / errors helpers.
   - 'errors.format'
+  # Default validation messages looked up by ActiveModel (e.g. belongs_to's `required`).
+  - 'errors.messages.*'
   # Pagination labels are referenced from Kaminari's bundled views inside the gem.
   - 'views.pagination.*'

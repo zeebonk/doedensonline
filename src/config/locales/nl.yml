@@ -66,6 +66,8 @@ nl:
         header: 'Er zijn problemen met de ingevoerde gegevens:'
   errors:
     format: "%{attribute}: %{message}"
+    messages:
+      required: moet bestaan
   flash:
     application:
       admins_only: Only admins allowed there
