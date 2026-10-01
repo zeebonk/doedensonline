@@ -21,7 +21,7 @@ terraform {
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "~> 4.0"
+      version = "~> 5.26"
     }
   }
 }
@@ -250,7 +250,7 @@ resource "local_file" "inventory" {
           "smtp_password" : module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4,
           "ecr_access_key_id" : aws_iam_access_key.doedensonline_dev.id,
           "ecr_secret_access_key" : aws_iam_access_key.doedensonline_dev.secret,
-          "cloudflared_tunnel_token" : cloudflare_zero_trust_tunnel_cloudflared.prod.tunnel_token,
+          "cloudflared_tunnel_token" : data.cloudflare_zero_trust_tunnel_cloudflared_token.prod.token,
         },
       }
     },
@@ -270,7 +270,7 @@ resource "local_file" "inventory" {
           "smtp_password" : module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4,
           "ecr_access_key_id" : aws_iam_access_key.doedensonline_dev.id,
           "ecr_secret_access_key" : aws_iam_access_key.doedensonline_dev.secret,
-          "cloudflared_tunnel_token" : cloudflare_zero_trust_tunnel_cloudflared.dev.tunnel_token,
+          "cloudflared_tunnel_token" : data.cloudflare_zero_trust_tunnel_cloudflared_token.dev.token,
         },
       }
     },
@@ -369,19 +369,19 @@ resource "aws_ses_domain_dkim" "doedensonline" {
 # Cloudflare
 
 resource "cloudflare_zone" "doedensonline" {
-  account_id = var.cloudflare_account_id
-  zone       = local.domain
-}
-
-resource "cloudflare_zone_settings_override" "doedensonline" {
-  zone_id = cloudflare_zone.doedensonline.id
-
-  settings {
-    always_use_https = "on"
+  account = {
+    id = var.cloudflare_account_id
   }
+  name = local.domain
 }
 
-resource "cloudflare_record" "doedensonline" {
+resource "cloudflare_zone_setting" "doedensonline_always_use_https" {
+  zone_id    = cloudflare_zone.doedensonline.id
+  setting_id = "always_use_https"
+  value      = "on"
+}
+
+resource "cloudflare_dns_record" "doedensonline" {
   zone_id = cloudflare_zone.doedensonline.id
   name    = local.domain
   type    = "CNAME"
@@ -395,7 +395,7 @@ resource "cloudflare_record" "doedensonline" {
 # www.doedensonline.nl exists only so Cloudflare's edge can intercept
 # requests and apply the redirect ruleset below — the tunnel never sees
 # this hostname.
-resource "cloudflare_record" "doedensonline_www" {
+resource "cloudflare_dns_record" "doedensonline_www" {
   zone_id = cloudflare_zone.doedensonline.id
   name    = "www.${local.domain}"
   type    = "CNAME"
@@ -404,7 +404,7 @@ resource "cloudflare_record" "doedensonline_www" {
   proxied = true
 }
 
-resource "cloudflare_record" "doedensonline_dev" {
+resource "cloudflare_dns_record" "doedensonline_dev" {
   zone_id = cloudflare_zone.doedensonline.id
   name    = "dev.${local.domain}"
   type    = "CNAME"
@@ -415,17 +415,17 @@ resource "cloudflare_record" "doedensonline_dev" {
   proxied = true
 }
 
-resource "cloudflare_record" "doedensonline_dkim_record" {
+resource "cloudflare_dns_record" "doedensonline_dkim_record" {
   for_each = toset(aws_ses_domain_dkim.doedensonline.dkim_tokens)
   zone_id  = cloudflare_zone.doedensonline.id
-  name     = "${each.key}._domainkey"
+  name     = "${each.key}._domainkey.${local.domain}"
   type     = "CNAME"
   content  = "${each.key}.dkim.amazonses.com"
   ttl      = 60
   proxied  = false
 }
 
-resource "cloudflare_record" "doedensonline_amazonses_verification_record" {
+resource "cloudflare_dns_record" "doedensonline_amazonses_verification_record" {
   zone_id = cloudflare_zone.doedensonline.id
   name    = "_amazonses.${local.domain}"
   type    = "TXT"
@@ -440,23 +440,31 @@ resource "random_id" "dev_tunnel_secret" {
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared" "dev" {
+  account_id    = var.cloudflare_account_id
+  name          = "doedensonline-dev"
+  tunnel_secret = random_id.dev_tunnel_secret.b64_std
+}
+
+data "cloudflare_zero_trust_tunnel_cloudflared_token" "dev" {
   account_id = var.cloudflare_account_id
-  name       = "doedensonline-dev"
-  secret     = random_id.dev_tunnel_secret.b64_std
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.dev.id
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "dev" {
   account_id = var.cloudflare_account_id
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.dev.id
+  source     = "cloudflare"
 
-  config {
-    ingress_rule {
-      hostname = "dev.${local.domain}"
-      service  = "http://localhost:8080"
-    }
-    ingress_rule {
-      service = "http_status:404"
-    }
+  config = {
+    ingress = [
+      {
+        hostname = "dev.${local.domain}"
+        service  = "http://localhost:8080"
+      },
+      {
+        service = "http_status:404"
+      },
+    ]
   }
 }
 
@@ -465,23 +473,31 @@ resource "random_id" "prod_tunnel_secret" {
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared" "prod" {
+  account_id    = var.cloudflare_account_id
+  name          = "doedensonline-prod"
+  tunnel_secret = random_id.prod_tunnel_secret.b64_std
+}
+
+data "cloudflare_zero_trust_tunnel_cloudflared_token" "prod" {
   account_id = var.cloudflare_account_id
-  name       = "doedensonline-prod"
-  secret     = random_id.prod_tunnel_secret.b64_std
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.prod.id
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "prod" {
   account_id = var.cloudflare_account_id
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.prod.id
+  source     = "cloudflare"
 
-  config {
-    ingress_rule {
-      hostname = local.domain
-      service  = "http://localhost:8081"
-    }
-    ingress_rule {
-      service = "http_status:404"
-    }
+  config = {
+    ingress = [
+      {
+        hostname = local.domain
+        service  = "http://localhost:8081"
+      },
+      {
+        service = "http_status:404"
+      },
+    ]
   }
 }
 
@@ -494,22 +510,61 @@ resource "cloudflare_ruleset" "redirect_www_to_apex" {
   kind    = "zone"
   phase   = "http_request_dynamic_redirect"
 
-  rules {
-    action      = "redirect"
-    expression  = "starts_with(http.host, \"www.\")"
-    description = "Redirect www.* to apex"
-    enabled     = true
+  rules = [
+    {
+      action      = "redirect"
+      expression  = "starts_with(http.host, \"www.\")"
+      description = "Redirect www.* to apex"
+      enabled     = true
 
-    action_parameters {
-      from_value {
-        status_code = 301
-        target_url {
-          expression = "concat(\"https://\", wildcard_replace(http.host, \"www.*\", \"$${1}\"), http.request.uri.path)"
+      action_parameters = {
+        from_value = {
+          status_code = 301
+          target_url = {
+            expression = "concat(\"https://\", wildcard_replace(http.host, \"www.*\", \"$${1}\"), http.request.uri.path)"
+          }
+          preserve_query_string = true
         }
-        preserve_query_string = true
       }
-    }
-  }
+    },
+  ]
+}
+
+# Cloudflare provider v4 -> v5 migration. These can be removed once the
+# migration has been applied.
+
+moved {
+  from = cloudflare_record.doedensonline
+  to   = cloudflare_dns_record.doedensonline
+}
+
+moved {
+  from = cloudflare_record.doedensonline_www
+  to   = cloudflare_dns_record.doedensonline_www
+}
+
+moved {
+  from = cloudflare_record.doedensonline_dev
+  to   = cloudflare_dns_record.doedensonline_dev
+}
+
+moved {
+  from = cloudflare_record.doedensonline_dkim_record
+  to   = cloudflare_dns_record.doedensonline_dkim_record
+}
+
+moved {
+  from = cloudflare_record.doedensonline_amazonses_verification_record
+  to   = cloudflare_dns_record.doedensonline_amazonses_verification_record
+}
+
+# v5 has no `cloudflare_zone_settings_override`; adopt the existing setting
+# instead. The old state entry must be dropped by hand first, since v5 has no
+# schema to read it with:
+#   tofu state rm cloudflare_zone_settings_override.doedensonline
+import {
+  to = cloudflare_zone_setting.doedensonline_always_use_https
+  id = "${cloudflare_zone.doedensonline.id}/always_use_https"
 }
 
 # GitHub Actions secrets for the dev deploy job
