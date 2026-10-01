@@ -1,5 +1,5 @@
 class NewsItem < ApplicationRecord
-  belongs_to :user, required: true
+  belongs_to :user
   has_many :news_comments, dependent: :destroy
   validates_presence_of :message
 

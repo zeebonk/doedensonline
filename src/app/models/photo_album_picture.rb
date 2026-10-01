@@ -1,6 +1,6 @@
 class PhotoAlbumPicture < ApplicationRecord
   validates :filename, presence: true
-  belongs_to :photo_album, required: true
+  belongs_to :photo_album
 
   before_create :assign_position
   after_destroy :remove_image_files

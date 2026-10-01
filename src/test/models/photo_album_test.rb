@@ -1,8 +1,9 @@
 require 'test_helper'
 
 class PhotoAlbumTest < ActiveSupport::TestCase
-  # Replace this with your real tests.
-  test "the truth" do
-    assert true
+  test "requires a user" do
+    photo_album = PhotoAlbum.new(title: 'Title', description: 'Description')
+    refute photo_album.valid?
+    assert photo_album.errors.added?(:user, :required)
   end
 end
