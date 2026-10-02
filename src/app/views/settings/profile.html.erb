@@ -6,7 +6,7 @@
 
   <p class="intro"><%= t('.intro') %></p>
 
-  <p style="color: green"><%= flash[:settings] %></p>
+  <p class="success"><%= flash[:settings] %></p>
 
   <%= form_for @user, :url => { :action => "update_profile" } do |f| %>
     <%= error_messages_for(f.object) %>
