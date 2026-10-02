@@ -26,11 +26,7 @@ class ApplicationController < ActionController::Base
   end
 
   def is_authorized
-    if controller_name == 'home' && (action_name == 'sign_in' || action_name == 'destroy_session' ||
-                action_name == 'authenticate' || action_name == 'password_forgotten' ||
-                action_name == 'reset_password')
-      return
-    end
+    return if controller_name == 'home' && %w[sign_in destroy_session authenticate password_forgotten reset_password].include?(action_name)
 
     unless session[:user_id]
       session[:request] = request.fullpath

@@ -1,4 +1,4 @@
-FROM ruby:2.6.10-alpine
+FROM ruby:2.7.8-alpine
 
 WORKDIR /app
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
@@ -13,7 +13,7 @@ RUN apk add --no-cache \
         nodejs \
         tzdata
 
-RUN gem update --system 3.2.3 --no-document \
+RUN gem update --system 3.4.22 --no-document \
     && gem install bundler -v 2.4.22 --no-document \
     && bundle config set --global force_ruby_platform true \
     && bundle config set --global build.sqlite3 --with-sqlite3-dir=/usr

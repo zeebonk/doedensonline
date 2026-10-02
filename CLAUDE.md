@@ -55,6 +55,16 @@ build. Regenerate the lockfile **before** rebuilding:
    docker compose build app
    ```
 
+A Ruby version bump (changing `ruby` in the `Gemfile` and the Dockerfile's
+base image) can't use the old image for step 3: its Ruby rejects gems that need
+the new Ruby. Regenerate the lockfile in a plain container of the new Ruby,
+with the Bundler version from the Dockerfile, then rebuild as in step 4:
+
+```
+docker run --rm -v "$PWD/src:/app" -w /app ruby:<new>-alpine \
+  sh -c 'gem install bundler -v <bundler> --no-document && bundle _<bundler>_ lock --update'
+```
+
 For other ad-hoc bundler commands:
 
 ```
