@@ -1,18 +1,20 @@
 source 'https://rubygems.org'
 
-ruby '2.6.10'
+ruby '2.7.8'
 
 gem 'execjs', '2.10.2'
 gem 'i18n-tasks', '1.0.15', require: false
 gem 'jquery-rails', '4.6.1'
+# json 3 rejects the quirks_mode option that Active Support 5.2 passes.
+gem 'json', '2.21.2'
 gem 'kaminari', '1.2.2'
 gem 'mail', '2.9.1'
 gem 'mini_magick', '5.4.0'
-gem 'nokogiri', '1.13.10'
+gem 'nokogiri', '1.15.7'
 gem 'puma', '6.6.1'
 gem 'rails', '5.2.8.1'
 gem 'rake', '13.4.2'
-gem 'rubocop', '1.50.2', require: false
+gem 'rubocop', '1.91.0', require: false
 gem 'sprockets', '4.4.1'
 gem 'sprockets-rails', '3.4.2'
 gem 'sqlite3', '1.4.4'
@@ -20,6 +22,6 @@ gem 'turbolinks', '5.2.1'
 gem 'uglifier', '4.2.1'
 
 group :test do
-  gem 'minitest', '5.25.4'
+  gem 'minitest', '5.26.1'
   gem 'rails-controller-testing', '1.0.5'
 end

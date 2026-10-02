@@ -2,16 +2,16 @@ version: 2
 
 # Not covered on purpose:
 # - bundler (src/): every gem is exact-pinned and the app is on an EOL Ruby
-#   (2.6) and an old Rails, so most current gem releases need a newer Ruby or
+#   (2.7) and an old Rails, so most current gem releases need a newer Ruby or
 #   Rails and can't be installed. Dependabot would mostly open PRs that fail,
 #   and ignore rules would have to cover most of the Gemfile and be updated on
 #   every upgrade. Gems are upgraded by hand alongside Rails/Ruby upgrades (see
 #   the plan-rails-upgrade skill and CLAUDE.md). Reconsider once the app is on
 #   a supported Ruby and Rails.
-# - docker (src/Dockerfile): the only dependency is the ruby:2.6.10-alpine
-#   base image. Ruby 2.6 is EOL, so no newer 2.6.x tags will appear, and any
-#   tag Dependabot could propose (ruby:2.7+) is a Ruby upgrade that breaks the
-#   Gemfile's `ruby '2.6.10'`. Add this back (ignoring major and minor
+# - docker (src/Dockerfile): the only dependency is the ruby:2.7.8-alpine
+#   base image. Ruby 2.7 is EOL, so no newer 2.7.x tags will appear, and any
+#   tag Dependabot could propose (ruby:3.0+) is a Ruby upgrade that breaks the
+#   Gemfile's `ruby '2.7.8'`. Add this back (ignoring major and minor
 #   versions) once the app is on a supported Ruby.
 # - docker-compose: docker-compose.yml only references our own ECR image.
 # - mise.toml: Dependabot has no mise ecosystem, so the tool versions pinned

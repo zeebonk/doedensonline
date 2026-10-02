@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 2.7
   NewCops: enable
   SuggestExtensions: false
   Exclude:
@@ -53,7 +53,11 @@ Style/For:
   Enabled: false
 
 # Existing controllers use non-predicate method names (e.g. `is_authorized`).
-Naming/PredicateName:
+Naming/PredicatePrefix:
+  Enabled: false
+
+# Legacy helpers return booleans without a `?` suffix (e.g. `user_is_author`).
+Naming/PredicateMethod:
   Enabled: false
 
 # Existing regex literals use `/.../`; no need to switch to `%r{}`.
