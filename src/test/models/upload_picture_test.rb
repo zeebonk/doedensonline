@@ -7,7 +7,7 @@ class UploadPictureTest < ActiveSupport::TestCase
     return unless @uploader
 
     %w[large medium small].each do |size|
-      path = Rails.root.join('public', 'images', size, @uploader.filename)
+      path = Rails.public_path.join('images', size, @uploader.filename)
       FileUtils.rm_f(path)
     end
   end
@@ -19,7 +19,7 @@ class UploadPictureTest < ActiveSupport::TestCase
     # in a JPEG (e.g. \xFF), which the controller swallows as "unsupported image".
     tempfile = Tempfile.new('upload')
     FileUtils.copy_file(FIXTURE_PATH, tempfile.path)
-    refute tempfile.binmode?, 'sanity check: tempfile should not start in binmode'
+    assert_not tempfile.binmode?, 'sanity check: tempfile should not start in binmode'
 
     upload = ActionDispatch::Http::UploadedFile.new(
       tempfile: tempfile,
@@ -33,7 +33,7 @@ class UploadPictureTest < ActiveSupport::TestCase
     @uploader.create_small_image
 
     %w[large medium small].each do |size|
-      path = Rails.root.join('public', 'images', size, @uploader.filename)
+      path = Rails.public_path.join('images', size, @uploader.filename)
       assert File.exist?(path), "expected #{size} variant to be written to #{path}"
     end
   end

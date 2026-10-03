@@ -16,7 +16,7 @@ class PhotoAlbumPicture < ApplicationRecord
 
   def remove_image_files
     %w[small medium large].each do |size|
-      path = Rails.root.join('public', 'images', size, filename).to_s
+      path = Rails.public_path.join('images', size, filename).to_s
       FileUtils.remove_file(path, true)
     end
   end

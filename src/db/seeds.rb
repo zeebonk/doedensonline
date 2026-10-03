@@ -1,4 +1,4 @@
-unless User.where(first_name: 'Gijs').exists?
+unless User.exists?(first_name: 'Gijs')
   User.create!(
     first_name: 'Gijs',
     last_name: 'Doedens',

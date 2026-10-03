@@ -1,7 +1,7 @@
 # Receives Content-Security-Policy violation reports from browsers and logs
 # them. Inherits from ActionController::Base so it skips sign-in, and browsers
 # don't send a CSRF token with reports.
-class CspReportsController < ActionController::Base
+class CspReportsController < ActionController::Base # rubocop:disable Rails/ApplicationController
   MAX_REPORT_SIZE = 16.kilobytes
 
   skip_forgery_protection

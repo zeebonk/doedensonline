@@ -16,7 +16,7 @@ class UploadPicture
     source = upload.respond_to?(:tempfile) ? upload.tempfile : upload
     source.binmode if source.respond_to?(:binmode)
     @source_image = MiniMagick::Image.read(source)
-    @filename = "#{Time.now.strftime('%d%m%Y%H%M%S')}#{Time.now.usec}.jpg"
+    @filename = "#{Time.zone.now.strftime('%d%m%Y%H%M%S')}#{Time.zone.now.usec}.jpg"
   end
 
   # This method creates a medium copy of the source image
@@ -62,7 +62,7 @@ class UploadPicture
 
   def draw_picture_in_canvas(width, height)
     # Create a new image with the size of the box and a white background
-    canvas = MiniMagick::Image.open "#{Rails.root}/public/images/temp.bmp"
+    canvas = MiniMagick::Image.open Rails.public_path.join('images/temp.bmp').to_s
     canvas.resize "#{width}x#{height}!"
 
     # Create thumb to fit the dimensions

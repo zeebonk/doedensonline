@@ -1,7 +1,7 @@
 class NewsItem < ApplicationRecord
   belongs_to :user
   has_many :news_comments, dependent: :destroy
-  validates_presence_of :message
+  validates :message, presence: true
 
   def preview(size)
     message = self[:message]
