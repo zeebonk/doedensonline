@@ -22,6 +22,8 @@ DoedensOnline::Application.configure do
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.default_url_options = { host: 'dev.doedensonline.nl' }
 
+  config.hosts << 'dev.doedensonline.nl'
+
   config.active_support.deprecation = :log
 
   config.active_record.migration_error = :page_load
