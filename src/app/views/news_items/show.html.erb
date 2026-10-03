@@ -19,7 +19,7 @@
       <% Time::DATE_FORMATS[:article_date] = "<span class='day'>%d</span><span class='month-year'>%B<br/>%Y</span>" %>
       <%= @news_item.created_at.to_s(:article_date).html_safe %>
       </div>
-      <%= @news_item.message.html_safe %>
+      <%= rich_text(@news_item.message) %>
       <% if @news_item.user_id == @current_user.id %>
       <div class="balloon-actions">
 
@@ -43,7 +43,7 @@
   </div>
   <div class="balloon-top">
     <div class="balloon-bottom">
-      <%= news_comment.message.html_safe %>
+      <%= rich_text(news_comment.message) %>
       <% if news_comment.user.id == @current_user.id %>
       <div class="balloon-actions">
 

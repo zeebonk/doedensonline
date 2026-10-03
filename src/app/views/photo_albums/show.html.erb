@@ -23,7 +23,7 @@
         <%= @photo_album.created_at.to_s(:article_date).html_safe %>
       </div>
 
-      <%= @photo_album.description.html_safe %>
+      <%= rich_text(@photo_album.description) %>
 
       <% if @photo_album.user_id == @current_user.id %>
         <div class="balloon-actions">
@@ -60,7 +60,7 @@
   </div>
   <div class="balloon-top">
     <div class="balloon-bottom">
-      <%= photo_album_comment.message.html_safe %>
+      <%= rich_text(photo_album_comment.message) %>
       <% if photo_album_comment.user.id == @current_user.id %>
       <div class="balloon-actions">
 
