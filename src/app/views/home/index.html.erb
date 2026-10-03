@@ -7,7 +7,7 @@
     <div class="preview-balloon-content">
       <%= link_to t('.read_more'), news_item_path(news_item), :title => t('.read_more_title'), :class => 'read-on' %>
       <p>
-        <%= news_item.preview(140).html_safe %>
+        <%= news_item.preview(140) %>
       </p>
     </div>
     <div class="preview-balloon-poster">

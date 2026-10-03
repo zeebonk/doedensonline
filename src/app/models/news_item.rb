@@ -4,9 +4,7 @@ class NewsItem < ApplicationRecord
   validates :message, presence: true
 
   def preview(size)
-    message = self[:message]
-    message = message.gsub(/<\/?[^>]*>/, "")
-    message.strip!
+    message = Loofah.fragment(self[:message]).scrub!(:prune).to_text(encode_special_chars: false).squish
     if message.size > size
       message = message[0, size]
       message.strip!
