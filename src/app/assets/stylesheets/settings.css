@@ -27,3 +27,8 @@
   font-size: 12px;
   font-weight: bold;
 }
+
+#settings p.success
+{
+  color: green;
+}
