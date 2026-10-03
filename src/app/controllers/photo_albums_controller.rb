@@ -13,7 +13,7 @@ class PhotoAlbumsController < ApplicationController
   # GET /photo_albums/1
   def show
     @current_user = current_user
-    @photo_album_comments = PhotoAlbumComment.where("photo_album_id = ?", @photo_album.id).order('created_at ASC').to_a
+    @photo_album_comments = PhotoAlbumComment.where(photo_album_id: @photo_album.id).order(:created_at).to_a
   end
 
   # GET /photo_albums/new
@@ -65,7 +65,7 @@ class PhotoAlbumsController < ApplicationController
 
     if success
       flash[:notice] = t('flash.photo_albums.created')
-      targets = User.where(notify_photo_album: true).where('id != ?', current_user.id)
+      targets = User.where(notify_photo_album: true).where.not(id: current_user.id)
       targets.each do |target|
         Mailer.notify_new_photo_album(target.email, @photo_album, current_user).deliver_now
       end

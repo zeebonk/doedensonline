@@ -8,7 +8,7 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
 
     # Clean up any image files leaked by prior tests in the suite.
     %w[small medium large].each do |size|
-      Dir.glob(Rails.root.join('public', 'images', size, '*')).each do |path|
+      Rails.public_path.glob("images/#{size}/*").each do |path|
         next if %w[temp.bmp preview.jpg].include?(File.basename(path))
 
         File.delete(path)
@@ -34,13 +34,13 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
 
   def uploaded_jpeg_fixture
     Rack::Test::UploadedFile.new(
-      Rails.root.join('test', 'fixtures', 'files', 'sample.jpg'), 'image/jpeg', true
+      Rails.root.join('test/fixtures/files/sample.jpg'), 'image/jpeg', true
     )
   end
 
   def uploaded_bad_extension_fixture
     upload = Rack::Test::UploadedFile.new(
-      Rails.root.join('test', 'fixtures', 'files', 'sample.jpg'), 'application/octet-stream', true
+      Rails.root.join('test/fixtures/files/sample.jpg'), 'application/octet-stream', true
     )
     upload.instance_variable_set(:@original_filename, 'evil.exe')
     upload
@@ -85,7 +85,7 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
     picture = PhotoAlbumPicture.last
     assert_equal @photo_album.id, picture.photo_album_id
     %w[large medium small].each do |size|
-      path = Rails.root.join('public', 'images', size, picture.filename)
+      path = Rails.public_path.join('images', size, picture.filename)
       assert File.exist?(path), "expected #{size} variant at #{path}"
       File.delete(path)
     end
@@ -101,7 +101,7 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
 
     PhotoAlbumPicture.last(3).each do |picture|
       %w[large medium small].each do |size|
-        path = Rails.root.join('public', 'images', size, picture.filename)
+        path = Rails.public_path.join('images', size, picture.filename)
         assert File.exist?(path), "expected #{size} variant at #{path}"
         File.delete(path)
       end
@@ -111,11 +111,11 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
   test "create rolls back all writes when one upload fails" do
     bad_file = uploaded_bad_extension_fixture
 
-    before = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
+    before = Rails.public_path.glob('images/large/*').size
     assert_no_difference('PhotoAlbumPicture.count') do
       post "/photo_albums/#{@photo_album.id}/pictures", params: { file: [uploaded_jpeg_fixture, bad_file] }
     end
-    after = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
+    after = Rails.public_path.glob('images/large/*').size
 
     assert_equal before, after, "no files should be left on disk after partial failure"
     assert_equal I18n.t('flash.photo_albums.some_pictures_failed'), flash[:error]
@@ -133,8 +133,8 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_template 'index'
-    assert_nil PhotoAlbumPicture.find_by_id(p1.id)
-    assert_not_nil PhotoAlbumPicture.find_by_id(p2.id)
+    assert_nil PhotoAlbumPicture.find_by(id: p1.id)
+    assert_not_nil PhotoAlbumPicture.find_by(id: p2.id)
   end
 
   test "destroy_many flashes an error when nothing is selected" do
@@ -153,7 +153,7 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_template 'index'
-    assert_not_nil PhotoAlbumPicture.find_by_id(only.id)
+    assert_not_nil PhotoAlbumPicture.find_by(id: only.id)
     assert_equal I18n.t('flash.photo_albums.cannot_destroy_last_picture'), flash[:error]
   end
 
@@ -167,8 +167,8 @@ class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_not_nil PhotoAlbumPicture.find_by_id(p1.id)
-    assert_not_nil PhotoAlbumPicture.find_by_id(p2.id)
+    assert_not_nil PhotoAlbumPicture.find_by(id: p1.id)
+    assert_not_nil PhotoAlbumPicture.find_by(id: p2.id)
     assert_equal I18n.t('flash.photo_albums.cannot_destroy_last_picture'), flash[:error]
   end
 end

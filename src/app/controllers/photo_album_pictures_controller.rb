@@ -12,7 +12,7 @@ class PhotoAlbumPicturesController < ApplicationController
     files = Array(params['file']).reject(&:blank?)
 
     if files.empty?
-      flash[:error] = t('flash.photo_albums.no_pictures_selected_upload')
+      flash.now[:error] = t('flash.photo_albums.no_pictures_selected_upload')
       return render action: 'index'
     end
 
@@ -29,10 +29,10 @@ class PhotoAlbumPicturesController < ApplicationController
           )
         end
       end
-      flash[:notice] = t('flash.photo_albums.pictures_added')
+      flash.now[:notice] = t('flash.photo_albums.pictures_added')
     rescue UploadPicture::InvalidUpload, ActiveRecord::ActiveRecordError, StandardError
       written_filenames.each { |fn| remove_images fn }
-      flash[:error] = t('flash.photo_albums.some_pictures_failed')
+      flash.now[:error] = t('flash.photo_albums.some_pictures_failed')
     end
 
     render action: 'index'
@@ -41,14 +41,14 @@ class PhotoAlbumPicturesController < ApplicationController
   # POST /photo_albums/:photo_album_id/pictures/destroy_many
   def destroy_many
     if params[:selected].blank?
-      flash[:error] = t('flash.photo_albums.no_pictures_selected_destroy')
+      flash.now[:error] = t('flash.photo_albums.no_pictures_selected_destroy')
     else
       selected = @photo_album.photo_album_pictures.where(id: params[:selected])
       if selected.count >= @photo_album.photo_album_pictures.count
-        flash[:error] = t('flash.photo_albums.cannot_destroy_last_picture')
+        flash.now[:error] = t('flash.photo_albums.cannot_destroy_last_picture')
       else
         selected.each(&:destroy)
-        flash[:notice] = t('flash.photo_albums.pictures_destroyed')
+        flash.now[:notice] = t('flash.photo_albums.pictures_destroyed')
       end
     end
 

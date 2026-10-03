@@ -13,7 +13,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
 
     # Clean up any image files leaked by prior tests in the suite.
     %w[small medium large].each do |size|
-      Dir.glob(Rails.root.join('public', 'images', size, '*')).each do |path|
+      Rails.public_path.glob("images/#{size}/*").each do |path|
         next if %w[temp.bmp preview.jpg].include?(File.basename(path))
 
         File.delete(path)
@@ -50,13 +50,13 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
 
   def uploaded_jpeg_fixture
     Rack::Test::UploadedFile.new(
-      Rails.root.join('test', 'fixtures', 'files', 'sample.jpg'), 'image/jpeg', true
+      Rails.root.join('test/fixtures/files/sample.jpg'), 'image/jpeg', true
     )
   end
 
   def uploaded_bad_extension_fixture
     upload = Rack::Test::UploadedFile.new(
-      Rails.root.join('test', 'fixtures', 'files', 'sample.jpg'), 'application/octet-stream', true
+      Rails.root.join('test/fixtures/files/sample.jpg'), 'application/octet-stream', true
     )
     upload.instance_variable_set(:@original_filename, 'evil.exe')
     upload
@@ -134,15 +134,15 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create re-renders new with validation errors when title and description blank" do
-    before = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
+    before = Rails.public_path.glob('images/large/*').size
     assert_no_difference('PhotoAlbum.count') do
       post '/photo_albums', params: { photo_album: { title: '', description: '', pictures: [uploaded_jpeg_fixture] } }
     end
-    after = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
+    after = Rails.public_path.glob('images/large/*').size
 
     assert_response :success
     assert_template 'new'
-    refute assigns(:photo_album).persisted?
+    assert_not assigns(:photo_album).persisted?
     assert_equal before, after, "no files should orphan when validation fails"
   end
 
@@ -164,7 +164,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
 
     album.photo_album_pictures.each do |picture|
       %w[large medium small].each do |size|
-        path = Rails.root.join('public', 'images', size, picture.filename)
+        path = Rails.public_path.join('images', size, picture.filename)
         assert File.exist?(path), "expected #{size} variant at #{path}"
         File.delete(path)
       end
@@ -183,9 +183,9 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, ActionMailer::Base.deliveries.size
     assert_equal ['bob@example.com'], ActionMailer::Base.deliveries.first.to
 
-    PhotoAlbumPicture.where(photo_album_id: album.id).each do |picture|
+    PhotoAlbumPicture.where(photo_album_id: album.id).find_each do |picture|
       %w[large medium small].each do |size|
-        path = Rails.root.join('public', 'images', size, picture.filename)
+        path = Rails.public_path.join('images', size, picture.filename)
         FileUtils.rm_f(path)
       end
     end
@@ -204,9 +204,9 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, ActionMailer::Base.deliveries.size
     assert_equal ['bob@example.com'], ActionMailer::Base.deliveries.first.to
 
-    PhotoAlbumPicture.where(photo_album_id: album.id).each do |picture|
+    PhotoAlbumPicture.where(photo_album_id: album.id).find_each do |picture|
       %w[large medium small].each do |size|
-        path = Rails.root.join('public', 'images', size, picture.filename)
+        path = Rails.public_path.join('images', size, picture.filename)
         FileUtils.rm_f(path)
       end
     end
@@ -223,7 +223,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
   test "create rejects unsupported file types and writes no images" do
     bad_file = uploaded_bad_extension_fixture
 
-    before = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
+    before = Rails.public_path.glob('images/large/*').size
     assert_no_difference('PhotoAlbum.count') do
       post '/photo_albums', params: { photo_album: {
         title: 'New album',
@@ -231,7 +231,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
         pictures: [bad_file]
       } }
     end
-    after = Dir.glob(Rails.root.join('public', 'images', 'large', '*')).size
+    after = Rails.public_path.glob('images/large/*').size
 
     assert_response :success
     assert_template 'new'

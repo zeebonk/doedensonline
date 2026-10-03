@@ -11,10 +11,18 @@ class NewsItemsController < ApplicationController
                           .per(10)
   end
 
+  # GET /news/:id
+  def show
+    @news_comments = NewsComment.where(news_item_id: @news_item.id).order(:created_at).to_a
+  end
+
   # GET /news/new
   def new
     @news_item = NewsItem.new
   end
+
+  # GET /news/:id/edit
+  def edit; end
 
   # POST /news
   def create
@@ -24,7 +32,7 @@ class NewsItemsController < ApplicationController
 
     if @news_item.save
       flash[:notice] = t('flash.news.created')
-      targets = User.where(notify_news: true).where('id != ?', current_user.id)
+      targets = User.where(notify_news: true).where.not(id: current_user.id)
       targets.each do |target|
         Mailer.notify_new_news(target.email, @news_item, current_user).deliver_now
       end
@@ -33,14 +41,6 @@ class NewsItemsController < ApplicationController
       render action: "new"
     end
   end
-
-  # GET /news/:id
-  def show
-    @news_comments = NewsComment.where("news_item_id = ?", @news_item.id).order('created_at ASC').to_a
-  end
-
-  # GET /news/:id/edit
-  def edit; end
 
   # PATCH /news/:id
   def update

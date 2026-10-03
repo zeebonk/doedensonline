@@ -20,9 +20,9 @@ class ApplicationController < ActionController::Base
   end
 
   def remove_images(filename)
-    FileUtils.remove_file "#{Rails.root}/public/images/small/#{filename}", true
-    FileUtils.remove_file "#{Rails.root}/public/images/medium/#{filename}", true
-    FileUtils.remove_file "#{Rails.root}/public/images/large/#{filename}", true
+    FileUtils.remove_file Rails.public_path.join('images', 'small', filename).to_s, true
+    FileUtils.remove_file Rails.public_path.join('images', 'medium', filename).to_s, true
+    FileUtils.remove_file Rails.public_path.join('images', 'large', filename).to_s, true
   end
 
   def is_authorized

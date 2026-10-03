@@ -9,6 +9,9 @@ class NewsCommentsController < ApplicationController
     @news_comment.news_item_id = params[:news_item_id]
   end
 
+  # GET /news/:news_item_id/comments/:id/edit
+  def edit; end
+
   # POST /news/:news_item_id/comments
   def create
     @news_comment = NewsComment.new(news_comment_params)
@@ -24,9 +27,6 @@ class NewsCommentsController < ApplicationController
       render action: "new"
     end
   end
-
-  # GET /news/:news_item_id/comments/:id/edit
-  def edit; end
 
   # PATCH /news/:news_item_id/comments/:id
   def update

@@ -1,5 +1,9 @@
+plugins:
+  - rubocop-rails
+
 AllCops:
   TargetRubyVersion: 2.7
+  TargetRailsVersion: 5.2
   NewCops: enable
   SuggestExtensions: false
   Exclude:
@@ -98,3 +102,12 @@ Metrics/BlockNesting:
 Metrics/BlockLength:
   Exclude:
     - 'config/routes.rb'
+
+# The app has a single `Mailer` and no ApplicationMailer base class.
+Rails/ApplicationMailer:
+  Enabled: false
+
+# Legacy code and tests use `update_attribute` to set single columns without
+# running validations; refactor later.
+Rails/SkipsModelValidations:
+  Enabled: false
