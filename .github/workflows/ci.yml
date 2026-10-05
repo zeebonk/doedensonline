@@ -14,9 +14,7 @@ jobs:
   prepare:
     runs-on: ubuntu-latest
     outputs:
-      cache-from-amd64: ${{ steps.cache.outputs.cache-from-amd64 }}
-      cache-from-arm64: ${{ steps.cache.outputs.cache-from-arm64 }}
-      cache-from-all: ${{ steps.cache.outputs.cache-from-all }}
+      cache-from: ${{ steps.cache.outputs.cache-from }}
       cache-to-amd64: ${{ steps.cache.outputs.cache-to-amd64 }}
       cache-to-arm64: ${{ steps.cache.outputs.cache-to-arm64 }}
     steps:
@@ -31,20 +29,15 @@ jobs:
             scopes="pr-${PR_NUMBER}-cache ${scopes}"
           fi
 
-          from() {
-            for scope in ${scopes}; do
-              for arch in "$@"; do
-                echo "type=registry,ref=${ECR_IMAGE}:${scope}-${arch}"
-              done
-            done
-          }
-
           {
-            for arch in amd64 arm64; do
-              printf 'cache-from-%s<<EOF\n%s\nEOF\n' "${arch}" "$(from "${arch}")"
-              echo "cache-to-${arch}=type=registry,ref=${ECR_IMAGE}:${scopes%% *}-${arch},image-manifest=true,oci-mediatypes=true"
+            echo 'cache-from<<EOF'
+            for scope in ${scopes}; do
+              echo "type=registry,ref=${ECR_IMAGE}:${scope}-amd64"
+              echo "type=registry,ref=${ECR_IMAGE}:${scope}-arm64"
             done
-            printf 'cache-from-all<<EOF\n%s\nEOF\n' "$(from amd64 arm64)"
+            echo 'EOF'
+            echo "cache-to-amd64=type=registry,ref=${ECR_IMAGE}:${scopes%% *}-amd64,image-manifest=true,oci-mediatypes=true"
+            echo "cache-to-arm64=type=registry,ref=${ECR_IMAGE}:${scopes%% *}-arm64,image-manifest=true,oci-mediatypes=true"
           } >> "$GITHUB_OUTPUT"
 
   build:
@@ -89,7 +82,7 @@ jobs:
           platforms: linux/${{ matrix.arch }}
           load: true
           tags: ${{ env.ECR_IMAGE }}:latest
-          cache-from: ${{ needs.prepare.outputs[format('cache-from-{0}', matrix.arch)] }}
+          cache-from: ${{ needs.prepare.outputs.cache-from }}
           cache-to: ${{ needs.prepare.outputs[format('cache-to-{0}', matrix.arch)] }}
 
       # Lint results don't depend on the platform; run them once.
@@ -156,7 +149,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ env.ECR_IMAGE }}:${{ steps.tag.outputs.tag }}
-          cache-from: ${{ needs.prepare.outputs.cache-from-all }}
+          cache-from: ${{ needs.prepare.outputs.cache-from }}
 
   tofu-fmt:
     runs-on: ubuntu-latest
