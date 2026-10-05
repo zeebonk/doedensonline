@@ -7,13 +7,49 @@ on:
   release:
     types: [published]
 
+env:
+  ECR_IMAGE: 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline
+
 jobs:
-  # Builds, tests, and pushes the image for each platform on a native runner.
-  # Images are pushed by digest only (untagged); the `release` job below tags them
-  # together once every platform has succeeded, so a failure on one platform
-  # never publishes a tag. Orphaned untagged digests are expired by the ECR
-  # lifecycle policy.
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      cache-from-amd64: ${{ steps.cache.outputs.cache-from-amd64 }}
+      cache-from-arm64: ${{ steps.cache.outputs.cache-from-arm64 }}
+      cache-from-all: ${{ steps.cache.outputs.cache-from-all }}
+      cache-to-amd64: ${{ steps.cache.outputs.cache-to-amd64 }}
+      cache-to-arm64: ${{ steps.cache.outputs.cache-to-arm64 }}
+    steps:
+      - name: Compute layer cache refs
+        id: cache
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          # The first scope is the one written to.
+          scopes="cache"
+          if [ -n "${PR_NUMBER}" ]; then
+            scopes="pr-${PR_NUMBER}-cache ${scopes}"
+          fi
+
+          from() {
+            for scope in ${scopes}; do
+              for arch in "$@"; do
+                echo "type=registry,ref=${ECR_IMAGE}:${scope}-${arch}"
+              done
+            done
+          }
+
+          # ECR requires the cache to be stored as an OCI image manifest.
+          {
+            for arch in amd64 arm64; do
+              printf 'cache-from-%s<<EOF\n%s\nEOF\n' "${arch}" "$(from "${arch}")"
+              echo "cache-to-${arch}=type=registry,ref=${ECR_IMAGE}:${scopes%% *}-${arch},image-manifest=true,oci-mediatypes=true"
+            done
+            printf 'cache-from-all<<EOF\n%s\nEOF\n' "$(from amd64 arm64)"
+          } >> "$GITHUB_OUTPUT"
+
   build:
+    needs: [prepare]
     strategy:
       matrix:
         include:
@@ -25,10 +61,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    env:
-      ECR_REGISTRY: 313336455033.dkr.ecr.eu-west-1.amazonaws.com
-      ECR_REPOSITORY: doedensonline
-      CACHE_REF: 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:cache-${{ matrix.arch }}
     steps:
       - uses: actions/checkout@v7
 
@@ -40,12 +72,8 @@ jobs:
           ln -sf "$(mise where docker-compose)/docker-cli-plugin-docker-compose" \
             ~/.docker/cli-plugins/docker-compose
 
-      # Set up (and switch to) a BuildKit builder so the layers built by the
-      # build step are reused by the push below.
       - uses: docker/setup-buildx-action@v4
 
-      # Logged in before building so the build can read and write the layer
-      # cache stored in ECR.
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
@@ -55,20 +83,15 @@ jobs:
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      # Built for the runner's native platform and loaded into the local
-      # Docker engine for the lint and test steps, under the image name
-      # docker-compose.yml expects so `docker compose run` doesn't rebuild.
-      # Layers are cached per platform in ECR; ECR requires the cache to be
-      # stored as an OCI image manifest.
       - name: Build app image
         uses: docker/build-push-action@v7
         with:
           context: ./src
           platforms: linux/${{ matrix.arch }}
           load: true
-          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-          cache-from: type=registry,ref=${{ env.CACHE_REF }}
-          cache-to: type=registry,ref=${{ env.CACHE_REF }},image-manifest=true,oci-mediatypes=true
+          tags: ${{ env.ECR_IMAGE }}:latest
+          cache-from: ${{ needs.prepare.outputs[format('cache-from-{0}', matrix.arch)] }}
+          cache-to: ${{ needs.prepare.outputs[format('cache-to-{0}', matrix.arch)] }}
 
       # Lint results don't depend on the platform; run them once.
       - name: Run RuboCop
@@ -82,42 +105,13 @@ jobs:
       - name: Run tests
         run: docker compose run --rm -e RAILS_ENV=test app bundle exec rails db:migrate test
 
-      - name: Push image to ECR by digest
-        id: push
-        uses: docker/build-push-action@v7
-        with:
-          context: ./src
-          platforms: linux/${{ matrix.arch }}
-          outputs: type=image,name=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }},push-by-digest=true,name-canonical=true,push=true
-
-      - name: Export digest
-        env:
-          DIGEST: ${{ steps.push.outputs.digest }}
-        run: |
-          mkdir -p "${RUNNER_TEMP}/digests"
-          touch "${RUNNER_TEMP}/digests/${DIGEST#sha256:}"
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: digests-${{ matrix.arch }}
-          path: ${{ runner.temp }}/digests/*
-          if-no-files-found: error
-          retention-days: 1
-
-  # Tags the per-platform digests as a single multi-arch image. It is the
-  # required status check on master, so it runs even when a build fails (a job
-  # skipped through `needs` would count as passing) and fails itself in that
-  # case, without tagging anything.
   release:
-    needs: [build]
+    needs: [prepare, build]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
-    env:
-      ECR_REGISTRY: 313336455033.dkr.ecr.eu-west-1.amazonaws.com
-      ECR_REPOSITORY: doedensonline
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
@@ -143,12 +137,6 @@ jobs:
             echo "tag=$(echo "${BRANCH}" | tr '/' '-').$(git rev-parse --short "${SHA}")" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/download-artifact@v8
-        with:
-          path: ${{ runner.temp }}/digests
-          pattern: digests-*
-          merge-multiple: true
-
       - uses: docker/setup-buildx-action@v4
 
       - name: Configure AWS credentials
@@ -160,19 +148,16 @@ jobs:
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Tag multi-arch image in ECR
-        working-directory: ${{ runner.temp }}/digests
-        env:
-          TAG: ${{ steps.tag.outputs.tag }}
-        run: |
-          sources=()
-          for digest in *; do
-            sources+=("${ECR_REGISTRY}/${ECR_REPOSITORY}@sha256:${digest}")
-          done
-          docker buildx imagetools create \
-            -t "${ECR_REGISTRY}/${ECR_REPOSITORY}:${TAG}" \
-            "${sources[@]}"
-          docker buildx imagetools inspect "${ECR_REGISTRY}/${ECR_REPOSITORY}:${TAG}"
+      # This step assumes that all layers are cached in the build stage and
+      # therefore nothing actually gets built.
+      - name: Build and push multi-arch image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./src
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.ECR_IMAGE }}:${{ steps.tag.outputs.tag }}
+          cache-from: ${{ needs.prepare.outputs.cache-from-all }}
 
   tofu-fmt:
     runs-on: ubuntu-latest
@@ -212,8 +197,6 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     env:
-      ECR_REGISTRY: 313336455033.dkr.ecr.eu-west-1.amazonaws.com
-      ECR_REPOSITORY: doedensonline
       APP_STATE_PATH: /app-state/dev
     steps:
       - name: Configure SSH
@@ -239,7 +222,7 @@ jobs:
           ssh "root@${SSH_HOST}" bash -se <<REMOTE
           set -euo pipefail
 
-          IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}:${TAG}"
+          IMAGE="${ECR_IMAGE}:${TAG}"
 
           docker pull "\${IMAGE}"
           docker rm -f doedensonline-dev 2>/dev/null || true
@@ -268,8 +251,6 @@ jobs:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     env:
-      ECR_REGISTRY: 313336455033.dkr.ecr.eu-west-1.amazonaws.com
-      ECR_REPOSITORY: doedensonline
       APP_STATE_PATH: /app-state/prod
     steps:
       - name: Configure SSH
@@ -295,7 +276,7 @@ jobs:
           ssh "root@${SSH_HOST}" bash -se <<REMOTE
           set -euo pipefail
 
-          IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}:${TAG}"
+          IMAGE="${ECR_IMAGE}:${TAG}"
 
           docker pull "\${IMAGE}"
           docker rm -f doedensonline-prod 2>/dev/null || true
