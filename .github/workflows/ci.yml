@@ -7,9 +7,8 @@ on:
   release:
     types: [published]
 
-# A new push to a pull request cancels its superseded run. Master pushes and
-# releases each get their own group, so every commit still builds and publishes
-# its image.
+# Master pushes and releases get their own group, only PR pushes cancel
+# earlier started builds.
 concurrency:
   group: ci-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: true
@@ -194,8 +193,6 @@ jobs:
   deploy-dev:
     needs: [release, tofu-fmt, ansible-lint]
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    # One deploy at a time; a newer deploy waiting in line replaces an older
-    # waiting one, but never cancels a running one.
     concurrency:
       group: deploy-dev
       cancel-in-progress: false
