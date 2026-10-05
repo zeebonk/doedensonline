@@ -39,7 +39,6 @@ jobs:
             done
           }
 
-          # ECR requires the cache to be stored as an OCI image manifest.
           {
             for arch in amd64 arm64; do
               printf 'cache-from-%s<<EOF\n%s\nEOF\n' "${arch}" "$(from "${arch}")"
