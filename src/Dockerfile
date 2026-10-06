@@ -1,4 +1,4 @@
-FROM ruby:3.1.7-alpine
+FROM ruby:3.3.12-alpine
 
 WORKDIR /app
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
@@ -16,11 +16,11 @@ RUN apk add --no-cache \
         nodejs \
         tzdata
 
-RUN gem update --system 3.6.9 --no-document \
+RUN gem update --system 4.0.22 --no-document \
     && bundle config set --global build.sqlite3 --enable-system-libraries
 
 COPY Gemfile Gemfile.lock ./
-RUN BUNDLE_FROZEN=true bundle _2.6.9_ install
+RUN BUNDLE_FROZEN=true bundle _4.0.22_ install
 
 COPY . .
 
