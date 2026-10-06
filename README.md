@@ -86,27 +86,34 @@ Releases are automated via GitHub Actions:
 - **Dev** — every push to `master` builds and pushes the image to ECR, then
   SSHes into the Hetzner dev host and replaces the running container.
 - **Prod** — publishing a GitHub Release builds and pushes an image tagged with
-  the release tag, then SSHes into the AWS EC2 prod host and replaces the
-  running container.
+  the release tag, then SSHes into the Hetzner host and replaces the running
+  prod container.
 
 Both flows run the test, RuboCop, ansible-lint, and `tofu fmt` jobs first; a
 failure in any of those blocks the deploy.
 
-### Manual deploy via Ansible
+### Roll back
 
-The Ansible playbook is still available for one-off runs (e.g. to re-converge
-host config or roll back to a specific image). Pass the target group via
-`-e target=<group>` and the image tag via `-e image_tag=<tag>`:
+Re-run the `deploy-prod` (or `deploy-dev`) job of the workflow run that
+deployed the version to roll back to. A re-run reuses that run's image tag, so
+it redeploys that image.
+
+### Provision hosts via Ansible
+
+The playbook converges the host-level config the deploy jobs rely on
+(packages, Docker, ECR pull credentials, the Cloudflare tunnel); it doesn't
+deploy the application. Run it after `tofu apply`, and on a fresh host before
+its first deploy. Pass the target group via `-e target=<group>`:
 
 ```
 cd iac
 uv sync
-uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=prod -e image_tag=1.0.5
-uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=dev -e image_tag=master.abc1234
+uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=prod
+uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=dev
 ```
 
 To dry-run and preview changes:
 
 ```
-uv run ansible-playbook -i inventory.yaml playbook.yaml --check --diff -e target=prod -e image_tag=1.0.5
+uv run ansible-playbook -i inventory.yaml playbook.yaml --check --diff -e target=prod
 ```

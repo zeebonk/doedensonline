@@ -11,40 +11,6 @@
         - python3-requests  # Required by the Docker module
        state: present
 
-   - name: Ensure /app-state has the right permissions
-     ansible.builtin.file:
-       path: /app-state
-       owner: root
-       group: root
-       state: directory
-       mode: '777'  # TODO: better permissions
-
-   - name: Ensure app state subdirectories exist
-     ansible.builtin.file:
-       path: "{{ app_state_path }}/{{ item }}"
-       state: directory
-       owner: root
-       group: root
-       mode: '777'  # TODO: better permissions
-     loop:
-       - db
-       - small
-       - medium
-       - large
-
-   - name: Ensure sqlite database files exist
-     ansible.builtin.file:
-       path: "{{ app_state_path }}/db/{{ item }}.sqlite3"
-       state: touch
-       owner: root
-       group: root
-       mode: '777'  # TODO: better permissions
-       modification_time: preserve
-       access_time: preserve
-     loop:
-       - development
-       - production
-
    - name: Ensure Docker is running
      ansible.builtin.service:
        enabled: true
@@ -81,40 +47,6 @@
        group: root
        mode: '0600'
      no_log: true
-
-   - name: Ensure the webserver is running
-     community.docker.docker_container:
-       name: "doedensonline-{{ instance }}"
-       image: "313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:{{ image_tag | mandatory }}"
-       restart_policy: always
-       published_ports: "{{ host_ports | map('regex_replace', '^(.*)$', '0.0.0.0:\\1:8080') | list }}"
-       env:
-         RAILS_ENV: "{{ rails_env }}"
-         DO_SMTP_HOST: "{{ smtp_host }}"
-         DO_SMTP_USERNAME: "{{ smtp_username }}"
-         DO_SMTP_PASSWORD: "{{ smtp_password }}"
-       volumes:
-        - "{{ app_state_path }}/db/development.sqlite3:/app/db/development.sqlite3:rw"
-        - "{{ app_state_path }}/db/production.sqlite3:/app/db/production.sqlite3:rw"
-        - "{{ app_state_path }}/small/:/app/public/images/small/"
-        - "{{ app_state_path }}/medium/:/app/public/images/medium/"
-        - "{{ app_state_path }}/large/:/app/public/images/large/"
-
-   - name: Ensure database schema is up to date
-     community.docker.docker_container_exec:
-       container: "doedensonline-{{ instance }}"
-       command: bundle exec rails db:migrate
-       env:
-         RAILS_ENV: "{{ rails_env }}"
-     when: rails_env == 'development'
-
-   - name: Ensure database is seeded
-     community.docker.docker_container_exec:
-       container: "doedensonline-{{ instance }}"
-       command: bundle exec rails db:seed
-       env:
-         RAILS_ENV: "{{ rails_env }}"
-     when: rails_env == 'development'
 
    - name: Ensure cloudflared tunnel is running
      community.docker.docker_container:
