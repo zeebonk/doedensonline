@@ -3,7 +3,7 @@ plugins:
 
 AllCops:
   TargetRubyVersion: 2.7
-  TargetRailsVersion: 6.0
+  TargetRailsVersion: 6.1
   NewCops: enable
   SuggestExtensions: false
   Exclude:
