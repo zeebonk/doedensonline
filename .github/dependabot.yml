@@ -1,18 +1,18 @@
 version: 2
 
 # Not covered on purpose:
-# - bundler (src/): every gem is exact-pinned and the app is on an EOL Ruby
-#   (3.1) and an old Rails, so most current gem releases need a newer Ruby or
-#   Rails and can't be installed. Dependabot would mostly open PRs that fail,
-#   and ignore rules would have to cover most of the Gemfile and be updated on
-#   every upgrade. Gems are upgraded by hand alongside Rails/Ruby upgrades (see
-#   the plan-rails-upgrade skill and CLAUDE.md). Reconsider once the app is on
-#   a supported Ruby and Rails.
-# - docker (src/Dockerfile): the only dependency is the ruby:3.1.7-alpine
-#   base image. Ruby 3.1 is EOL, so no newer 3.1.x tags will appear, and any
-#   tag Dependabot could propose (ruby:3.2+) is a Ruby upgrade that breaks the
-#   Gemfile's `ruby '3.1.7'`. Add this back (ignoring major and minor
-#   versions) once the app is on a supported Ruby.
+# - bundler (src/): every gem is exact-pinned and the app is on an EOL Rails
+#   (7.0), so many current gem releases need a newer Rails and can't be
+#   installed. Dependabot would mostly open PRs that fail, and ignore rules
+#   would have to cover most of the Gemfile and be updated on every upgrade.
+#   Gems are upgraded by hand alongside Rails/Ruby upgrades (see the
+#   plan-rails-upgrade skill and CLAUDE.md). Reconsider once the app is on a
+#   supported Rails (8.x).
+# - docker (src/Dockerfile): the only dependency is the ruby:3.3.12-alpine
+#   base image. Ruby 3.3 is supported, so newer 3.3.x tags will appear, but
+#   the Gemfile pins `ruby '3.3.12'` exactly, so a base-image bump on its own
+#   would break `bundle install`. Add this back (ignoring major and minor
+#   versions) once the Gemfile accepts 3.3.x patch releases.
 # - docker-compose: docker-compose.yml only references our own ECR image.
 # - mise.toml: Dependabot has no mise ecosystem, so the tool versions pinned
 #   there (python, uv, opentofu, docker-compose) are bumped by hand.
