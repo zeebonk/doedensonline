@@ -16,7 +16,6 @@ RUN apk add --no-cache \
         nodejs \
         tzdata
 
-# RubyGems 3.6.9 ships Bundler 2.6.9 as its default bundler.
 RUN gem update --system 3.6.9 --no-document \
     && bundle config set --global build.sqlite3 --enable-system-libraries
 
