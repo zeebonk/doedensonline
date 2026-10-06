@@ -1,6 +1,6 @@
 ---
 name: plan-rails-upgrade
-description: Plan the upgrade of the Rails app in src/ to the next Rails minor version (latest patch), including matching Ruby and dependency upgrades, and file the plan as a GitHub issue.
+description: Plan the upgrade of the Rails app in src/ to the next Rails minor version (latest patch), including matching Ruby and dependency upgrades, and file the plan as a GitHub issue. A paper exercise based on release notes and the codebase; it doesn't build or run anything.
 ---
 
 Create a plan for upgrading Rails to the next minor version (latest patch).
@@ -13,9 +13,16 @@ Include, when relevant:
 
 Put the plan in a Github issue.
 
+## Paper exercise only
+
+Base the plan on two things: the published docs (release notes, upgrade guides, gem CHANGELOGs, RubyGems metadata) and a read-through of the codebase. Fix whatever issues those don't reveal while executing the plan, not while planning it.
+
+- Allowed: reading and grepping the repo, fetching docs, querying the RubyGems API.
+- Not allowed: building images, running containers, running `bundle`, running tests, copying `src/` into a scratch copy, or editing any files in the repo.
+- If you can't settle something on paper (e.g. whether the lockfile resolves, or whether a gem's behaviour change affects us), don't try it out. List it under **Open questions / verify during execution**: say what to check and what to do for each outcome.
+
 ## Notes from previous runs
 
-- Earlier plans to use as a structure reference: #154 (4.1 → 4.2) and #196 (5.0 → 5.1).
-- Follow the Docker-only workflow in `CLAUDE.md`. There is no Ruby on the host.
-- Validate the plan with a throwaway spike before filing it. Copy `src/` into `.context/`, build it under a separate image tag (not the compose `latest` tag), run `bundle lock --update` with the candidate Gemfile, then run the tests, RuboCop, i18n-tasks, and a production eager-load/Puma boot. Report the results in the issue.
-- To find the newest gem version that still supports the app's Ruby, query the RubyGems API (`/api/v1/versions/<gem>.json`, field `ruby_version`). Run the query from inside a `ruby:<version>` container so you can use `Gem::Requirement`.
+- Earlier plans to use as a structure reference: #154 (4.1 → 4.2) and #196 (5.0 → 5.1). Leave out #196's "Validation spike" section. Plans no longer include a spike.
+- The plan's execution steps must follow the Docker-only workflow in `CLAUDE.md`. There is no Ruby on the host.
+- To find the newest gem version that still supports the app's Ruby, `curl` the RubyGems API (`/api/v1/versions/<gem>.json`, field `ruby_version`) and read the requirements. Don't start a container to evaluate them.
