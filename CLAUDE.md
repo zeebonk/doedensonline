@@ -105,17 +105,16 @@ Cloudflare tunnels, AWS SES/IAM, GitHub Actions secrets) **and** writes a
 local `iac/inventory.yaml` via a `local_file` resource. This generated file is
 the bridge between Terraform and Ansible:
 
-- Terraform owns infra-level facts: server IPs, tunnel tokens, SES SMTP
-  credentials, ECR access keys, per-instance vars (`rails_env`,
-  `app_state_path`, `host_ports`, etc.).
+- Terraform owns infra-level facts: server IPs, tunnel tokens, ECR access
+  keys, the per-instance `instance` name.
 - It serializes those facts into `iac/inventory.yaml` as a standard Ansible
   inventory with `prod` and `dev` groups.
-- Ansible (`playbook.yaml`, `sync.yaml`) then consumes that inventory to
-  provision/converge the same VMs:
+- Ansible (`playbook.yaml`) then consumes that inventory to provision/converge
+  the same VMs:
 
   ```
   cd iac
-  uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=prod -e image_tag=...
+  uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=prod
   ```
 
 Implications:
@@ -124,10 +123,15 @@ Implications:
   edit it by hand and don't commit it — changes will be overwritten on the
   next `tofu apply`. To change inventory contents, edit the `local_file
   "inventory"` block in `main.tf`.
-- **It contains secrets** (SMTP password, ECR keys, Cloudflare tunnel tokens).
+- **It contains secrets** (ECR keys, Cloudflare tunnel tokens).
   Don't paste its contents into chats, PRs, or logs.
 - **`tofu apply` must run before Ansible** on a fresh checkout — without it
   there is no inventory file for the playbook to read.
 - New host-level variables that Ansible needs should be added to the
   `local_file "inventory"` block so they flow through automatically, rather
   than being hardcoded in the playbook.
+- **The playbook doesn't deploy the app.** It only sets up the host (packages,
+  Docker, ECR pull credentials, the Cloudflare tunnel). The app container,
+  its state directories and SQLite file, migrations and seeding are owned by
+  the `deploy-dev`/`deploy-prod` jobs in `.github/workflows/ci.yml`; change
+  per-environment deploy settings (`RAILS_ENV`, ports, mounts, env vars) there.

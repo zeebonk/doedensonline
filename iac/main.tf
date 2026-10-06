@@ -248,17 +248,11 @@ resource "local_file" "inventory" {
     "prod" : {
       "vars" : {
         "instance" : "prod",
-        "rails_env" : "production",
-        "app_state_path" : "/app-state/prod",
-        "host_ports" : [8081],
       },
       "hosts" : {
         "prod-webserver" : {
           "ansible_host" : hcloud_server.doedensonline.ipv4_address,
           "ansible_user" : "root",
-          "smtp_host" : "email-smtp.${local.region}.amazonaws.com",
-          "smtp_username" : module.iam_user_doedensonline_ses.access_key_id,
-          "smtp_password" : module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4,
           "ecr_access_key_id" : aws_iam_access_key.doedensonline_dev.id,
           "ecr_secret_access_key" : aws_iam_access_key.doedensonline_dev.secret,
           "cloudflared_tunnel_token" : data.cloudflare_zero_trust_tunnel_cloudflared_token.prod.token,
@@ -268,17 +262,11 @@ resource "local_file" "inventory" {
     "dev" : {
       "vars" : {
         "instance" : "dev",
-        "rails_env" : "development",
-        "app_state_path" : "/app-state/dev",
-        "host_ports" : [8080],
       },
       "hosts" : {
         "dev-webserver" : {
           "ansible_host" : hcloud_server.doedensonline.ipv4_address,
           "ansible_user" : "root",
-          "smtp_host" : "email-smtp.${local.region}.amazonaws.com",
-          "smtp_username" : module.iam_user_doedensonline_ses.access_key_id,
-          "smtp_password" : module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4,
           "ecr_access_key_id" : aws_iam_access_key.doedensonline_dev.id,
           "ecr_secret_access_key" : aws_iam_access_key.doedensonline_dev.secret,
           "cloudflared_tunnel_token" : data.cloudflare_zero_trust_tunnel_cloudflared_token.dev.token,
