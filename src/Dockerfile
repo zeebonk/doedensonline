@@ -24,4 +24,7 @@ RUN BUNDLE_FROZEN=true bundle _2.6.9_ install
 
 COPY . .
 
-RUN bundle exec rails assets:precompile RAILS_ENV=production
+# Booting production needs a secret_key_base (config/initializers/
+# cookie_rotator.rb reads it), but precompiling assets doesn't use it; the real
+# one is only passed in at runtime.
+RUN SECRET_KEY_BASE=dummy bundle exec rails assets:precompile RAILS_ENV=production

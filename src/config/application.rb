@@ -10,7 +10,7 @@ require 'action_mailer/railtie'
 # require 'action_mailbox/engine'
 # require 'action_text/engine'
 require 'action_view/railtie'
-require 'action_cable/engine'
+# require 'action_cable/engine'
 require 'sprockets/railtie'
 require 'rails/test_unit/railtie'
 
@@ -18,7 +18,7 @@ Bundler.require(*Rails.groups)
 
 module DoedensOnline
   class Application < Rails::Application
-    config.load_defaults 6.1
+    config.load_defaults 7.0
 
     config.encoding = 'utf-8'
     config.time_zone = 'Amsterdam'
