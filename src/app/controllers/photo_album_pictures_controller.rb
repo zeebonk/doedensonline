@@ -9,7 +9,7 @@ class PhotoAlbumPicturesController < ApplicationController
 
   # POST /photo_albums/:photo_album_id/pictures
   def create
-    files = Array(params['file']).reject(&:blank?)
+    files = Array(params['file']).compact_blank
 
     if files.empty?
       flash.now[:error] = t('flash.photo_albums.no_pictures_selected_upload')

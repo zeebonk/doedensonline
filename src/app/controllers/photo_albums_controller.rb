@@ -33,7 +33,7 @@ class PhotoAlbumsController < ApplicationController
     @photo_album = PhotoAlbum.new(title: album_params[:title], description: album_params[:description])
     @photo_album.user_id = current_user.id
 
-    files = Array(album_params[:pictures]).reject(&:blank?)
+    files = Array(album_params[:pictures]).compact_blank
 
     @photo_album.valid?
     @photo_album.errors.add(:pictures, t('flash.photo_albums_errors.no_pictures_selected')) if files.empty?
