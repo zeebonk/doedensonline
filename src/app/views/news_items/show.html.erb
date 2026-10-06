@@ -16,8 +16,7 @@
   <div class="balloon-top">
     <div class="balloon-bottom">
       <div class="date-container">
-      <% Time::DATE_FORMATS[:article_date] = "<span class='day'>%d</span><span class='month-year'>%B<br/>%Y</span>" %>
-      <%= @news_item.created_at.to_s(:article_date).html_safe %>
+      <%= @news_item.created_at.to_fs(:article_date).html_safe %>
       </div>
       <%= rich_text(@news_item.message) %>
       <% if @news_item.user_id == @current_user.id %>
