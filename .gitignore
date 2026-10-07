@@ -12,6 +12,7 @@ src/public/images/small/*
 !src/public/images/small/.keep
 src/db/*.sqlite3
 src/db/*.sqlite3-journal
+src/storage/
 src/log/
 src/tmp/
 src/public/assets/
