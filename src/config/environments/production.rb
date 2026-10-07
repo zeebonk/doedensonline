@@ -8,7 +8,7 @@ DoedensOnline::Application.configure do
 
   config.public_file_server.enabled = true
 
-  config.assets.js_compressor = :uglifier
+  config.assets.js_compressor = :terser
   config.assets.compile = false
   config.assets.digest = true
 
