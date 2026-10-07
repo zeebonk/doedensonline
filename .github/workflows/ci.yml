@@ -227,8 +227,6 @@ jobs:
           IMAGE="${ECR_IMAGE}:${TAG}"
 
           mkdir -p '${APP_STATE_PATH}'/{db,small,medium,large}
-          # Bind-mounting a missing file makes Docker create a directory there.
-          touch '${APP_STATE_PATH}/db/${RAILS_ENV}.sqlite3'
 
           docker pull "\${IMAGE}"
           docker rm -f doedensonline-dev 2>/dev/null || true
@@ -241,7 +239,7 @@ jobs:
             -e DO_SMTP_USERNAME='${SMTP_USERNAME}' \\
             -e DO_SMTP_PASSWORD='${SMTP_PASSWORD}' \\
             -e SECRET_KEY_BASE='${SECRET_KEY_BASE}' \\
-            -v '${APP_STATE_PATH}/db/${RAILS_ENV}.sqlite3:/app/db/${RAILS_ENV}.sqlite3:rw' \\
+            -v '${APP_STATE_PATH}/db/:/app/storage/' \\
             -v '${APP_STATE_PATH}/small/:/app/public/images/small/' \\
             -v '${APP_STATE_PATH}/medium/:/app/public/images/medium/' \\
             -v '${APP_STATE_PATH}/large/:/app/public/images/large/' \\
@@ -288,8 +286,6 @@ jobs:
           IMAGE="${ECR_IMAGE}:${TAG}"
 
           mkdir -p '${APP_STATE_PATH}'/{db,small,medium,large}
-          # Bind-mounting a missing file makes Docker create a directory there.
-          touch '${APP_STATE_PATH}/db/${RAILS_ENV}.sqlite3'
 
           docker pull "\${IMAGE}"
           docker rm -f doedensonline-prod 2>/dev/null || true
@@ -302,7 +298,7 @@ jobs:
             -e DO_SMTP_USERNAME='${SMTP_USERNAME}' \\
             -e DO_SMTP_PASSWORD='${SMTP_PASSWORD}' \\
             -e SECRET_KEY_BASE='${SECRET_KEY_BASE}' \\
-            -v '${APP_STATE_PATH}/db/${RAILS_ENV}.sqlite3:/app/db/${RAILS_ENV}.sqlite3:rw' \\
+            -v '${APP_STATE_PATH}/db/:/app/storage/' \\
             -v '${APP_STATE_PATH}/small/:/app/public/images/small/' \\
             -v '${APP_STATE_PATH}/medium/:/app/public/images/medium/' \\
             -v '${APP_STATE_PATH}/large/:/app/public/images/large/' \\
