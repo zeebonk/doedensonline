@@ -8,11 +8,11 @@ version: 2
 #   upgrade. Gems are upgraded by hand alongside Rails/Ruby upgrades (see the
 #   plan-rails-upgrade skill and CLAUDE.md). Reconsider at the Rails 8.1
 #   upgrade.
-# - docker (src/Dockerfile): the only dependency is the ruby:3.3.12-alpine
-#   base image. Ruby 3.3 is supported, so newer 3.3.x tags will appear, but
-#   the Gemfile pins `ruby '3.3.12'` exactly, so a base-image bump on its own
+# - docker (src/Dockerfile): the only dependency is the ruby:3.4.11-alpine
+#   base image. Ruby 3.4 is supported, so newer 3.4.x tags will appear, but
+#   the Gemfile pins `ruby '3.4.11'` exactly, so a base-image bump on its own
 #   would break `bundle install`. Add this back (ignoring major and minor
-#   versions) once the Gemfile accepts 3.3.x patch releases.
+#   versions) once the Gemfile accepts 3.4.x patch releases.
 # - docker-compose: docker-compose.yml only references our own ECR image.
 # - mise.toml: Dependabot has no mise ecosystem, so the tool versions pinned
 #   there (python, uv, opentofu, docker-compose) are bumped by hand.
