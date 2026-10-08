@@ -10,7 +10,7 @@ class UsersController < ApplicationController
 
   # GET /users/1
   def show
-    @user = User.find(params[:id])
+    @user = User.find(params.expect(:id))
   end
 
   # GET /users/new
@@ -20,7 +20,7 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
-    @user = User.find(params[:id])
+    @user = User.find(params.expect(:id))
   end
 
   # POST /users
@@ -37,7 +37,7 @@ class UsersController < ApplicationController
 
   # PUT /users/1
   def update
-    @user = User.find(params[:id])
+    @user = User.find(params.expect(:id))
 
     if @user.update(user_admin_params)
       flash[:notice] = t('flash.users.updated')
@@ -49,7 +49,7 @@ class UsersController < ApplicationController
 
   # DELETE /users/1
   def destroy
-    @user = User.find(params[:id])
+    @user = User.find(params.expect(:id))
     @user.destroy
 
     redirect_to(users_url)
@@ -58,10 +58,12 @@ class UsersController < ApplicationController
   private
 
   def user_admin_params
-    params.require(:user).permit(
-      :first_name, :last_name, :email,
-      :notify_news, :notify_photo_album,
-      :password, :isadmin
+    params.expect(
+      user: %i[
+        first_name last_name email
+        notify_news notify_photo_album
+        password isadmin
+      ]
     )
   end
 end

@@ -69,7 +69,7 @@ class NewsItemsController < ApplicationController
   private
 
   def news_item_params
-    params.require(:news_item).permit(:message)
+    params.expect(news_item: [:message])
   end
 
   def load_news_item

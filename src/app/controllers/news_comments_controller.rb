@@ -56,7 +56,7 @@ class NewsCommentsController < ApplicationController
   private
 
   def news_comment_params
-    params.require(:news_comment).permit(:message)
+    params.expect(news_comment: [:message])
   end
 
   def load_news_comment

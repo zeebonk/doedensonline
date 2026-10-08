@@ -91,7 +91,7 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
 
   test "update_notifications ignores params outside the notification scope" do
     original_email = @user.email
-    patch '/settings/update_notifications', params: { user: { email: 'not-an-email' } }
+    patch '/settings/update_notifications', params: { user: { notify_news: '1', email: 'not-an-email' } }
 
     assert_redirected_to controller: 'settings', action: 'notifications'
     assert_equal original_email, @user.reload.email

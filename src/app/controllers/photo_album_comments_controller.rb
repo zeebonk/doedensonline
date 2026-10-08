@@ -60,7 +60,7 @@ class PhotoAlbumCommentsController < ApplicationController
   private
 
   def photo_album_comment_params
-    params.require(:photo_album_comment).permit(:message)
+    params.expect(photo_album_comment: [:message])
   end
 
   def photo_album_from_id(id)

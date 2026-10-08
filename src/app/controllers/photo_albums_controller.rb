@@ -97,7 +97,7 @@ class PhotoAlbumsController < ApplicationController
   private
 
   def photo_album_params
-    params.require(:photo_album).permit(:title, :description)
+    params.expect(photo_album: %i[title description])
   end
 
   def load_photo_album
