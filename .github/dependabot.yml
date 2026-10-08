@@ -2,7 +2,7 @@ version: 2
 
 # Not covered on purpose:
 # - bundler (src/): every gem is exact-pinned and the app is on an EOL Rails
-#   (7.1), so many current gem releases need a newer Rails and can't be
+#   (7.2), so many current gem releases need a newer Rails and can't be
 #   installed. Dependabot would mostly open PRs that fail, and ignore rules
 #   would have to cover most of the Gemfile and be updated on every upgrade.
 #   Gems are upgraded by hand alongside Rails/Ruby upgrades (see the
