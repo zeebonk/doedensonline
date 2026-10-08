@@ -68,10 +68,10 @@ class SettingsController < ApplicationController
   private
 
   def profile_params
-    params.require(:user).permit(:first_name, :last_name, :email)
+    params.expect(user: %i[first_name last_name email])
   end
 
   def notification_params
-    params.require(:user).permit(:notify_news, :notify_photo_album)
+    params.expect(user: %i[notify_news notify_photo_album])
   end
 end
