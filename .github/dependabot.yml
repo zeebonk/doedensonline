@@ -1,13 +1,12 @@
 version: 2
 
 # Not covered on purpose:
-# - bundler (src/): every gem is exact-pinned and the app is on Rails 8.0,
-#   whose security support ends 2026-11-07. Some current gem releases can't
-#   be installed yet because Rails caps them (json, marcel). Dependabot would
-#   open PRs that fail, and ignore rules would have to be updated on every
-#   upgrade. Gems are upgraded by hand alongside Rails/Ruby upgrades (see the
-#   plan-rails-upgrade skill and CLAUDE.md). Reconsider at the Rails 8.1
-#   upgrade.
+# - bundler (src/): every gem is exact-pinned and the app is on Rails 8.1,
+#   whose security support ends 2027-10-10. One current gem release can't
+#   be installed yet because Rails caps it (marcel). Gems are upgraded by
+#   hand alongside Rails/Ruby upgrades (see the plan-rails-upgrade skill and
+#   CLAUDE.md). Re-enabling this, with ignore rules for marcel and for Rails
+#   minor/major bumps, is tracked as a follow-up of #243.
 # - docker (src/Dockerfile): the only dependency is the ruby:3.4.11-alpine
 #   base image. Ruby 3.4 is supported, so newer 3.4.x tags will appear, but
 #   the Gemfile pins `ruby '3.4.11'` exactly, so a base-image bump on its own

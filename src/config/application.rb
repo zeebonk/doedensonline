@@ -18,7 +18,7 @@ Bundler.require(*Rails.groups)
 
 module DoedensOnline
   class Application < Rails::Application
-    config.load_defaults 8.0
+    config.load_defaults 8.1
 
     config.encoding = 'utf-8'
     config.time_zone = 'Amsterdam'

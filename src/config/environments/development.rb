@@ -6,6 +6,7 @@ DoedensOnline::Application.configure do
   config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
   config.action_controller.raise_on_missing_callback_actions = true
+  config.action_dispatch.verbose_redirect_logs = true
 
   config.assets.debug = true
   config.assets.raise_runtime_errors = true
