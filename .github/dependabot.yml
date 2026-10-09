@@ -7,11 +7,11 @@ version: 2
 #   hand alongside Rails/Ruby upgrades (see the plan-rails-upgrade skill and
 #   CLAUDE.md). Re-enabling this, with ignore rules for marcel and for Rails
 #   minor/major bumps, is tracked as a follow-up of #243.
-# - docker (src/Dockerfile): the only dependency is the ruby:3.4.11-alpine
-#   base image. Ruby 3.4 is supported, so newer 3.4.x tags will appear, but
-#   the Gemfile pins `ruby '3.4.11'` exactly, so a base-image bump on its own
+# - docker (src/Dockerfile): the only dependency is the ruby:4.0.7-alpine
+#   base image. Ruby 4.0 is supported, so newer 4.0.x tags will appear, but
+#   the Gemfile pins `ruby '4.0.7'` exactly, so a base-image bump on its own
 #   would break `bundle install`. Add this back (ignoring major and minor
-#   versions) once the Gemfile accepts 3.4.x patch releases.
+#   versions) once the Gemfile accepts 4.0.x patch releases.
 # - docker-compose: docker-compose.yml only references our own ECR image.
 # - mise.toml: Dependabot has no mise ecosystem, so the tool versions pinned
 #   there (python, uv, opentofu, docker-compose) are bumped by hand.
