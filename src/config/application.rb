@@ -26,6 +26,9 @@ module DoedensOnline
 
     config.filter_parameters += [:password]
 
+    # Docker's health check requests /up every 30 seconds on the servers.
+    config.silence_healthcheck_path = '/up'
+
     config.assets.enabled = true
   end
 end

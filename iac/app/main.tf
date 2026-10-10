@@ -86,11 +86,19 @@ locals {
 
   container_env = [
     "RAILS_ENV=${local.env.rails_env}",
+    # Production always logs to STDOUT; this makes development (on dev) do it too.
+    "RAILS_LOG_TO_STDOUT=1",
     "DO_SMTP_HOST=${var.smtp_host}",
     "DO_SMTP_USERNAME=${var.smtp_username}",
     "DO_SMTP_PASSWORD=${var.smtp_password}",
     "SECRET_KEY_BASE=${var.secret_key_base}",
   ]
+
+  # Docker doesn't rotate json-file logs by default.
+  log_opts = {
+    max-size = "10m"
+    max-file = "5"
+  }
 }
 
 provider "aws" {
@@ -131,6 +139,9 @@ resource "docker_container" "migrate" {
   attach   = true
   must_run = false
 
+  log_driver = "json-file"
+  log_opts   = local.log_opts
+
   volumes {
     host_path      = "${local.state_path}/db"
     container_path = local.volumes.db
@@ -149,6 +160,21 @@ resource "docker_container" "app" {
   image   = docker_image.app.image_id
   restart = "always"
   env     = local.container_env
+
+  log_driver = "json-file"
+  log_opts   = local.log_opts
+
+  healthcheck {
+    test           = ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/up"]
+    interval       = "30s"
+    timeout        = "5s"
+    retries        = 3
+    start_period   = "30s"
+    start_interval = "1s"
+  }
+
+  wait         = true
+  wait_timeout = 60
 
   ports {
     internal = 8080
