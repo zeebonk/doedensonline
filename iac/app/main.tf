@@ -153,7 +153,7 @@ resource "docker_container" "app" {
   ports {
     internal = 8080
     external = local.env.port
-    ip       = "0.0.0.0"
+    ip       = "127.0.0.1"
   }
 
   dynamic "volumes" {
