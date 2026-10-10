@@ -17,6 +17,27 @@
        name: docker
        state: started
 
+   - name: Ensure Docker rotates container logs
+     ansible.builtin.copy:
+       content: |
+         {
+           "log-driver": "json-file",
+           "log-opts": {
+             "max-size": "10m",
+             "max-file": "5"
+           }
+         }
+       dest: /etc/docker/daemon.json
+       owner: root
+       group: root
+       mode: '0644'
+     notify: Restart Docker
+
+   # Restart before the containers below are created, so they get the log
+   # settings.
+   - name: Flush handlers
+     ansible.builtin.meta: flush_handlers
+
    - name: Ensure ~/.docker/ exists
      file:
        path: ~/.docker/
@@ -57,3 +78,10 @@
        command: tunnel --no-autoupdate run --token {{ cloudflared_tunnel_token }}
      when: cloudflared_tunnel_token is defined
      no_log: true
+
+  handlers:
+
+   - name: Restart Docker
+     ansible.builtin.service:
+       name: docker
+       state: restarted

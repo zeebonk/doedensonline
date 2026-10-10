@@ -150,6 +150,18 @@ resource "docker_container" "app" {
   restart = "always"
   env     = local.container_env
 
+  healthcheck {
+    test           = ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/up"]
+    interval       = "30s"
+    timeout        = "5s"
+    retries        = 3
+    start_period   = "30s"
+    start_interval = "1s"
+  }
+
+  wait         = true
+  wait_timeout = 60
+
   ports {
     internal = 8080
     external = local.env.port

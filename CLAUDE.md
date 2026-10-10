@@ -131,9 +131,9 @@ Implications:
   `local_file "inventory"` block so they flow through automatically, rather
   than being hardcoded in the playbook.
 - **The playbook doesn't deploy the app.** It only sets up the host (packages,
-  Docker, ECR pull credentials, the Cloudflare tunnel). The app container,
-  its state directories and SQLite file, migrations and seeding are owned by
-  the separate `iac/app/` root module (kreuzwerker/docker provider, one
-  OpenTofu workspace per environment), which the `deploy` job in
+  Docker and its log rotation, ECR pull credentials, the Cloudflare tunnel).
+  The app container, its state directories and SQLite file, migrations and
+  seeding are owned by the separate `iac/app/` root module (kreuzwerker/docker
+  provider, one OpenTofu workspace per environment), which the `deploy` job in
   `.github/workflows/ci.yml` applies. Change per-environment deploy settings
   (`RAILS_ENV`, ports, mounts, env vars) in `iac/app/main.tf`.

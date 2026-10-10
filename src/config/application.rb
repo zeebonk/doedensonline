@@ -26,6 +26,11 @@ module DoedensOnline
 
     config.filter_parameters += [:password]
 
+    config.logger = ActiveSupport::TaggedLogging.logger($stdout)
+    config.log_tags = [:request_id]
+
+    config.silence_healthcheck_path = '/up'
+
     config.assets.enabled = true
   end
 end

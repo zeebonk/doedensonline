@@ -9,6 +9,7 @@ DoedensOnline::Application.configure do
   config.public_file_server.enabled = true
 
   config.hosts = ['doedensonline.nl']
+  config.host_authorization = { exclude: ->(request) { request.path == '/up' } }
   config.assume_ssl = true
 
   config.assets.js_compressor = :terser
@@ -16,6 +17,8 @@ DoedensOnline::Application.configure do
   config.assets.digest = true
 
   config.i18n.fallbacks = true
+
+  config.log_level = ENV.fetch('RAILS_LOG_LEVEL', 'info')
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {

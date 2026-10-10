@@ -31,6 +31,8 @@ DoedensOnline::Application.routes.draw do
 
   post 'csp_reports', to: 'csp_reports#create'
 
+  get 'up', to: 'rails/health#show', as: :rails_health_check
+
   get  'settings',                      to: 'settings#index'
   get  'settings/profile',              to: 'settings#profile'
   get  'settings/password',             to: 'settings#password'

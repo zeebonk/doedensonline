@@ -98,10 +98,11 @@ Layout/EndAlignment:
 Metrics/BlockNesting:
   Enabled: false
 
-# The routes DSL is a single big block by design.
+# The routes DSL and the environment configs are single big blocks by design.
 Metrics/BlockLength:
   Exclude:
     - 'config/routes.rb'
+    - 'config/environments/*.rb'
 
 # The app has a single `Mailer` and no ApplicationMailer base class.
 Rails/ApplicationMailer:
