@@ -150,8 +150,6 @@ resource "docker_container" "app" {
   restart = "always"
   env     = local.container_env
 
-  # Only cloudflared, which runs on the host network, needs to reach the app.
-  # Docker's port publishing bypasses host firewalls, so don't rely on one.
   ports {
     internal = 8080
     external = local.env.port
