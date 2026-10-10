@@ -189,6 +189,36 @@ module "ecr_push_policy" {
   policy = data.aws_iam_policy_document.ecr_push_policy_document.json
 }
 
+# State of the ../app root module, one object per workspace.
+data "aws_iam_policy_document" "deploy_state_policy_document" {
+  statement {
+    sid       = "AllowListStateBucket"
+    actions   = ["s3:ListBucket"]
+    resources = ["arn:aws:s3:::doedensonline-terraform"]
+  }
+  statement {
+    sid = "AllowDeployState"
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+    resources = [
+      "arn:aws:s3:::doedensonline-terraform/env:/*/deploy",
+      "arn:aws:s3:::doedensonline-terraform/env:/*/deploy.tflock",
+    ]
+  }
+}
+
+module "deploy_state_policy" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-policy"
+
+  name = "DeployState"
+  path = "/"
+
+  policy = data.aws_iam_policy_document.deploy_state_policy_document.json
+}
+
 resource "aws_iam_openid_connect_provider" "github_actions" {
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
@@ -226,7 +256,8 @@ module "iam_role_github_actions" {
   }
 
   policies = {
-    ECRPush = module.ecr_push_policy.arn
+    ECRPush     = module.ecr_push_policy.arn
+    DeployState = module.deploy_state_policy.arn
   }
 }
 

@@ -157,7 +157,7 @@ jobs:
           tags: ${{ env.ECR_IMAGE }}:${{ steps.tag.outputs.tag }}
           cache-from: ${{ needs.prepare.outputs.cache-from }}
 
-  tofu-fmt:
+  tofu:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -170,11 +170,25 @@ jobs:
       - name: Check OpenTofu formatting
         run: tofu fmt -check -recursive
 
+      - name: Validate server module
+        working-directory: iac/server
+        run: |
+          tofu init -backend=false -input=false
+          tofu validate
+
+      # The app module only evaluates in the dev and prod workspaces.
+      - name: Validate app module
+        working-directory: iac/app
+        run: |
+          tofu init -backend=false -input=false
+          TF_WORKSPACE=dev tofu validate
+          TF_WORKSPACE=prod tofu validate
+
   ansible-lint:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: iac
+        working-directory: iac/server
     steps:
       - uses: actions/checkout@v7
 
@@ -190,21 +204,40 @@ jobs:
         run: |
           uv run ansible-playbook --syntax-check -i localhost, -e target=localhost playbook.yaml
 
-  deploy-dev:
-    needs: [release, tofu-fmt, ansible-lint]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+  # Master pushes deploy to dev, releases to prod.
+  deploy:
+    needs: [release, tofu, ansible-lint]
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'release'
     concurrency:
-      group: deploy-dev
+      # The env context isn't available here.
+      group: deploy-${{ github.event_name == 'release' && 'prod' || 'dev' }}
       cancel-in-progress: false
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     env:
-      APP_STATE_PATH: /app-state/dev
-      RAILS_ENV: development
+      ENVIRONMENT: ${{ github.event_name == 'release' && 'prod' || 'dev' }}
+      # Prefix of the environment's GitHub Actions secrets.
+      SECRETS: ${{ github.event_name == 'release' && 'PROD' || 'DEV' }}
+    defaults:
+      run:
+        working-directory: iac/app
     steps:
+      - uses: actions/checkout@v7
+
+      - uses: jdx/mise-action@v5
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::313336455033:role/github-actions
+          aws-region: eu-west-1
+
       - name: Configure SSH
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
-          SSH_HOST: ${{ secrets.DEV_SSH_HOST }}
+          SSH_PRIVATE_KEY: ${{ secrets[format('{0}_SSH_PRIVATE_KEY', env.SECRETS)] }}
+          SSH_HOST: ${{ secrets[format('{0}_SSH_HOST', env.SECRETS)] }}
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
@@ -212,97 +245,28 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H "${SSH_HOST}" >> ~/.ssh/known_hosts
 
-      - name: Deploy to dev
-        env:
-          SSH_HOST: ${{ secrets.DEV_SSH_HOST }}
-          TAG: ${{ needs.release.outputs.tag }}
-          SMTP_HOST: ${{ secrets.DEV_SMTP_HOST }}
-          SMTP_USERNAME: ${{ secrets.DEV_SMTP_USERNAME }}
-          SMTP_PASSWORD: ${{ secrets.DEV_SMTP_PASSWORD }}
-          SECRET_KEY_BASE: ${{ secrets.DEV_SECRET_KEY_BASE }}
+      - name: Initialize OpenTofu
         run: |
-          ssh "root@${SSH_HOST}" bash -se <<REMOTE
-          set -euo pipefail
+          tofu init -input=false
+          tofu workspace select -or-create "${ENVIRONMENT}"
 
-          IMAGE="${ECR_IMAGE}:${TAG}"
-
-          mkdir -p '${APP_STATE_PATH}'/{db,small,medium,large}
-
-          docker pull "\${IMAGE}"
-          docker rm -f doedensonline-dev 2>/dev/null || true
-          docker run -d \\
-            --name doedensonline-dev \\
-            --restart always \\
-            -p 0.0.0.0:8080:8080 \\
-            -e RAILS_ENV='${RAILS_ENV}' \\
-            -e DO_SMTP_HOST='${SMTP_HOST}' \\
-            -e DO_SMTP_USERNAME='${SMTP_USERNAME}' \\
-            -e DO_SMTP_PASSWORD='${SMTP_PASSWORD}' \\
-            -e SECRET_KEY_BASE='${SECRET_KEY_BASE}' \\
-            -v '${APP_STATE_PATH}/db/:/app/storage/' \\
-            -v '${APP_STATE_PATH}/small/:/app/public/images/small/' \\
-            -v '${APP_STATE_PATH}/medium/:/app/public/images/medium/' \\
-            -v '${APP_STATE_PATH}/large/:/app/public/images/large/' \\
-            "\${IMAGE}"
-
-          docker exec -e RAILS_ENV='${RAILS_ENV}' doedensonline-dev bundle exec rails db:migrate
-          docker exec -e RAILS_ENV='${RAILS_ENV}' doedensonline-dev bundle exec rails db:seed
-          REMOTE
-
-  deploy-prod:
-    needs: [release, tofu-fmt, ansible-lint]
-    if: github.event_name == 'release'
-    concurrency:
-      group: deploy-prod
-      cancel-in-progress: false
-    runs-on: ubuntu-latest
-    env:
-      APP_STATE_PATH: /app-state/prod
-      RAILS_ENV: production
-    steps:
-      - name: Configure SSH
+      # TODO: Remove once dev and prod have both been deployed by OpenTofu.
+      # Containers started by the former SSH deploy aren't in the state and
+      # block OpenTofu from creating one with the same name.
+      - name: Remove container not managed by OpenTofu
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+          SSH_HOST: ${{ secrets[format('{0}_SSH_HOST', env.SECRETS)] }}
         run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          printf '%s\n' "${SSH_PRIVATE_KEY}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "${SSH_HOST}" >> ~/.ssh/known_hosts
+          if ! tofu state list docker_container.app >/dev/null 2>&1; then
+            ssh "root@${SSH_HOST}" docker rm -f "doedensonline-${ENVIRONMENT}" 2>/dev/null || true
+          fi
 
-      - name: Deploy to prod
+      - name: Deploy to ${{ env.ENVIRONMENT }}
         env:
-          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
-          TAG: ${{ needs.release.outputs.tag }}
-          SMTP_HOST: ${{ secrets.PROD_SMTP_HOST }}
-          SMTP_USERNAME: ${{ secrets.PROD_SMTP_USERNAME }}
-          SMTP_PASSWORD: ${{ secrets.PROD_SMTP_PASSWORD }}
-          SECRET_KEY_BASE: ${{ secrets.PROD_SECRET_KEY_BASE }}
-        run: |
-          ssh "root@${SSH_HOST}" bash -se <<REMOTE
-          set -euo pipefail
-
-          IMAGE="${ECR_IMAGE}:${TAG}"
-
-          mkdir -p '${APP_STATE_PATH}'/{db,small,medium,large}
-
-          docker pull "\${IMAGE}"
-          docker rm -f doedensonline-prod 2>/dev/null || true
-          docker run -d \\
-            --name doedensonline-prod \\
-            --restart always \\
-            -p 0.0.0.0:8081:8080 \\
-            -e RAILS_ENV='${RAILS_ENV}' \\
-            -e DO_SMTP_HOST='${SMTP_HOST}' \\
-            -e DO_SMTP_USERNAME='${SMTP_USERNAME}' \\
-            -e DO_SMTP_PASSWORD='${SMTP_PASSWORD}' \\
-            -e SECRET_KEY_BASE='${SECRET_KEY_BASE}' \\
-            -v '${APP_STATE_PATH}/db/:/app/storage/' \\
-            -v '${APP_STATE_PATH}/small/:/app/public/images/small/' \\
-            -v '${APP_STATE_PATH}/medium/:/app/public/images/medium/' \\
-            -v '${APP_STATE_PATH}/large/:/app/public/images/large/' \\
-            "\${IMAGE}"
-
-          docker exec -e RAILS_ENV='${RAILS_ENV}' doedensonline-prod bundle exec rails db:migrate
-          REMOTE
+          TF_VAR_ssh_host: ${{ secrets[format('{0}_SSH_HOST', env.SECRETS)] }}
+          TF_VAR_image_tag: ${{ needs.release.outputs.tag }}
+          TF_VAR_smtp_host: ${{ secrets[format('{0}_SMTP_HOST', env.SECRETS)] }}
+          TF_VAR_smtp_username: ${{ secrets[format('{0}_SMTP_USERNAME', env.SECRETS)] }}
+          TF_VAR_smtp_password: ${{ secrets[format('{0}_SMTP_PASSWORD', env.SECRETS)] }}
+          TF_VAR_secret_key_base: ${{ secrets[format('{0}_SECRET_KEY_BASE', env.SECRETS)] }}
+        run: tofu apply -input=false -auto-approve

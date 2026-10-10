@@ -1,7 +1,7 @@
 .terraform
 .venv
 inventory.yaml
-iac/terraform.tfvars
+iac/server/terraform.tfvars
 *.tfplan
 designs/
 src/public/images/large/*

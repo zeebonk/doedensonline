@@ -33,7 +33,7 @@ docker compose run --rm app bundle exec rubocop --auto-correct
 ## Lint Ansible playbooks
 
 ```
-cd iac
+cd iac/server
 uv sync --all-groups
 uv run ansible-lint playbook.yaml
 uv run ansible-playbook --syntax-check -i localhost, -e target=localhost playbook.yaml
@@ -46,7 +46,7 @@ Copy the Terraform variables template and paste your Hetzner Cloud API token
 (from the Hetzner Cloud console under Security → API Tokens, read-write scope):
 
 ```
-cd iac
+cd iac/server
 cp terraform.tfvars.example terraform.tfvars
 # edit terraform.tfvars and set hcloud_token
 ```
@@ -84,19 +84,37 @@ runners and only tags the combined multi-arch image once both succeed.
 Releases are automated via GitHub Actions:
 
 - **Dev** — every push to `master` builds and pushes the image to ECR, then
-  SSHes into the Hetzner dev host and replaces the running container.
+  applies `iac/app` in the `dev` workspace, which migrates and seeds the
+  database and replaces the running container.
 - **Prod** — publishing a GitHub Release builds and pushes an image tagged with
-  the release tag, then SSHes into the Hetzner host and replaces the running
-  prod container.
+  the release tag, then applies `iac/app` in the `prod` workspace, which
+  migrates the database and replaces the running prod container.
 
-Both flows run the test, RuboCop, ansible-lint, and `tofu fmt` jobs first; a
-failure in any of those blocks the deploy.
+Both flows run the test, RuboCop, ansible-lint, and OpenTofu format and
+validate jobs first; a failure in any of those blocks the deploy.
 
 ### Roll back
 
-Re-run the `deploy-prod` (or `deploy-dev`) job of the workflow run that
-deployed the version to roll back to. A re-run reuses that run's image tag, so
-it redeploys that image.
+Re-run the `deploy` job of the workflow run that deployed the version to
+roll back to. A re-run reuses that run's image tag, so it redeploys that
+image.
+
+### Deploy manually
+
+`iac/app` is a separate OpenTofu root module with its own state, one
+workspace per environment. It reaches Docker on the host over SSH as root.
+The variables mirror the `DEV_*`/`PROD_*` GitHub Actions secrets set by
+`iac/server/main.tf`:
+
+```
+cd iac/app
+export AWS_PROFILE=doedensonline
+tofu init
+tofu workspace select dev
+tofu apply -var image_tag=master.abc1234 -var ssh_host=... \
+    -var smtp_host=... -var smtp_username=... -var smtp_password=... \
+    -var secret_key_base=...
+```
 
 ### Provision hosts via Ansible
 
@@ -106,7 +124,7 @@ deploy the application. Run it after `tofu apply`, and on a fresh host before
 its first deploy. Pass the target group via `-e target=<group>`:
 
 ```
-cd iac
+cd iac/server
 uv sync
 uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=prod
 uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=dev
