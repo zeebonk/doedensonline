@@ -1,17 +1,6 @@
 version: 2
 
 # Not covered on purpose:
-# - bundler (src/): every gem is exact-pinned and the app is on Rails 8.1,
-#   whose security support ends 2027-10-10. One current gem release can't
-#   be installed yet because Rails caps it (marcel). Gems are upgraded by
-#   hand alongside Rails/Ruby upgrades (see the plan-rails-upgrade skill and
-#   CLAUDE.md). Re-enabling this, with ignore rules for marcel and for Rails
-#   minor/major bumps, is tracked as a follow-up of #243.
-# - docker (src/Dockerfile): the only dependency is the ruby:4.0.7-alpine
-#   base image. Ruby 4.0 is supported, so newer 4.0.x tags will appear, but
-#   the Gemfile pins `ruby '4.0.7'` exactly, so a base-image bump on its own
-#   would break `bundle install`. Add this back (ignoring major and minor
-#   versions) once the Gemfile accepts 4.0.x patch releases.
 # - docker-compose: docker-compose.yml only references our own ECR image.
 # - mise.toml: Dependabot has no mise ecosystem, so the tool versions pinned
 #   there (python, uv, opentofu, docker-compose) are bumped by hand.
@@ -42,3 +31,38 @@ updates:
     groups:
       opentofu:
         patterns: ["*"]
+
+  - package-ecosystem: bundler
+    directory: /src
+    schedule:
+      interval: weekly
+    groups:
+      bundler:
+        patterns: ["*"]
+    ignore:
+      # Active Storage 8.1 requires marcel ~> 1.0.
+      - dependency-name: marcel
+        versions: [">= 2"]
+      # Rails minor and major upgrades go through the plan-rails-upgrade
+      # skill; patch releases are fine to take from here. action* also
+      # matches action_text-trix, whose minor version Action Text caps anyway.
+      - dependency-name: rails
+        update-types: [version-update:semver-minor, version-update:semver-major]
+      - dependency-name: railties
+        update-types: [version-update:semver-minor, version-update:semver-major]
+      - dependency-name: action*
+        update-types: [version-update:semver-minor, version-update:semver-major]
+      - dependency-name: active*
+        update-types: [version-update:semver-minor, version-update:semver-major]
+
+  # Only Ruby patch releases of the base image, which the Gemfile's
+  # `ruby '~> x.y.z'` accepts. Minor and major Ruby upgrades also need the
+  # Gemfile, Gemfile.lock and RuboCop's TargetRubyVersion to move, so they go
+  # through the plan-rails-upgrade skill.
+  - package-ecosystem: docker
+    directory: /src
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: "*"
+        update-types: [version-update:semver-minor, version-update:semver-major]
