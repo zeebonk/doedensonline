@@ -250,17 +250,6 @@ jobs:
           tofu init -input=false
           tofu workspace select -or-create "${ENVIRONMENT}"
 
-      # TODO: Remove once dev and prod have both been deployed by OpenTofu.
-      # Containers started by the former SSH deploy aren't in the state and
-      # block OpenTofu from creating one with the same name.
-      - name: Remove container not managed by OpenTofu
-        env:
-          SSH_HOST: ${{ secrets[format('{0}_SSH_HOST', env.SECRETS)] }}
-        run: |
-          if ! tofu state list docker_container.app >/dev/null 2>&1; then
-            ssh "root@${SSH_HOST}" docker rm -f "doedensonline-${ENVIRONMENT}" 2>/dev/null || true
-          fi
-
       - name: Deploy to ${{ env.ENVIRONMENT }}
         env:
           TF_VAR_ssh_host: ${{ secrets[format('{0}_SSH_HOST', env.SECRETS)] }}
