@@ -23,4 +23,6 @@ DoedensOnline::Application.configure do
 
   config.active_support.deprecation = :stderr
   config.active_support.test_order = :random
+
+  config.log_level = ENV.fetch('RAILS_LOG_LEVEL', 'fatal')
 end

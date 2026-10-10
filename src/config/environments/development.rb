@@ -33,11 +33,4 @@ DoedensOnline::Application.configure do
   config.active_record.migration_error = :page_load
 
   config.log_level = :debug
-
-  # The dev server runs in development mode; log to STDOUT there like
-  # production does. Locally, logs keep going to log/development.log.
-  if ENV['RAILS_LOG_TO_STDOUT'].present?
-    config.logger = ActiveSupport::TaggedLogging.logger($stdout)
-    config.log_tags = [:request_id]
-  end
 end

@@ -26,7 +26,9 @@ module DoedensOnline
 
     config.filter_parameters += [:password]
 
-    # Docker's health check requests /up every 30 seconds on the servers.
+    config.logger = ActiveSupport::TaggedLogging.logger($stdout)
+    config.log_tags = [:request_id]
+
     config.silence_healthcheck_path = '/up'
 
     config.assets.enabled = true

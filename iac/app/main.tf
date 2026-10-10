@@ -86,8 +86,6 @@ locals {
 
   container_env = [
     "RAILS_ENV=${local.env.rails_env}",
-    # Production always logs to STDOUT; this makes development (on dev) do it too.
-    "RAILS_LOG_TO_STDOUT=1",
     "DO_SMTP_HOST=${var.smtp_host}",
     "DO_SMTP_USERNAME=${var.smtp_username}",
     "DO_SMTP_PASSWORD=${var.smtp_password}",

@@ -18,9 +18,6 @@ DoedensOnline::Application.configure do
 
   config.i18n.fallbacks = true
 
-  # Log to STDOUT, so `docker logs` shows the logs and Docker rotates them.
-  config.logger = ActiveSupport::TaggedLogging.logger($stdout)
-  config.log_tags = [:request_id]
   config.log_level = ENV.fetch('RAILS_LOG_LEVEL', 'info')
 
   config.action_mailer.delivery_method = :smtp
