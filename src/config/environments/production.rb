@@ -8,6 +8,9 @@ DoedensOnline::Application.configure do
 
   config.public_file_server.enabled = true
 
+  config.hosts = ['doedensonline.nl']
+  config.assume_ssl = true
+
   config.assets.js_compressor = :terser
   config.assets.compile = false
   config.assets.digest = true
