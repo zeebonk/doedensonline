@@ -10,12 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_01_120000) do
-  create_table "mailers", force: :cascade do |t|
-    t.datetime "created_at", precision: nil
-    t.datetime "updated_at", precision: nil
-  end
-
+ActiveRecord::Schema[8.1].define(version: 2026_10_10_120100) do
   create_table "news_comments", force: :cascade do |t|
     t.text "message"
     t.integer "news_item_id"
@@ -32,7 +27,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_01_120000) do
   end
 
   create_table "photo_album_comments", force: :cascade do |t|
-    t.string "message", limit: 255
+    t.text "message"
     t.integer "photo_album_id"
     t.integer "user_id"
     t.datetime "created_at", precision: nil
@@ -41,14 +36,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_01_120000) do
 
   create_table "photo_album_pictures", force: :cascade do |t|
     t.integer "photo_album_id"
-    t.string "filename", limit: 255
+    t.string "filename"
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
     t.integer "position"
   end
 
   create_table "photo_albums", force: :cascade do |t|
-    t.string "title", limit: 255
+    t.string "title"
     t.text "description"
     t.integer "user_id"
     t.datetime "created_at", precision: nil
@@ -56,10 +51,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_01_120000) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "first_name", limit: 255
-    t.string "last_name", limit: 255
-    t.string "email", limit: 255
-    t.string "password", limit: 255
+    t.string "first_name"
+    t.string "last_name"
+    t.string "email"
+    t.string "password"
     t.boolean "notify_news"
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
