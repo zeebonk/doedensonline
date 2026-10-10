@@ -83,7 +83,7 @@ For the test database use `-e RAILS_ENV=test`.
 ## Rails console / one-off commands
 
 ```
-docker compose run --rm app script/console
+docker compose run --rm app bin/rails console
 docker compose run --rm app <any command>
 ```
 
