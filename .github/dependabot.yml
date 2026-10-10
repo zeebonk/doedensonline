@@ -26,7 +26,7 @@ updates:
         patterns: ["*"]
 
   - package-ecosystem: uv
-    directory: /iac
+    directory: /iac/server
     schedule:
       interval: weekly
     groups:
@@ -34,7 +34,9 @@ updates:
         patterns: ["*"]
 
   - package-ecosystem: opentofu
-    directory: /iac
+    directories:
+      - /iac/server
+      - /iac/app
     schedule:
       interval: weekly
     groups:

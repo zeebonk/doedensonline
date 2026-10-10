@@ -100,26 +100,26 @@ docker compose run --rm app <any command>
 
 # Infrastructure: Terraform → Ansible handoff
 
-Terraform (`iac/main.tf`) provisions the cloud resources (Hetzner VMs,
+Terraform (`iac/server/main.tf`) provisions the cloud resources (Hetzner VMs,
 Cloudflare tunnels, AWS SES/IAM, GitHub Actions secrets) **and** writes a
-local `iac/inventory.yaml` via a `local_file` resource. This generated file is
+local `iac/server/inventory.yaml` via a `local_file` resource. This generated file is
 the bridge between Terraform and Ansible:
 
 - Terraform owns infra-level facts: server IPs, tunnel tokens, ECR access
   keys, the per-instance `instance` name.
-- It serializes those facts into `iac/inventory.yaml` as a standard Ansible
+- It serializes those facts into `iac/server/inventory.yaml` as a standard Ansible
   inventory with `prod` and `dev` groups.
 - Ansible (`playbook.yaml`) then consumes that inventory to provision/converge
   the same VMs:
 
   ```
-  cd iac
+  cd iac/server
   uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=prod
   ```
 
 Implications:
 
-- **`iac/inventory.yaml` is generated, not authored.** It is gitignored. Don't
+- **`iac/server/inventory.yaml` is generated, not authored.** It is gitignored. Don't
   edit it by hand and don't commit it — changes will be overwritten on the
   next `tofu apply`. To change inventory contents, edit the `local_file
   "inventory"` block in `main.tf`.
@@ -133,5 +133,7 @@ Implications:
 - **The playbook doesn't deploy the app.** It only sets up the host (packages,
   Docker, ECR pull credentials, the Cloudflare tunnel). The app container,
   its state directories and SQLite file, migrations and seeding are owned by
-  the `deploy-dev`/`deploy-prod` jobs in `.github/workflows/ci.yml`; change
-  per-environment deploy settings (`RAILS_ENV`, ports, mounts, env vars) there.
+  the separate `iac/app/` root module (kreuzwerker/docker provider, one
+  OpenTofu workspace per environment), which the `deploy` job in
+  `.github/workflows/ci.yml` applies. Change per-environment deploy settings
+  (`RAILS_ENV`, ports, mounts, env vars) in `iac/app/main.tf`.
