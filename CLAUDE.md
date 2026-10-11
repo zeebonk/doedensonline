@@ -98,42 +98,33 @@ docker compose run --rm app <any command>
   conflicts instead of resolving them.
 
 
-# Infrastructure: Terraform → Ansible handoff
+# Infrastructure: `iac/server` and `iac/app`
 
-Terraform (`iac/server/main.tf`) provisions the cloud resources (Hetzner VMs,
-Cloudflare tunnels, AWS SES/IAM, GitHub Actions secrets) **and** writes a
-local `iac/server/inventory.yaml` via a `local_file` resource. This generated file is
-the bridge between Terraform and Ansible:
+Two OpenTofu root modules, each with its own state:
 
-- Terraform owns infra-level facts: server IPs, tunnel tokens, ECR access
-  keys, the per-instance `instance` name.
-- It serializes those facts into `iac/server/inventory.yaml` as a standard Ansible
-  inventory with `prod` and `dev` groups.
-- Ansible (`playbook.yaml`) then consumes that inventory to provision/converge
-  the same VMs:
+- `iac/server/main.tf` provisions the cloud resources (Hetzner VM, Cloudflare
+  tunnels, AWS SES/IAM/ECR, GitHub Actions secrets) **and** the host itself.
+  It's applied by hand, never by CI.
+- `iac/app/main.tf` deploys the app container, its state directories and
+  SQLite file, migrations and seeding (kreuzwerker/docker provider, one
+  OpenTofu workspace per environment). The `deploy` job in
+  `.github/workflows/ci.yml` applies it. Change per-environment deploy
+  settings (`RAILS_ENV`, ports, mounts, env vars) there.
 
-  ```
-  cd iac/server
-  uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=prod
-  ```
+How `iac/server` sets up the host:
 
-Implications:
-
-- **`iac/server/inventory.yaml` is generated, not authored.** It is gitignored. Don't
-  edit it by hand and don't commit it — changes will be overwritten on the
-  next `tofu apply`. To change inventory contents, edit the `local_file
-  "inventory"` block in `main.tf`.
-- **It contains secrets** (ECR keys, Cloudflare tunnel tokens).
-  Don't paste its contents into chats, PRs, or logs.
-- **`tofu apply` must run before Ansible** on a fresh checkout — without it
-  there is no inventory file for the playbook to read.
-- New host-level variables that Ansible needs should be added to the
-  `local_file "inventory"` block so they flow through automatically, rather
-  than being hardcoded in the playbook.
-- **The playbook doesn't deploy the app.** It only sets up the host (packages,
-  Docker and its log rotation, ECR pull credentials, the Cloudflare tunnel).
-  The app container, its state directories and SQLite file, migrations and
-  seeding are owned by the separate `iac/app/` root module (kreuzwerker/docker
-  provider, one OpenTofu workspace per environment), which the `deploy` job in
-  `.github/workflows/ci.yml` applies. Change per-environment deploy settings
-  (`RAILS_ENV`, ports, mounts, env vars) in `iac/app/main.tf`.
+- **cloud-init (`hcloud_server.user_data`) only runs on first boot.** It's in
+  `ignore_changes`, because changing it would replace the server and wipe the
+  app state in `/app-state`. A change there doesn't reach the existing server;
+  apply it by hand over SSH as well.
+- **Everything else on the host runs as Docker containers** managed by the
+  kreuzwerker/docker provider over `ssh://root@<server>` (currently the
+  `cloudflared` tunnel per environment). So `tofu plan`/`apply` in
+  `iac/server` need SSH access to the server, and a from-scratch build needs
+  `tofu apply -target=hcloud_server.doedensonline` before a full apply.
+- **Docker log rotation is per container, not daemon-wide.** Every
+  `docker_container` in either module sets `log_driver = "json-file"` and the
+  shared `log_opts`; keep the two copies in sync and set them on new
+  containers.
+- **The host holds no registry credentials.** `iac/app` passes ECR
+  credentials along with each pull through the provider's `registry_auth`.

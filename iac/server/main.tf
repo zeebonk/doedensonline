@@ -23,6 +23,10 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 5.26"
     }
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "~> 4.6"
+    }
   }
 }
 
@@ -62,6 +66,14 @@ variable "cloudflare_account_id" {
 
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
+}
+
+# Docker on the server, reached over SSH as root. It can only connect once
+# the server exists and cloud-init has installed Docker, so building from
+# scratch takes `tofu apply -target=hcloud_server.doedensonline` first.
+provider "docker" {
+  host     = "ssh://root@${hcloud_server.doedensonline.ipv4_address}"
+  ssh_opts = ["-o", "StrictHostKeyChecking=accept-new"]
 }
 
 resource "aws_kms_key" "doedensonline" {
@@ -134,27 +146,6 @@ resource "aws_ecr_lifecycle_policy" "doedensonline" {
       },
     ]
   })
-}
-
-data "aws_iam_policy_document" "ecr_read_only_policy_document" {
-  statement {
-    sid = "AllowECRReadOnly"
-    actions = [
-      "ecr:GetAuthorizationToken",
-      "ecr:BatchGetImage",
-      "ecr:GetDownloadUrlForLayer",
-    ]
-    resources = ["*"]
-  }
-}
-
-module "ecr_read_only_policy" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-policy"
-
-  name = "ECRReadOnly"
-  path = "/"
-
-  policy = data.aws_iam_policy_document.ecr_read_only_policy_document.json
 }
 
 data "aws_iam_policy_document" "ecr_push_policy_document" {
@@ -261,53 +252,6 @@ module "iam_role_github_actions" {
   }
 }
 
-resource "aws_iam_user" "doedensonline_dev" {
-  name = "doedensonline-dev"
-}
-
-resource "aws_iam_user_policy_attachment" "doedensonline_dev_ecr_read_only" {
-  user       = aws_iam_user.doedensonline_dev.name
-  policy_arn = module.ecr_read_only_policy.arn
-}
-
-resource "aws_iam_access_key" "doedensonline_dev" {
-  user = aws_iam_user.doedensonline_dev.name
-}
-
-resource "local_file" "inventory" {
-  content = yamlencode({
-    "prod" : {
-      "vars" : {
-        "instance" : "prod",
-      },
-      "hosts" : {
-        "prod-webserver" : {
-          "ansible_host" : hcloud_server.doedensonline.ipv4_address,
-          "ansible_user" : "root",
-          "ecr_access_key_id" : aws_iam_access_key.doedensonline_dev.id,
-          "ecr_secret_access_key" : aws_iam_access_key.doedensonline_dev.secret,
-          "cloudflared_tunnel_token" : data.cloudflare_zero_trust_tunnel_cloudflared_token.prod.token,
-        },
-      }
-    },
-    "dev" : {
-      "vars" : {
-        "instance" : "dev",
-      },
-      "hosts" : {
-        "dev-webserver" : {
-          "ansible_host" : hcloud_server.doedensonline.ipv4_address,
-          "ansible_user" : "root",
-          "ecr_access_key_id" : aws_iam_access_key.doedensonline_dev.id,
-          "ecr_secret_access_key" : aws_iam_access_key.doedensonline_dev.secret,
-          "cloudflared_tunnel_token" : data.cloudflare_zero_trust_tunnel_cloudflared_token.dev.token,
-        },
-      }
-    },
-  })
-  filename = "${path.module}/inventory.yaml"
-}
-
 
 # Hetzner
 
@@ -336,10 +280,22 @@ resource "hcloud_server" "doedensonline" {
     hcloud_ssh_key.github_actions.id,
   ]
 
-  # ssh_keys is only honored at server creation. Adding the github-actions
-  # key after the fact requires appending it to authorized_keys directly.
+  # Log rotation isn't configured daemon-wide; every container sets its own
+  # log_opts.
+  user_data = <<-EOT
+    #cloud-config
+    packages:
+      - docker.io
+      - htop
+      - vim
+  EOT
+
+  # ssh_keys and user_data are only honored at server creation, and changing
+  # either would replace the server and its app state. Adding the
+  # github-actions key after the fact requires appending it to
+  # authorized_keys directly; user_data changes have to be applied by hand.
   lifecycle {
-    ignore_changes = [ssh_keys]
+    ignore_changes = [ssh_keys, user_data]
   }
 }
 
@@ -558,6 +514,45 @@ resource "cloudflare_ruleset" "redirect_www_to_apex" {
       }
     },
   ]
+}
+
+# Docker on the server
+
+locals {
+  # Docker doesn't rotate container logs by default. Keep in sync with
+  # ../app/main.tf.
+  docker_log_opts = {
+    max-size = "10m"
+    max-file = "5"
+  }
+
+  tunnel_tokens = {
+    dev  = data.cloudflare_zero_trust_tunnel_cloudflared_token.dev.token
+    prod = data.cloudflare_zero_trust_tunnel_cloudflared_token.prod.token
+  }
+}
+
+data "docker_registry_image" "cloudflared" {
+  name = "cloudflare/cloudflared:latest"
+}
+
+# Re-pulled, and the tunnels restarted, whenever `latest` moves.
+resource "docker_image" "cloudflared" {
+  name          = data.docker_registry_image.cloudflared.name
+  pull_triggers = [data.docker_registry_image.cloudflared.sha256_digest]
+}
+
+resource "docker_container" "cloudflared" {
+  for_each = toset(["dev", "prod"])
+
+  name         = "doedensonline-${each.key}-cloudflared"
+  image        = docker_image.cloudflared.image_id
+  restart      = "always"
+  network_mode = "host"
+  command      = ["tunnel", "--no-autoupdate", "run"]
+  env          = ["TUNNEL_TOKEN=${local.tunnel_tokens[each.key]}"]
+  log_driver   = "json-file"
+  log_opts     = local.docker_log_opts
 }
 
 # GitHub Actions secrets for the dev deploy job
