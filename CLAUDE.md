@@ -103,28 +103,23 @@ docker compose run --rm app <any command>
 Two OpenTofu root modules, each with its own state:
 
 - `iac/server/main.tf` provisions the cloud resources (Hetzner VM, Cloudflare
-  tunnels, AWS SES/IAM/ECR, GitHub Actions secrets) **and** the host itself.
-  It's applied by hand, never by CI.
-- `iac/app/main.tf` deploys the app container, its state directories and
-  SQLite file, migrations and seeding (kreuzwerker/docker provider, one
-  OpenTofu workspace per environment). The `deploy` job in
+  tunnels, AWS SES/IAM/ECR, GitHub Actions secrets). It's applied by hand,
+  never by CI.
+- `iac/app/main.tf` deploys everything that runs on the host: the app
+  container, its state directories and SQLite file, migrations and seeding,
+  and the environment's `cloudflared` tunnel container (kreuzwerker/docker
+  provider, one OpenTofu workspace per environment). The `deploy` job in
   `.github/workflows/ci.yml` applies it. Change per-environment deploy
   settings (`RAILS_ENV`, ports, mounts, env vars) there.
 
-How `iac/server` sets up the host:
+How the host is set up:
 
 - **cloud-init (`hcloud_server.user_data`) only runs on first boot.** It's in
   `ignore_changes`, because changing it would replace the server and wipe the
   app state in `/app-state`. A change there doesn't reach the existing server;
   apply it by hand over SSH as well.
-- **Everything else on the host runs as Docker containers** managed by the
-  kreuzwerker/docker provider over `ssh://root@<server>` (currently the
-  `cloudflared` tunnel per environment). So `tofu plan`/`apply` in
-  `iac/server` need SSH access to the server, and a from-scratch build needs
-  `tofu apply -target=hcloud_server.doedensonline` before a full apply.
 - **Docker log rotation is per container, not daemon-wide.** Every
-  `docker_container` in either module sets `log_driver = "json-file"` and the
-  shared `log_opts`; keep the two copies in sync and set them on new
-  containers.
+  `docker_container` in `iac/app` sets `log_driver = "json-file"` and
+  `local.log_opts`; set them on new containers too.
 - **The host holds no registry credentials.** `iac/app` passes ECR
   credentials along with each pull through the provider's `registry_auth`.
