@@ -1,6 +1,6 @@
-# Deploys the app container to a host provisioned by ../server/main.tf. Kept in its
-# own root module and state so CI can deploy without touching (or having
-# access to) the infrastructure state.
+# Deploys the app container and its Cloudflare tunnel to a host provisioned
+# by ../server/main.tf. Kept in its own root module and state so CI can deploy
+# without touching (or having access to) the infrastructure state.
 #
 # One OpenTofu workspace per environment: `dev` or `prod`.
 
@@ -52,6 +52,17 @@ variable "smtp_password" {
 variable "secret_key_base" {
   type      = string
   sensitive = true
+}
+
+variable "tunnel_token" {
+  description = "Token of the environment's Cloudflare tunnel."
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = var.tunnel_token != ""
+    error_message = "tunnel_token must not be empty."
+  }
 }
 
 locals {
@@ -187,4 +198,26 @@ resource "docker_container" "app" {
   }
 
   depends_on = [docker_container.migrate]
+}
+
+# Connects the environment's Cloudflare tunnel, set up by ../server/main.tf,
+# to the app's port on localhost. The image tag is bumped by hand.
+resource "docker_image" "cloudflared" {
+  name = "cloudflare/cloudflared:2026.10.0"
+
+  # Dev and prod each manage this image on the same host. Removing it when
+  # a tag bump reaches dev would fail while prod's tunnel still uses it.
+  keep_locally = true
+}
+
+resource "docker_container" "cloudflared" {
+  name         = "${local.name}-tunnel"
+  image        = docker_image.cloudflared.image_id
+  restart      = "always"
+  network_mode = "host"
+  command      = ["tunnel", "--no-autoupdate", "run"]
+  env          = ["TUNNEL_TOKEN=${var.tunnel_token}"]
+
+  log_driver = "json-file"
+  log_opts   = local.log_opts
 }
