@@ -3,7 +3,7 @@ version: 2
 # Not covered on purpose:
 # - docker-compose: docker-compose.yml only references our own ECR image.
 # - mise.toml: Dependabot has no mise ecosystem, so the tool versions pinned
-#   there (python, uv, opentofu, docker-compose) are bumped by hand.
+#   there (opentofu, docker-compose) are bumped by hand.
 
 updates:
   - package-ecosystem: github-actions
@@ -12,14 +12,6 @@ updates:
       interval: weekly
     groups:
       github-actions:
-        patterns: ["*"]
-
-  - package-ecosystem: uv
-    directory: /iac/server
-    schedule:
-      interval: weekly
-    groups:
-      python:
         patterns: ["*"]
 
   - package-ecosystem: opentofu

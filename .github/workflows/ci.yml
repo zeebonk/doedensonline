@@ -184,29 +184,9 @@ jobs:
           TF_WORKSPACE=dev tofu validate
           TF_WORKSPACE=prod tofu validate
 
-  ansible-lint:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: iac/server
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: jdx/mise-action@v5
-
-      - name: Install dependencies
-        run: uv sync --all-groups
-
-      - name: Run ansible-lint
-        run: uv run ansible-lint playbook.yaml
-
-      - name: Check playbook syntax
-        run: |
-          uv run ansible-playbook --syntax-check -i localhost, -e target=localhost playbook.yaml
-
   # Master pushes deploy to dev, releases to prod.
   deploy:
-    needs: [release, tofu, ansible-lint]
+    needs: [release, tofu]
     if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'release'
     concurrency:
       # The env context isn't available here.

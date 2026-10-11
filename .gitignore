@@ -1,6 +1,4 @@
 .terraform
-.venv
-inventory.yaml
 iac/server/terraform.tfvars
 *.tfplan
 designs/

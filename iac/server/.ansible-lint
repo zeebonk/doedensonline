@@ -1,3 +1,0 @@
-profile: min
-extra_vars:
-  target: localhost

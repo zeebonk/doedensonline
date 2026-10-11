@@ -30,16 +30,6 @@ docker compose run --rm app bundle exec rubocop --auto-correct
 ```
 
 
-## Lint Ansible playbooks
-
-```
-cd iac/server
-uv sync --all-groups
-uv run ansible-lint playbook.yaml
-uv run ansible-playbook --syntax-check -i localhost, -e target=localhost playbook.yaml
-```
-
-
 ## Setup infrastructure
 
 Copy the Terraform variables template and paste your Hetzner Cloud API token
@@ -64,6 +54,20 @@ Then apply:
 tofu init
 tofu apply
 ```
+
+Besides the cloud resources, this sets up the server itself: cloud-init
+installs Docker on first boot, and the Cloudflare tunnel containers are
+managed through Docker over SSH as root, so `plan` and `apply` need SSH
+access to the server. That connection only works once the server exists and
+Docker is installed, so on a fresh setup create the server first:
+
+```
+tofu apply -target=hcloud_server.doedensonline
+tofu apply
+```
+
+The server's cloud-init config only applies when the server is created;
+changing it doesn't touch the existing server.
 
 
 ## Push latest image to ECR
@@ -90,7 +94,7 @@ Releases are automated via GitHub Actions:
   the release tag, then applies `iac/app` in the `prod` workspace, which
   migrates the database and replaces the running prod container.
 
-Both flows run the test, RuboCop, ansible-lint, and OpenTofu format and
+Both flows run the test, RuboCop, and OpenTofu format and
 validate jobs first; a failure in any of those blocks the deploy.
 
 ### Roll back
@@ -114,24 +118,4 @@ tofu workspace select dev
 tofu apply -var image_tag=master.abc1234 -var ssh_host=... \
     -var smtp_host=... -var smtp_username=... -var smtp_password=... \
     -var secret_key_base=...
-```
-
-### Provision hosts via Ansible
-
-The playbook converges the host-level config the deploy jobs rely on
-(packages, Docker, ECR pull credentials, the Cloudflare tunnel); it doesn't
-deploy the application. Run it after `tofu apply`, and on a fresh host before
-its first deploy. Pass the target group via `-e target=<group>`:
-
-```
-cd iac/server
-uv sync
-uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=prod
-uv run ansible-playbook -i inventory.yaml playbook.yaml -e target=dev
-```
-
-To dry-run and preview changes:
-
-```
-uv run ansible-playbook -i inventory.yaml playbook.yaml --check --diff -e target=prod
 ```
