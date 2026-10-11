@@ -92,8 +92,6 @@ locals {
     "SECRET_KEY_BASE=${var.secret_key_base}",
   ]
 
-  # Docker doesn't rotate container logs by default. Keep in sync with
-  # ../server/main.tf.
   log_opts = {
     max-size = "10m"
     max-file = "5"
