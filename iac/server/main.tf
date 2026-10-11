@@ -68,9 +68,6 @@ provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
 
-# Docker on the server, reached over SSH as root. It can only connect once
-# the server exists and cloud-init has installed Docker, so building from
-# scratch takes `tofu apply -target=hcloud_server.doedensonline` first.
 provider "docker" {
   host     = "ssh://root@${hcloud_server.doedensonline.ipv4_address}"
   ssh_opts = ["-o", "StrictHostKeyChecking=accept-new"]
