@@ -55,19 +55,12 @@ tofu init
 tofu apply
 ```
 
-Besides the cloud resources, this sets up the server itself: cloud-init
-installs Docker on first boot, and the Cloudflare tunnel containers are
-managed through Docker over SSH as root, so `plan` and `apply` need SSH
-access to the server. That connection only works once the server exists and
-Docker is installed, so on a fresh setup create the server first:
+On first boot, cloud-init installs Docker on the server. The server's
+cloud-init config only applies when the server is created; changing it
+doesn't touch the existing server.
 
-```
-tofu apply -target=hcloud_server.doedensonline
-tofu apply
-```
-
-The server's cloud-init config only applies when the server is created;
-changing it doesn't touch the existing server.
+Nothing runs on a fresh server yet: each environment's app and Cloudflare
+tunnel containers come up with its first deploy (see below).
 
 
 ## Push latest image to ECR

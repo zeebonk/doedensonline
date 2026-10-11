@@ -23,10 +23,6 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 5.26"
     }
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "~> 4.6"
-    }
   }
 }
 
@@ -66,11 +62,6 @@ variable "cloudflare_account_id" {
 
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
-}
-
-provider "docker" {
-  host     = "ssh://root@${hcloud_server.doedensonline.ipv4_address}"
-  ssh_opts = ["-o", "StrictHostKeyChecking=accept-new"]
 }
 
 resource "aws_kms_key" "doedensonline" {
@@ -277,8 +268,6 @@ resource "hcloud_server" "doedensonline" {
     hcloud_ssh_key.github_actions.id,
   ]
 
-  # Log rotation isn't configured daemon-wide; every container sets its own
-  # log_opts.
   user_data = <<-EOT
     #cloud-config
     packages:
@@ -511,48 +500,6 @@ resource "cloudflare_ruleset" "redirect_www_to_apex" {
       }
     },
   ]
-}
-
-# Docker on the server
-
-locals {
-  # Docker doesn't rotate container logs by default. Keep in sync with
-  # ../app/main.tf.
-  docker_log_opts = {
-    max-size = "10m"
-    max-file = "5"
-  }
-
-  tunnel_tokens = {
-    dev  = data.cloudflare_zero_trust_tunnel_cloudflared_token.dev.token
-    prod = data.cloudflare_zero_trust_tunnel_cloudflared_token.prod.token
-  }
-}
-
-data "docker_registry_image" "cloudflared" {
-  name = "cloudflare/cloudflared:latest"
-}
-
-# Re-pulled, and the tunnels restarted, whenever `latest` moves. Kept on the
-# host when replaced or destroyed, as ../app/main.tf can run the tunnels from
-# the same image.
-resource "docker_image" "cloudflared" {
-  name          = data.docker_registry_image.cloudflared.name
-  pull_triggers = [data.docker_registry_image.cloudflared.sha256_digest]
-  keep_locally  = true
-}
-
-resource "docker_container" "cloudflared" {
-  for_each = toset(["dev", "prod"])
-
-  name         = "doedensonline-${each.key}-cloudflared"
-  image        = docker_image.cloudflared.image_id
-  restart      = "always"
-  network_mode = "host"
-  command      = ["tunnel", "--no-autoupdate", "run"]
-  env          = ["TUNNEL_TOKEN=${local.tunnel_tokens[each.key]}"]
-  log_driver   = "json-file"
-  log_opts     = local.docker_log_opts
 }
 
 # GitHub Actions secrets for the dev deploy job
