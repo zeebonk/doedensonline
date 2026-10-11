@@ -117,5 +117,5 @@ tofu init
 tofu workspace select dev
 tofu apply -var image_tag=master.abc1234 -var ssh_host=... \
     -var smtp_host=... -var smtp_username=... -var smtp_password=... \
-    -var secret_key_base=...
+    -var secret_key_base=... -var tunnel_token=...
 ```

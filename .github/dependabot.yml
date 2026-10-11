@@ -4,6 +4,8 @@ version: 2
 # - docker-compose: docker-compose.yml only references our own ECR image.
 # - mise.toml: Dependabot has no mise ecosystem, so the tool versions pinned
 #   there (opentofu, docker-compose) are bumped by hand.
+# - cloudflared: the opentofu ecosystem only bumps providers and modules, not
+#   the image tag pinned in iac/app/main.tf, so it's bumped by hand.
 
 updates:
   - package-ecosystem: github-actions

@@ -533,10 +533,13 @@ data "docker_registry_image" "cloudflared" {
   name = "cloudflare/cloudflared:latest"
 }
 
-# Re-pulled, and the tunnels restarted, whenever `latest` moves.
+# Re-pulled, and the tunnels restarted, whenever `latest` moves. Kept on the
+# host when replaced or destroyed, as ../app/main.tf can run the tunnels from
+# the same image.
 resource "docker_image" "cloudflared" {
   name          = data.docker_registry_image.cloudflared.name
   pull_triggers = [data.docker_registry_image.cloudflared.sha256_digest]
+  keep_locally  = true
 }
 
 resource "docker_container" "cloudflared" {
@@ -562,6 +565,7 @@ locals {
     DEV_SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
     DEV_SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
     DEV_SECRET_KEY_BASE = random_id.dev_secret_key_base.hex
+    DEV_TUNNEL_TOKEN    = data.cloudflare_zero_trust_tunnel_cloudflared_token.dev.token
   }
 
   github_actions_prod_secrets = {
@@ -571,6 +575,7 @@ locals {
     PROD_SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
     PROD_SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
     PROD_SECRET_KEY_BASE = random_id.prod_secret_key_base.hex
+    PROD_TUNNEL_TOKEN    = data.cloudflare_zero_trust_tunnel_cloudflared_token.prod.token
   }
 }
 
