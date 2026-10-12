@@ -1,51 +1,18 @@
 name: Server
 
-# Plans iac/server on master, applies it on release tags.
+# Plans iac/server on master, applies it on release tags. A release applies
+# whatever its plan shows: changes since the last apply, including a failed
+# one, and drift.
 on:
   push:
     branches: [master]
+    # GitHub ignores `paths` for tag pushes, so every release tag plans.
     paths: ["iac/server/**", "mise.toml", ".github/workflows/server.yml"]
-    # GitHub ignores `paths` for tag pushes; the changes job filters those.
     tags: ["*.*.*"]
-  # Re-runs a failed apply on a tag (the next tag's changes check would skip
-  # it), or plans on master.
   workflow_dispatch:
 
 jobs:
-  # A tag push only applies if iac/server or mise.toml changed since the
-  # previous release tag. Every other run goes ahead.
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      changed: ${{ steps.diff.outputs.changed }}
-    steps:
-      - uses: actions/checkout@v7
-        if: github.event_name == 'push' && github.ref_type == 'tag'
-        with:
-          fetch-depth: 0
-
-      - name: Diff against the previous release tag
-        id: diff
-        env:
-          TAG_PUSH: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
-        run: |
-          if [ "${TAG_PUSH}" != "true" ]; then
-            changed=true
-          elif ! prev=$(git describe --tags --abbrev=0 --match '*.*.*' HEAD^ 2>/dev/null); then
-            echo "No previous release tag."
-            changed=true
-          elif git diff --quiet "${prev}" HEAD -- iac/server mise.toml; then
-            echo "Nothing changed in iac/server or mise.toml since ${prev}."
-            changed=false
-          else
-            echo "iac/server or mise.toml changed since ${prev}."
-            changed=true
-          fi
-          echo "changed=${changed}" >> "$GITHUB_OUTPUT"
-
   server:
-    needs: [changes]
-    if: needs.changes.outputs.changed == 'true'
     runs-on: ubuntu-latest
     # Only this environment can assume the github-actions-server role.
     environment: server

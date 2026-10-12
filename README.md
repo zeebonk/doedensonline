@@ -56,10 +56,10 @@ tofu init
 tofu apply
 ```
 
-After that, CI takes over: every push to `master` that touches `iac/server`
-plans it, and every release tag that changes `iac/server` or `mise.toml` since
-the previous tag applies it (`.github/workflows/server.yml`). To re-run a
-failed apply, run the Server workflow manually on the release tag.
+After that, CI takes over (`.github/workflows/server.yml`): every push to
+`master` that touches `iac/server` plans it, and every release tag applies
+whatever the plan shows, including drift. The next release retries a failed
+apply; to retry it sooner, run the Server workflow manually on the release tag.
 
 On first boot, cloud-init installs Docker on the server. The server's
 cloud-init config only applies when the server is created; changing it

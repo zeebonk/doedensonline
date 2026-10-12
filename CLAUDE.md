@@ -104,8 +104,8 @@ Two OpenTofu root modules, each with its own state:
 
 - `iac/server/main.tf` provisions the cloud resources (Hetzner VM, Cloudflare
   tunnels, AWS SES/IAM/ECR, GitHub Actions secrets).
-  `.github/workflows/server.yml` plans it on master and applies it on release
-  tags that change `iac/server` or `mise.toml`. Bootstrapping, and fixing a
+  `.github/workflows/server.yml` plans it on master and applies the plan on
+  every release tag, drift included. Bootstrapping, and fixing a
   bad apply that locks CI out, are still done locally with
   `AWS_PROFILE=doedensonline`. The server apply and the prod deploy start on
   the same tag in no particular order: release an infra change that the app
