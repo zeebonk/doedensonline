@@ -244,7 +244,7 @@ module "iam_role_github_actions" {
   }
 }
 
-# Plans and applies this module from CI. Only jobs in the `server` GitHub
+# Applies this module from CI on master. Only jobs in the `server` GitHub
 # environment can assume it, not any branch or PR like the role above. This
 # module manages IAM, KMS and the OIDC provider, so it's admin-equivalent
 # anyway.
@@ -281,6 +281,45 @@ module "iam_role_github_actions_server" {
 
   policies = {
     AdministratorAccess = "arn:aws:iam::aws:policy/AdministratorAccess"
+  }
+}
+
+# Plans this module on pull requests. Any branch can use the `server-plan`
+# GitHub environment, so this role is read-only and plans skip the state
+# lock.
+module "iam_role_github_actions_server_plan" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.8.2"
+
+  name            = "github-actions-server-plan"
+  use_name_prefix = false
+
+  trust_policy_permissions = {
+    AllowAssumeRoleFromGitHubActionsServerPlanEnvironment = {
+      actions = ["sts:AssumeRoleWithWebIdentity"]
+      principals = [
+        {
+          type        = "Federated"
+          identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
+        }
+      ]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "token.actions.githubusercontent.com:aud"
+          values   = ["sts.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "token.actions.githubusercontent.com:sub"
+          values   = ["repo:zeebonk/doedensonline:environment:server-plan"]
+        }
+      ]
+    }
+  }
+
+  policies = {
+    ReadOnlyAccess = "arn:aws:iam::aws:policy/ReadOnlyAccess"
   }
 }
 
