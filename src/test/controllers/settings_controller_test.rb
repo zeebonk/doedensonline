@@ -5,7 +5,7 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     # Fixtures store passwords raw, but User#password= encrypts and
     # update_password authenticates against the encrypted form, so build
     # the user through the model.
-    User.delete_all
+    delete_all_records
     @user = create_user!(
       first_name: 'Alice',
       last_name: 'Anderson',

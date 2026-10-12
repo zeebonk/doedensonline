@@ -6,10 +6,7 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     ActionMailer::Base.perform_deliveries = true
     ActionMailer::Base.deliveries.clear
 
-    PhotoAlbumComment.delete_all
-    PhotoAlbumPicture.delete_all
-    PhotoAlbum.delete_all
-    User.delete_all
+    delete_all_records
 
     # Clean up any image files leaked by prior tests in the suite.
     %w[small medium large].each do |size|
