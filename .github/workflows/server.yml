@@ -1,0 +1,109 @@
+name: Server
+
+# Plans iac/server on master, applies it on release tags.
+on:
+  push:
+    branches: [master]
+    paths: ["iac/server/**", "mise.toml", ".github/workflows/server.yml"]
+    # GitHub ignores `paths` for tag pushes; the changes job filters those.
+    tags: ["*.*.*"]
+  # Re-runs a failed apply on a tag (the next tag's changes check would skip
+  # it), or plans on master.
+  workflow_dispatch:
+
+jobs:
+  # A tag push only applies if iac/server or mise.toml changed since the
+  # previous release tag. Every other run goes ahead.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v7
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        with:
+          fetch-depth: 0
+
+      - name: Diff against the previous release tag
+        id: diff
+        env:
+          TAG_PUSH: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+        run: |
+          if [ "${TAG_PUSH}" != "true" ]; then
+            changed=true
+          elif ! prev=$(git describe --tags --abbrev=0 --match '*.*.*' HEAD^ 2>/dev/null); then
+            echo "No previous release tag."
+            changed=true
+          elif git diff --quiet "${prev}" HEAD -- iac/server mise.toml; then
+            echo "Nothing changed in iac/server or mise.toml since ${prev}."
+            changed=false
+          else
+            echo "iac/server or mise.toml changed since ${prev}."
+            changed=true
+          fi
+          echo "changed=${changed}" >> "$GITHUB_OUTPUT"
+
+  server:
+    needs: [changes]
+    if: needs.changes.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    # Only this environment can assume the github-actions-server role.
+    environment: server
+    # Plans and applies get separate groups: GitHub replaces a pending run
+    # with a newer one, so a master plan could otherwise drop a pending
+    # apply. The S3 state lock covers the overlap.
+    concurrency:
+      group: server-${{ github.ref_type }}
+      cancel-in-progress: false
+    permissions:
+      id-token: write
+      contents: read
+    defaults:
+      run:
+        working-directory: iac/server
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: jdx/mise-action@v5
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::313336455033:role/github-actions-server
+          aws-region: eu-west-1
+
+      - name: Initialize OpenTofu
+        run: tofu init -input=false
+
+      # The plan file holds secrets in plain text, so it never leaves this
+      # job; the apply below uses it directly.
+      - name: Plan
+        id: plan
+        env:
+          TF_VAR_hcloud_token: ${{ secrets.HCLOUD_TOKEN }}
+          TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          GITHUB_TOKEN: ${{ secrets.SERVER_GITHUB_TOKEN }}
+        run: |
+          # -detailed-exitcode: 0 means no changes, 2 means changes pending.
+          code=0
+          tofu plan -input=false -lock-timeout=10m -detailed-exitcode -out=server.tfplan || code=$?
+          case "${code}" in
+            0) echo "changes=false" >> "$GITHUB_OUTPUT" ;;
+            2) echo "changes=true" >> "$GITHUB_OUTPUT" ;;
+            *) exit "${code}" ;;
+          esac
+
+          {
+            echo '```text'
+            tofu show -no-color server.tfplan
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Variables come from the plan file; only the providers need
+      # credentials again.
+      - name: Apply
+        if: github.ref_type == 'tag' && steps.plan.outputs.changes == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.SERVER_GITHUB_TOKEN }}
+        run: tofu apply -input=false -lock-timeout=10m server.tfplan
