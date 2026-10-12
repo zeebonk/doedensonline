@@ -51,6 +51,7 @@ export GITHUB_TOKEN=...
 Then apply:
 
 ```
+export AWS_PROFILE=doedensonline
 tofu init
 tofu apply
 ```

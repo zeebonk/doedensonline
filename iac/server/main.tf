@@ -1,9 +1,11 @@
 terraform {
+  # Credentials come from the environment: AWS_PROFILE=doedensonline
+  # locally, the github-actions-server role in CI.
   backend "s3" {
-    bucket  = "doedensonline-terraform"
-    key     = "app"
-    region  = "eu-west-1"
-    profile = "doedensonline"
+    bucket       = "doedensonline-terraform"
+    key          = "app"
+    region       = "eu-west-1"
+    use_lockfile = true
   }
 
   required_providers {
@@ -33,8 +35,7 @@ locals {
 }
 
 provider "aws" {
-  region  = local.region
-  profile = "doedensonline"
+  region = local.region
 }
 
 variable "hcloud_token" {
@@ -160,7 +161,8 @@ data "aws_iam_policy_document" "ecr_push_policy_document" {
 }
 
 module "ecr_push_policy" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "6.8.2"
 
   name = "ECRPush"
   path = "/"
@@ -190,7 +192,8 @@ data "aws_iam_policy_document" "deploy_state_policy_document" {
 }
 
 module "deploy_state_policy" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "6.8.2"
 
   name = "DeployState"
   path = "/"
@@ -205,7 +208,8 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
 }
 
 module "iam_role_github_actions" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.8.2"
 
   name            = "github-actions"
   use_name_prefix = false
@@ -237,6 +241,46 @@ module "iam_role_github_actions" {
   policies = {
     ECRPush     = module.ecr_push_policy.arn
     DeployState = module.deploy_state_policy.arn
+  }
+}
+
+# Plans and applies this module from CI. Only jobs in the `server` GitHub
+# environment can assume it, not any branch or PR like the role above. This
+# module manages IAM, KMS and the OIDC provider, so it's admin-equivalent
+# anyway.
+module "iam_role_github_actions_server" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.8.2"
+
+  name            = "github-actions-server"
+  use_name_prefix = false
+
+  trust_policy_permissions = {
+    AllowAssumeRoleFromGitHubActionsServerEnvironment = {
+      actions = ["sts:AssumeRoleWithWebIdentity"]
+      principals = [
+        {
+          type        = "Federated"
+          identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
+        }
+      ]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "token.actions.githubusercontent.com:aud"
+          values   = ["sts.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "token.actions.githubusercontent.com:sub"
+          values   = ["repo:zeebonk/doedensonline:environment:server"]
+        }
+      ]
+    }
+  }
+
+  policies = {
+    AdministratorAccess = "arn:aws:iam::aws:policy/AdministratorAccess"
   }
 }
 
@@ -309,7 +353,8 @@ resource "aws_ses_domain_identity" "doedensonline" {
 }
 
 module "iam_user_doedensonline_ses" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-user"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-user"
+  version = "6.8.2"
 
   name                    = "doedensonline-ses"
   create_login_profile    = false
