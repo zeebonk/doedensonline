@@ -104,8 +104,8 @@ Two OpenTofu root modules, each with its own state:
 
 - `iac/server/main.tf` provisions the cloud resources (Hetzner VM, Cloudflare
   tunnels, AWS SES/IAM/ECR, GitHub Actions secrets).
-  `.github/workflows/server.yml` plans it on pull requests (read-only role)
-  and applies it on master pushes that touch it, drift included.
+  `.github/workflows/server.yml` plans it on every pull request (read-only
+  role) and applies it on every master push, drift included.
   Bootstrapping, and fixing a bad apply that locks CI out, are still done
   locally with `AWS_PROFILE=doedensonline`. The server apply and the dev
   deploy start on the same master push in no particular order: merge an infra

@@ -4,9 +4,7 @@ name: Server
 on:
   push:
     branches: [master]
-    paths: ["iac/server/**", "mise.toml", ".github/workflows/server.yml"]
   pull_request:
-    paths: ["iac/server/**", "mise.toml", ".github/workflows/server.yml"]
   # Applies drift fixes or retries on master; plans a branch whose pull
   # request run was skipped (e.g. Dependabot's).
   workflow_dispatch:
