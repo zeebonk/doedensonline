@@ -45,8 +45,6 @@ jobs:
       - name: Initialize OpenTofu
         run: tofu init -input=false
 
-      # The plan file holds secrets in plain text, so it never leaves this
-      # job; the apply below uses it directly.
       - name: Plan
         id: plan
         env:
