@@ -58,8 +58,8 @@ tofu apply
 
 After that, CI takes over (`.github/workflows/server.yml`): every pull
 request gets a plan in the job summary, and every push to `master` applies it,
-along with any drift. To retry a failed apply or revert
-drift, run the Server workflow manually on `master`.
+along with any drift. To retry a failed apply, re-run the
+Server workflow run on `master`.
 
 On first boot, cloud-init installs Docker on the server. The server's
 cloud-init config only applies when the server is created; changing it

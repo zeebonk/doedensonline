@@ -1,13 +1,10 @@
 name: Server
 
-# Plans iac/server on pull requests and other branches, applies it on master.
+# Plans iac/server on pull requests, applies it on master.
 on:
   push:
     branches: [master]
   pull_request:
-  # Applies drift fixes or retries on master; plans a branch whose pull
-  # request run was skipped (e.g. Dependabot's).
-  workflow_dispatch:
 
 jobs:
   server:
