@@ -23,7 +23,9 @@ module DoedensOnline
     config.time_zone = 'Amsterdam'
     config.i18n.default_locale = :nl
 
-    config.filter_parameters += [:password]
+    config.filter_parameters += %i[
+      passw email secret token _key crypt salt certificate otp ssn cvv cvc
+    ]
 
     config.logger = ActiveSupport::TaggedLogging.logger($stdout)
     config.log_tags = [:request_id]

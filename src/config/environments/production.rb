@@ -32,4 +32,5 @@ DoedensOnline::Application.configure do
   config.active_support.deprecation = :notify
 
   config.active_record.dump_schema_after_migration = false
+  config.active_record.attributes_for_inspect = [:id]
 end
