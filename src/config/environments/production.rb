@@ -12,10 +12,6 @@ DoedensOnline::Application.configure do
   config.host_authorization = { exclude: ->(request) { request.path == '/up' } }
   config.assume_ssl = true
 
-  config.assets.js_compressor = :terser
-  config.assets.compile = false
-  config.assets.digest = true
-
   config.i18n.fallbacks = true
 
   config.log_level = ENV.fetch('RAILS_LOG_LEVEL', 'info')

@@ -10,9 +10,6 @@ DoedensOnline::Application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
   config.action_dispatch.verbose_redirect_logs = true
 
-  config.assets.debug = true
-  config.assets.raise_runtime_errors = true
-
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address: ENV.fetch("DO_SMTP_HOST", nil),
