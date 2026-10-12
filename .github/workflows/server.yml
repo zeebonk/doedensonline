@@ -77,8 +77,6 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # Variables come from the plan file; only the providers need
-      # credentials again.
       - name: Apply
         if: env.APPLY == 'true' && steps.plan.outputs.changes == 'true'
         env:
