@@ -86,8 +86,6 @@ GEM
     drb (2.2.3)
     erb (6.0.7)
     erubi (1.13.1)
-    execjs (2.10.2)
-      json (>= 2)
     globalid (1.4.0)
       activesupport (>= 6.1)
     highline (3.1.2)
@@ -174,6 +172,10 @@ GEM
       prettyprint
     prettyprint (0.2.1)
     prism (1.9.0)
+    propshaft (1.3.2)
+      actionpack (>= 7.0.0)
+      activesupport (>= 7.0.0)
+      rack
     puma (8.0.2)
       nio4r (~> 2.0)
     racc (1.8.1)
@@ -258,20 +260,10 @@ GEM
       rubocop-ast (>= 1.44.0, < 2.0)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
-    sprockets (4.4.1)
-      concurrent-ruby (~> 1.1)
-      logger
-      rack (>= 2.2.4, < 4)
-    sprockets-rails (3.5.2)
-      actionpack (>= 6.1)
-      activesupport (>= 6.1)
-      sprockets (>= 3.0.0)
     sqlite3 (2.9.6)
       mini_portile2 (~> 2.8.0)
     terminal-table (4.0.0)
       unicode-display_width (>= 1.1.1, < 4)
-    terser (1.2.8)
-      execjs (>= 0.3.0, < 3)
     thor (1.5.0)
     timeout (0.6.1)
     tsort (0.2.0)
@@ -297,23 +289,20 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  execjs (= 2.10.2)
   i18n-tasks (= 1.1.2)
   jquery-rails (= 4.6.1)
   kaminari (= 1.2.2)
   mail (= 2.9.1)
   mini_magick (= 5.4.0)
   nokogiri (= 1.19.4)
+  propshaft (= 1.3.2)
   puma (= 8.0.2)
   rails (= 8.1.4)
   rails-controller-testing (= 1.0.5)
   rake (= 13.4.2)
   rubocop (= 1.91.0)
   rubocop-rails (= 2.38.0)
-  sprockets (= 4.4.1)
-  sprockets-rails (= 3.5.2)
   sqlite3 (= 2.9.6)
-  terser (= 1.2.8)
   turbolinks (= 5.2.1)
 
 CHECKSUMS
@@ -341,7 +330,6 @@ CHECKSUMS
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
   erb (6.0.7) sha256=c5ca6dc25b0ef974a44dc8f59fe847577122483b1968a38dec305c60bf91ee92
   erubi (1.13.1) sha256=a082103b0885dbc5ecf1172fede897f9ebdb745a4b97a5e8dc63953db1ee4ad9
-  execjs (2.10.2) sha256=466cf2b49e50c0cfdff8fdb88a7a983dfab7ac0f6185c317ccb434a75c224c88
   globalid (1.4.0) sha256=037f12fbf1d9d7a014d501c2d5c77356fd4ddd96d7a7991d6700bba96706f427
   highline (3.1.2) sha256=67cbd34d19f6ef11a7ee1d82ffab5d36dfd5b3be861f450fc1716c7125f4bb4a
   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
@@ -377,6 +365,7 @@ CHECKSUMS
   pp (0.6.4) sha256=dfcb0fce700c41456265922884f9fe195d7fbb0674a3578e6c0f69588e82b570
   prettyprint (0.2.1) sha256=d555d57ea6d7cf001d4774b693546a6bd88bec1e778ddffb5c60b68ceec4b7d4
   prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85
+  propshaft (1.3.2) sha256=1d56a3e56a92c21bfc29caf07406b5386b00d4c47ddf357cf989a5a234b1389e
   puma (8.0.2) sha256=c8ed871dfbbe66448ea9ffd46692342d9804d4071522b52b5331b7b6e7b686fb
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rack (3.2.7) sha256=93e13e1c24f93556671d85d2d79fa228c3485815c50d7e2f265b5330c6528fb7
@@ -400,11 +389,8 @@ CHECKSUMS
   rubocop-rails (2.38.0) sha256=6e2b7c532efa95e3050371bec20b8f5b025662acead8bc70ee31f0e3e6fa2f06
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
-  sprockets (4.4.1) sha256=fbd665edad0916de5c7abefef0fc616866a60c5e48ce2846f39ac3fc5df9e184
-  sprockets-rails (3.5.2) sha256=a9e88e6ce9f8c912d349aa5401509165ec42326baf9e942a85de4b76dbc4119e
   sqlite3 (2.9.6) sha256=956fe606956420d04ac7157d3ace620c8caba2135b2e05c76e483493da24d08e
   terminal-table (4.0.0) sha256=f504793203f8251b2ea7c7068333053f0beeea26093ec9962e62ea79f94301d2
-  terser (1.2.8) sha256=64931851d173bc5be0a90bd4570d751be5e83b2b063ccb750dbdc11a7b1d14db
   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
   timeout (0.6.1) sha256=78f57368a7e7bbadec56971f78a3f5ecbcfb59b7fcbb0a3ed6ddc08a5094accb
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f

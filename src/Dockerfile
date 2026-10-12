@@ -7,13 +7,11 @@ CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
 # imagemagick: runtime dependency of the mini_magick gem.
 # imagemagick-jpeg: Alpine ships ImageMagick's JPEG coder separately. Uploads
 #   are resized to JPEG; PNG, GIF and BMP are built into imagemagick itself.
-# nodejs: JavaScript runtime for the asset pipeline (terser/execjs).
 RUN apk add --no-cache \
         build-base \
         imagemagick \
         imagemagick-jpeg \
         sqlite-dev \
-        nodejs \
         tzdata
 
 RUN gem update --system 4.0.22 --no-document \

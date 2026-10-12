@@ -11,7 +11,6 @@ require 'action_mailer/railtie'
 # require 'action_text/engine'
 require 'action_view/railtie'
 # require 'action_cable/engine'
-require 'sprockets/railtie'
 require 'rails/test_unit/railtie'
 
 Bundler.require(*Rails.groups)
@@ -30,7 +29,5 @@ module DoedensOnline
     config.log_tags = [:request_id]
 
     config.silence_healthcheck_path = '/up'
-
-    config.assets.enabled = true
   end
 end
