@@ -4,7 +4,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   def setup
     # Fixtures store passwords as raw strings, but User#password= encrypts.
     # Build users through the model so the real sign-in flow works.
-    User.delete_all
+    delete_all_records
     @admin = create_user!(
       first_name: 'Admin',
       last_name: 'McAdmin',

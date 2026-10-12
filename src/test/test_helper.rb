@@ -10,6 +10,11 @@ class ActiveSupport::TestCase
   def create_user!(attrs)
     User.create!(attrs)
   end
+
+  # Deletes the children before their parents, as the foreign keys require.
+  def delete_all_records
+    [NewsComment, NewsItem, PhotoAlbumComment, PhotoAlbumPicture, PhotoAlbum, User].each(&:delete_all)
+  end
 end
 
 class ActionDispatch::IntegrationTest

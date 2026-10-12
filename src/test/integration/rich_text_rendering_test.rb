@@ -9,12 +9,7 @@ class RichTextRenderingTest < ActionDispatch::IntegrationTest
             '<a href="javascript:alert(\'href\')">bad link</a>'.freeze
 
   def setup
-    NewsComment.delete_all
-    NewsItem.delete_all
-    PhotoAlbumComment.delete_all
-    PhotoAlbumPicture.delete_all
-    PhotoAlbum.delete_all
-    User.delete_all
+    delete_all_records
 
     @user = create_user!(
       first_name: 'Alice',

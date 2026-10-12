@@ -2,9 +2,7 @@ require 'test_helper'
 
 class NewsCommentsControllerTest < ActionDispatch::IntegrationTest
   def setup
-    NewsComment.delete_all
-    NewsItem.delete_all
-    User.delete_all
+    delete_all_records
 
     @user = create_user!(
       first_name: 'Alice',

@@ -7,10 +7,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     ActionMailer::Base.deliveries.clear
     # Fixtures store passwords as raw strings, but User#password= encrypts.
     # Start from a clean slate and create users through the model so
-    # authentication actually works. NewsItem fixtures reference user_id: 1,
-    # so clear them too to avoid orphaned associations when rendering index.
-    NewsItem.delete_all
-    User.delete_all
+    # authentication actually works.
+    delete_all_records
     @user = create_user!(
       first_name: 'Alice',
       last_name: 'Anderson',

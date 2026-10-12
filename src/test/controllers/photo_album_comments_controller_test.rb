@@ -2,10 +2,7 @@ require 'test_helper'
 
 class PhotoAlbumCommentsControllerTest < ActionDispatch::IntegrationTest
   def setup
-    PhotoAlbumComment.delete_all
-    PhotoAlbumPicture.delete_all
-    PhotoAlbum.delete_all
-    User.delete_all
+    delete_all_records
 
     @user = create_user!(
       first_name: 'Alice',

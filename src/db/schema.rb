@@ -10,44 +10,51 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_10_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_12_120000) do
   create_table "news_comments", force: :cascade do |t|
     t.text "message"
-    t.integer "news_item_id"
-    t.integer "user_id"
+    t.integer "news_item_id", null: false
+    t.integer "user_id", null: false
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
+    t.index ["news_item_id"], name: "index_news_comments_on_news_item_id"
+    t.index ["user_id"], name: "index_news_comments_on_user_id"
   end
 
   create_table "news_items", force: :cascade do |t|
     t.text "message"
-    t.integer "user_id"
+    t.integer "user_id", null: false
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
+    t.index ["user_id"], name: "index_news_items_on_user_id"
   end
 
   create_table "photo_album_comments", force: :cascade do |t|
     t.text "message"
-    t.integer "photo_album_id"
-    t.integer "user_id"
+    t.integer "photo_album_id", null: false
+    t.integer "user_id", null: false
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
+    t.index ["photo_album_id"], name: "index_photo_album_comments_on_photo_album_id"
+    t.index ["user_id"], name: "index_photo_album_comments_on_user_id"
   end
 
   create_table "photo_album_pictures", force: :cascade do |t|
-    t.integer "photo_album_id"
+    t.integer "photo_album_id", null: false
     t.string "filename"
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
     t.integer "position"
+    t.index ["photo_album_id"], name: "index_photo_album_pictures_on_photo_album_id"
   end
 
   create_table "photo_albums", force: :cascade do |t|
     t.string "title"
     t.text "description"
-    t.integer "user_id"
+    t.integer "user_id", null: false
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
+    t.index ["user_id"], name: "index_photo_albums_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -61,4 +68,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_10_120100) do
     t.boolean "isadmin"
     t.boolean "notify_photo_album"
   end
+
+  add_foreign_key "news_comments", "news_items"
+  add_foreign_key "news_comments", "users"
+  add_foreign_key "news_items", "users"
+  add_foreign_key "photo_album_comments", "photo_albums"
+  add_foreign_key "photo_album_comments", "users"
+  add_foreign_key "photo_album_pictures", "photo_albums"
+  add_foreign_key "photo_albums", "users"
 end

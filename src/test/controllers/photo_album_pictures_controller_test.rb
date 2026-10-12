@@ -2,9 +2,7 @@ require 'test_helper'
 
 class PhotoAlbumPicturesControllerTest < ActionDispatch::IntegrationTest
   def setup
-    PhotoAlbumPicture.delete_all
-    PhotoAlbum.delete_all
-    User.delete_all
+    delete_all_records
 
     # Clean up any image files leaked by prior tests in the suite.
     %w[small medium large].each do |size|

@@ -4,9 +4,7 @@ require 'test_helper'
 # (show_exceptions = :rescuable), as they are in production.
 class ErrorResponsesTest < ActionDispatch::IntegrationTest
   def setup
-    NewsComment.delete_all
-    NewsItem.delete_all
-    User.delete_all
+    delete_all_records
 
     @admin = create_user!(
       first_name: 'Admin',

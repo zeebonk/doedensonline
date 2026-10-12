@@ -28,4 +28,13 @@ class NewsItemTest < ActiveSupport::TestCase
     assert_equal 'abc def...', news_item.preview(8)
     assert_equal 'abc def ghi', news_item.preview(11)
   end
+
+  test "destroy deletes the comments" do
+    news_items(:one).destroy!
+    assert_equal 0, NewsComment.count
+  end
+
+  test "delete fails while the news item has comments" do
+    assert_raises(ActiveRecord::InvalidForeignKey) { news_items(:one).delete }
+  end
 end
