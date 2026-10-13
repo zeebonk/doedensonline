@@ -74,10 +74,20 @@ resource "aws_kms_alias" "doedensonline" {
   target_key_id = aws_kms_key.doedensonline.key_id
 }
 
+# Only the layer caches get overwritten. Every other tag is pushed once, so
+# no build can replace an image that a deploy (re-run) pulls by tag.
 resource "aws_ecr_repository" "doedensonline" {
   name                 = "doedensonline"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE_WITH_EXCLUSION"
   force_delete         = true
+  image_tag_mutability_exclusion_filter {
+    filter      = "cache-*"
+    filter_type = "WILDCARD"
+  }
+  image_tag_mutability_exclusion_filter {
+    filter      = "pr-*-cache-*"
+    filter_type = "WILDCARD"
+  }
   encryption_configuration {
     encryption_type = "KMS"
     kms_key         = aws_kms_key.doedensonline.arn
@@ -170,6 +180,34 @@ module "ecr_push_policy" {
   policy = data.aws_iam_policy_document.ecr_push_policy_document.json
 }
 
+data "aws_iam_policy_document" "ecr_pull_policy_document" {
+  statement {
+    sid = "AllowECRAuth"
+    actions = [
+      "ecr:GetAuthorizationToken",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid = "AllowECRPull"
+    actions = [
+      "ecr:BatchGetImage",
+      "ecr:GetDownloadUrlForLayer",
+    ]
+    resources = [aws_ecr_repository.doedensonline.arn]
+  }
+}
+
+module "ecr_pull_policy" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "6.8.2"
+
+  name = "ECRPull"
+  path = "/"
+
+  policy = data.aws_iam_policy_document.ecr_pull_policy_document.json
+}
+
 # State of the ../app root module, one object per workspace.
 data "aws_iam_policy_document" "deploy_state_policy_document" {
   statement {
@@ -207,6 +245,8 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
 
+# Replaced by github-actions-build and github-actions-deploy below; removed
+# once CI uses those.
 module "iam_role_github_actions" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.8.2"
@@ -244,10 +284,90 @@ module "iam_role_github_actions" {
   }
 }
 
+# Builds and pushes images. PR builds push their layer cache too, so any
+# job can assume it.
+module "iam_role_github_actions_build" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.8.2"
+
+  name            = "github-actions-build"
+  use_name_prefix = false
+
+  trust_policy_permissions = {
+    AllowAssumeRoleFromGitHubActions = {
+      actions = ["sts:AssumeRoleWithWebIdentity"]
+      principals = [
+        {
+          type        = "Federated"
+          identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
+        }
+      ]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "token.actions.githubusercontent.com:aud"
+          values   = ["sts.amazonaws.com"]
+        },
+        {
+          test     = "StringLike"
+          variable = "token.actions.githubusercontent.com:sub"
+          values   = ["repo:zeebonk/doedensonline:*"]
+        }
+      ]
+    }
+  }
+
+  policies = {
+    ECRPush = module.ecr_push_policy.arn
+  }
+}
+
+# Applies ../app. Only jobs in the `dev` and `prod` GitHub environments,
+# which only master and release tags can deploy to, can assume it.
+module "iam_role_github_actions_deploy" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.8.2"
+
+  name            = "github-actions-deploy"
+  use_name_prefix = false
+
+  trust_policy_permissions = {
+    AllowAssumeRoleFromGitHubActionsDeployEnvironments = {
+      actions = ["sts:AssumeRoleWithWebIdentity"]
+      principals = [
+        {
+          type        = "Federated"
+          identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
+        }
+      ]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "token.actions.githubusercontent.com:aud"
+          values   = ["sts.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "token.actions.githubusercontent.com:sub"
+          values = [
+            for environment in keys(local.github_deploy_environments) :
+            "repo:zeebonk/doedensonline:environment:${environment}"
+          ]
+        }
+      ]
+    }
+  }
+
+  policies = {
+    ECRPull     = module.ecr_pull_policy.arn
+    DeployState = module.deploy_state_policy.arn
+  }
+}
+
 # Plans this module on pull requests and applies it on master from CI. Only
 # jobs in the `server` GitHub environment, which requires an approval, can
-# assume it, not any job like the role above. This module manages IAM, KMS
-# and the OIDC provider, so it's admin-equivalent anyway.
+# assume it, not any job like github-actions-build. This module manages IAM,
+# KMS and the OIDC provider, so it's admin-equivalent anyway.
 module "iam_role_github_actions_server" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.8.2"
@@ -547,28 +667,40 @@ resource "cloudflare_ruleset" "redirect_www_to_apex" {
   ]
 }
 
-# GitHub Actions secrets for the dev deploy job
+# GitHub environments and secrets for the deploy job
 
 locals {
-  github_actions_dev_secrets = {
-    DEV_SSH_HOST        = hcloud_server.doedensonline.ipv4_address
-    DEV_SSH_PRIVATE_KEY = tls_private_key.github_actions_dev.private_key_openssh
-    DEV_SMTP_HOST       = "email-smtp.${local.region}.amazonaws.com"
-    DEV_SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
-    DEV_SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
-    DEV_SECRET_KEY_BASE = random_id.dev_secret_key_base.hex
-    DEV_TUNNEL_TOKEN    = data.cloudflare_zero_trust_tunnel_cloudflared_token.dev.token
+  # Which refs can deploy to each environment.
+  github_deploy_environments = {
+    dev  = { branch_pattern = "master" }
+    prod = { tag_pattern = "*.*.*" }
   }
 
-  github_actions_prod_secrets = {
-    PROD_SSH_HOST        = hcloud_server.doedensonline.ipv4_address
-    PROD_SSH_PRIVATE_KEY = tls_private_key.github_actions_dev.private_key_openssh
-    PROD_SMTP_HOST       = "email-smtp.${local.region}.amazonaws.com"
-    PROD_SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
-    PROD_SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
-    PROD_SECRET_KEY_BASE = random_id.prod_secret_key_base.hex
-    PROD_TUNNEL_TOKEN    = data.cloudflare_zero_trust_tunnel_cloudflared_token.prod.token
+  github_deploy_secrets = {
+    dev = {
+      SSH_HOST        = hcloud_server.doedensonline.ipv4_address
+      SSH_PRIVATE_KEY = tls_private_key.github_actions_dev.private_key_openssh
+      SMTP_HOST       = "email-smtp.${local.region}.amazonaws.com"
+      SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
+      SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
+      SECRET_KEY_BASE = random_id.dev_secret_key_base.hex
+      TUNNEL_TOKEN    = data.cloudflare_zero_trust_tunnel_cloudflared_token.dev.token
+    }
+    prod = {
+      SSH_HOST        = hcloud_server.doedensonline.ipv4_address
+      SSH_PRIVATE_KEY = tls_private_key.github_actions_dev.private_key_openssh
+      SMTP_HOST       = "email-smtp.${local.region}.amazonaws.com"
+      SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
+      SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
+      SECRET_KEY_BASE = random_id.prod_secret_key_base.hex
+      TUNNEL_TOKEN    = data.cloudflare_zero_trust_tunnel_cloudflared_token.prod.token
+    }
   }
+
+  # Repository-level copies, readable by every workflow run. Removed once
+  # the deploy job uses the environment secrets.
+  github_actions_dev_secrets  = { for name, value in local.github_deploy_secrets.dev : "DEV_${name}" => value }
+  github_actions_prod_secrets = { for name, value in local.github_deploy_secrets.prod : "PROD_${name}" => value }
 }
 
 # Rails 4.0 secret_key_base for the production and development
@@ -594,6 +726,41 @@ resource "github_actions_secret" "prod_deploy" {
   repository  = "doedensonline"
   secret_name = each.key
   value       = each.value
+}
+
+resource "github_repository_environment" "deploy" {
+  for_each    = local.github_deploy_environments
+  repository  = "doedensonline"
+  environment = each.key
+
+  deployment_branch_policy {
+    protected_branches     = false
+    custom_branch_policies = true
+  }
+}
+
+resource "github_repository_environment_deployment_policy" "deploy" {
+  for_each       = local.github_deploy_environments
+  repository     = "doedensonline"
+  environment    = github_repository_environment.deploy[each.key].environment
+  branch_pattern = lookup(each.value, "branch_pattern", null)
+  tag_pattern    = lookup(each.value, "tag_pattern", null)
+}
+
+resource "github_actions_environment_secret" "deploy" {
+  for_each = merge([
+    for environment, secrets in local.github_deploy_secrets : {
+      for name, value in secrets : "${environment}/${name}" => {
+        environment = environment
+        name        = name
+        value       = value
+      }
+    }
+  ]...)
+  repository  = "doedensonline"
+  environment = github_repository_environment.deploy[each.value.environment].environment
+  secret_name = each.value.name
+  value       = each.value.value
 }
 
 

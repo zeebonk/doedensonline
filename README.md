@@ -77,6 +77,9 @@ docker buildx build --push \
     --platform=linux/amd64,linux/arm64 ./src
 ```
 
+Tags are immutable, except the `cache-*` and `pr-*-cache-*` layer caches: a
+push to an existing tag fails.
+
 Local development (`docker compose`) builds for the host's native
 architecture. CI builds and tests the image natively on both amd64 and arm64
 runners and only tags the combined multi-arch image once both succeed.
