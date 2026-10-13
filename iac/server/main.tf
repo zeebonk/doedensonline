@@ -244,10 +244,10 @@ module "iam_role_github_actions" {
   }
 }
 
-# Plans and applies this module from CI. Only jobs in the `server` GitHub
-# environment can assume it, not any branch or PR like the role above. This
-# module manages IAM, KMS and the OIDC provider, so it's admin-equivalent
-# anyway.
+# Plans this module on pull requests and applies it on master from CI. Only
+# jobs in the `server` GitHub environment, which requires an approval, can
+# assume it, not any job like the role above. This module manages IAM, KMS
+# and the OIDC provider, so it's admin-equivalent anyway.
 module "iam_role_github_actions_server" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.8.2"
