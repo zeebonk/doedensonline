@@ -15,19 +15,16 @@ jobs:
       (github.event.pull_request.head.repo.full_name == github.repository &&
       github.actor != 'dependabot[bot]')
     runs-on: ubuntu-latest
-    # Only `server` (master only) can assume the admin role; `server-plan`
-    # (any branch) gets the read-only role.
-    environment: ${{ github.ref == 'refs/heads/master' && 'server' || 'server-plan' }}
-    # A newer master run applies everything an older pending one would, so
-    # one apply at a time is enough. Branch plans cancel older ones.
+    # Requires an approval; only this environment can assume the
+    # github-actions-server role.
+    environment: server
+    # Plans hold the state lock too, and a cancelled run can leave it behind.
     concurrency:
-      group: server-${{ github.ref == 'refs/heads/master' && 'apply' || github.ref }}
-      cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+      group: server-${{ github.ref }}
+      cancel-in-progress: false
     permissions:
       id-token: write
       contents: read
-    env:
-      APPLY: ${{ github.ref == 'refs/heads/master' }}
     defaults:
       run:
         working-directory: iac/server
@@ -39,7 +36,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::313336455033:role/${{ github.ref == 'refs/heads/master' && 'github-actions-server' || 'github-actions-server-plan' }}
+          role-to-assume: arn:aws:iam::313336455033:role/github-actions-server
           aws-region: eu-west-1
 
       - name: Initialize OpenTofu
@@ -53,16 +50,9 @@ jobs:
           TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           GITHUB_TOKEN: ${{ secrets.SERVER_GITHUB_TOKEN }}
         run: |
-          # The read-only plan role can't write the S3 lockfile.
-          if [ "${APPLY}" = "true" ]; then
-            lock="-lock-timeout=10m"
-          else
-            lock="-lock=false"
-          fi
-
           # -detailed-exitcode: 0 means no changes, 2 means changes pending.
           code=0
-          tofu plan -input=false "${lock}" -detailed-exitcode -out=server.tfplan || code=$?
+          tofu plan -input=false -lock-timeout=10m -detailed-exitcode -out=server.tfplan || code=$?
           case "${code}" in
             0) echo "changes=false" >> "$GITHUB_OUTPUT" ;;
             2) echo "changes=true" >> "$GITHUB_OUTPUT" ;;
@@ -76,7 +66,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Apply
-        if: env.APPLY == 'true' && steps.plan.outputs.changes == 'true'
+        if: github.ref == 'refs/heads/master' && steps.plan.outputs.changes == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.SERVER_GITHUB_TOKEN }}
         run: tofu apply -input=false -lock-timeout=10m server.tfplan
