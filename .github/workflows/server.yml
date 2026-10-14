@@ -15,11 +15,9 @@ jobs:
       (!github.event.pull_request.head.repo.fork &&
       github.actor != 'dependabot[bot]')
     runs-on: ubuntu-latest
-    # Only these environments can assume the github-actions-server role.
-    # Pull requests run in `server-plan`, which requires an approval, since
-    # any branch can change this workflow. Master runs in `server`, which
-    # only master can use: it only changes through a merged pull request,
-    # whose plan was already approved.
+    # Only these environments can assume github-actions-server. Pull requests
+    # need an approval, since any branch can edit this workflow. Master
+    # doesn't: it only changes through pull requests with an approved plan.
     environment: ${{ github.event_name == 'pull_request' && 'server-plan' || 'server' }}
     # Plans hold the state lock too, and a cancelled run can leave it behind.
     concurrency:
