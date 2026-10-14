@@ -6,7 +6,7 @@
 
 terraform {
   # Credentials come from the environment: AWS_PROFILE=doedensonline
-  # locally, the github-actions role in CI.
+  # locally, the github-actions-deploy role in CI.
   backend "s3" {
     bucket       = "doedensonline-terraform"
     key          = "deploy"

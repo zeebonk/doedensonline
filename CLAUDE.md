@@ -103,14 +103,15 @@ docker compose run --rm app <any command>
 Two OpenTofu root modules, each with its own state:
 
 - `iac/server/main.tf` provisions the cloud resources (Hetzner VM, Cloudflare
-  tunnels, AWS SES/IAM/ECR, GitHub Actions secrets).
+  tunnels, AWS SES/IAM/ECR, the `dev`/`prod` GitHub environments and their
+  secrets).
   `.github/workflows/server.yml` plans it on every pull request and applies
   it on every master push, drift included. Both wait for an approval on the
   `server` environment.
   Bootstrapping, and fixing a bad apply that locks CI out, are still done
   locally with `AWS_PROFILE=doedensonline`. The server apply and the dev
   deploy start on the same master push in no particular order: merge an infra
-  change that the app depends on (e.g. a new `DEV_*` secret) first.
+  change that the app depends on (e.g. a new deploy secret) first.
 - `iac/app/main.tf` deploys everything that runs on the host: the app
   container, its state directories and SQLite file, migrations and seeding,
   and the environment's `cloudflared` tunnel container (kreuzwerker/docker

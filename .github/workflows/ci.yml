@@ -75,7 +75,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::313336455033:role/github-actions
+          role-to-assume: arn:aws:iam::313336455033:role/github-actions-build
           aws-region: eu-west-1
 
       - name: Log in to Amazon ECR
@@ -140,7 +140,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::313336455033:role/github-actions
+          role-to-assume: arn:aws:iam::313336455033:role/github-actions-build
           aws-region: eu-west-1
 
       - name: Log in to Amazon ECR
@@ -193,13 +193,14 @@ jobs:
       group: deploy-${{ github.event_name == 'release' && 'prod' || 'dev' }}
       cancel-in-progress: false
     runs-on: ubuntu-latest
+    # Only master can deploy to dev and only release tags to prod. Only these
+    # environments get the deploy secrets and the github-actions-deploy role.
+    environment: ${{ github.event_name == 'release' && 'prod' || 'dev' }}
     permissions:
       id-token: write
       contents: read
     env:
       ENVIRONMENT: ${{ github.event_name == 'release' && 'prod' || 'dev' }}
-      # Prefix of the environment's GitHub Actions secrets.
-      SECRETS: ${{ github.event_name == 'release' && 'PROD' || 'DEV' }}
     defaults:
       run:
         working-directory: iac/app
@@ -211,13 +212,13 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::313336455033:role/github-actions
+          role-to-assume: arn:aws:iam::313336455033:role/github-actions-deploy
           aws-region: eu-west-1
 
       - name: Configure SSH
         env:
-          SSH_PRIVATE_KEY: ${{ secrets[format('{0}_SSH_PRIVATE_KEY', env.SECRETS)] }}
-          SSH_HOST: ${{ secrets[format('{0}_SSH_HOST', env.SECRETS)] }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
@@ -232,11 +233,11 @@ jobs:
 
       - name: Deploy to ${{ env.ENVIRONMENT }}
         env:
-          TF_VAR_ssh_host: ${{ secrets[format('{0}_SSH_HOST', env.SECRETS)] }}
+          TF_VAR_ssh_host: ${{ secrets.SSH_HOST }}
           TF_VAR_image_tag: ${{ needs.release.outputs.tag }}
-          TF_VAR_smtp_host: ${{ secrets[format('{0}_SMTP_HOST', env.SECRETS)] }}
-          TF_VAR_smtp_username: ${{ secrets[format('{0}_SMTP_USERNAME', env.SECRETS)] }}
-          TF_VAR_smtp_password: ${{ secrets[format('{0}_SMTP_PASSWORD', env.SECRETS)] }}
-          TF_VAR_secret_key_base: ${{ secrets[format('{0}_SECRET_KEY_BASE', env.SECRETS)] }}
-          TF_VAR_tunnel_token: ${{ secrets[format('{0}_TUNNEL_TOKEN', env.SECRETS)] }}
+          TF_VAR_smtp_host: ${{ secrets.SMTP_HOST }}
+          TF_VAR_smtp_username: ${{ secrets.SMTP_USERNAME }}
+          TF_VAR_smtp_password: ${{ secrets.SMTP_PASSWORD }}
+          TF_VAR_secret_key_base: ${{ secrets.SECRET_KEY_BASE }}
+          TF_VAR_tunnel_token: ${{ secrets.TUNNEL_TOKEN }}
         run: tofu apply -input=false -auto-approve
