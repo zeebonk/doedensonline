@@ -60,7 +60,10 @@ tofu apply
 
 After that, CI takes over (`.github/workflows/server.yml`): every pull
 request gets a plan in the job summary, and every push to `master` applies it,
-along with any drift. Both wait for an approval on the `server` environment.
+along with any drift. Pull request plans run in the `server-plan` environment
+and wait for an approval, because any branch can change the workflow. Master
+applies run in the `server` environment, which only master can use, without
+one.
 To retry a failed apply, re-run the Server workflow run on `master`.
 
 On first boot, cloud-init installs Docker on the server. The server's

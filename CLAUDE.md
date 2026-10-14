@@ -106,8 +106,9 @@ Two OpenTofu root modules, each with its own state:
   tunnels, AWS SES/IAM/ECR, the `dev`/`prod` GitHub environments and their
   secrets).
   `.github/workflows/server.yml` plans it on every pull request and applies
-  it on every master push, drift included. Both wait for an approval on the
-  `server` environment.
+  it on every master push, drift included. Pull request plans run in the
+  `server-plan` environment and wait for an approval; master applies run in
+  the master-only `server` environment without one.
   Bootstrapping, and fixing a bad apply that locks CI out, are still done
   locally with `AWS_PROFILE=doedensonline`. The server apply and the dev
   deploy start on the same master push in no particular order: merge an infra
