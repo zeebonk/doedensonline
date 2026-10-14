@@ -325,11 +325,9 @@ module "iam_role_github_actions_deploy" {
   }
 }
 
-# Plans this module on pull requests and applies it on master from CI. Only
-# jobs in the `server-plan` GitHub environment, which requires an approval,
-# and the master-only `server` environment can assume it, not any job like
-# github-actions-build. This module manages IAM, KMS and the OIDC provider,
-# so it's admin-equivalent anyway.
+# Plans this module on pull requests and applies it on master. Only the
+# `server-plan` (approval required) and `server` (master only) environments
+# can assume it. It's admin, as this module manages IAM, KMS and OIDC anyway.
 module "iam_role_github_actions_server" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.8.2"
