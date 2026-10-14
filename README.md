@@ -41,8 +41,10 @@ cp terraform.tfvars.example terraform.tfvars
 # edit terraform.tfvars and set hcloud_token
 ```
 
-Export a GitHub personal access token with `repo` scope so Terraform can
-manage the GitHub Actions secrets used by the dev deploy workflow:
+Export a GitHub personal access token so Terraform can manage the `dev` and
+`prod` environments and their secrets, used by the deploy job: a classic token
+with `repo` scope, or a fine-grained one with read and write access to
+Administration and Environments:
 
 ```
 export GITHUB_TOKEN=...
@@ -109,8 +111,8 @@ image.
 
 `iac/app` is a separate OpenTofu root module with its own state, one
 workspace per environment. It reaches Docker on the host over SSH as root.
-The variables mirror the `DEV_*`/`PROD_*` GitHub Actions secrets set by
-`iac/server/main.tf`:
+The variables mirror the secrets of the `dev` and `prod` GitHub environments,
+set by `iac/server/main.tf`:
 
 ```
 cd iac/app

@@ -245,45 +245,6 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
 
-# Replaced by github-actions-build and github-actions-deploy below; removed
-# once CI uses those.
-module "iam_role_github_actions" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.8.2"
-
-  name            = "github-actions"
-  use_name_prefix = false
-
-  trust_policy_permissions = {
-    AllowAssumeRoleFromGitHubActions = {
-      actions = ["sts:AssumeRoleWithWebIdentity"]
-      principals = [
-        {
-          type        = "Federated"
-          identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
-        }
-      ]
-      condition = [
-        {
-          test     = "StringEquals"
-          variable = "token.actions.githubusercontent.com:aud"
-          values   = ["sts.amazonaws.com"]
-        },
-        {
-          test     = "StringLike"
-          variable = "token.actions.githubusercontent.com:sub"
-          values   = ["repo:zeebonk/doedensonline:*"]
-        }
-      ]
-    }
-  }
-
-  policies = {
-    ECRPush     = module.ecr_push_policy.arn
-    DeployState = module.deploy_state_policy.arn
-  }
-}
-
 # Builds and pushes images. PR builds push their layer cache too, so any
 # job can assume it.
 module "iam_role_github_actions_build" {
@@ -696,11 +657,6 @@ locals {
       TUNNEL_TOKEN    = data.cloudflare_zero_trust_tunnel_cloudflared_token.prod.token
     }
   }
-
-  # Repository-level copies, readable by every workflow run. Removed once
-  # the deploy job uses the environment secrets.
-  github_actions_dev_secrets  = { for name, value in local.github_deploy_secrets.dev : "DEV_${name}" => value }
-  github_actions_prod_secrets = { for name, value in local.github_deploy_secrets.prod : "PROD_${name}" => value }
 }
 
 # Rails 4.0 secret_key_base for the production and development
@@ -712,20 +668,6 @@ resource "random_id" "prod_secret_key_base" {
 
 resource "random_id" "dev_secret_key_base" {
   byte_length = 64
-}
-
-resource "github_actions_secret" "dev_deploy" {
-  for_each    = local.github_actions_dev_secrets
-  repository  = "doedensonline"
-  secret_name = each.key
-  value       = each.value
-}
-
-resource "github_actions_secret" "prod_deploy" {
-  for_each    = local.github_actions_prod_secrets
-  repository  = "doedensonline"
-  secret_name = each.key
-  value       = each.value
 }
 
 resource "github_repository_environment" "deploy" {
