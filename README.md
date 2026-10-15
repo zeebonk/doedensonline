@@ -41,6 +41,18 @@ cp terraform.tfvars.example terraform.tfvars
 # edit terraform.tfvars and set hcloud_token
 ```
 
+Also set `cloudflare_account_id` and `cloudflare_api_token`. Create the token
+as an account-owned token (Manage Account → Account API Tokens) with these
+permissions:
+
+- On the entire account: Cloudflare Tunnel Write and Account API Tokens Write,
+  so it can create the `doedensonline-deploy` token for the deploy job.
+- On all zones in the account: Zone Write, Zone Settings Write, DNS Write and
+  Dynamic URL Redirects Write.
+
+CI reads these from the `HCLOUD_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and
+`CLOUDFLARE_API_TOKEN` secrets of the `server` environment.
+
 Export a GitHub personal access token so Terraform can manage the `dev` and
 `prod` environments and their secrets, used by the deploy job: a classic token
 with `repo` scope, or a fine-grained one with read and write access to

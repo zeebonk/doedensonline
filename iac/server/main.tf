@@ -628,6 +628,54 @@ resource "cloudflare_ruleset" "redirect_www_to_apex" {
   ]
 }
 
+# Lets the deploy job (../app) manage each environment's tunnel and DNS
+# record. Tunnel permissions only scope to the whole account, and both
+# hostnames are in one zone, so dev and prod share the token.
+locals {
+  # Permission group name => scope.
+  deploy_token_permission_groups = {
+    "Cloudflare Tunnel Write" = "com.cloudflare.api.account"
+    "DNS Write"               = "com.cloudflare.api.account.zone"
+    "Zone Read"               = "com.cloudflare.api.account.zone"
+  }
+}
+
+data "cloudflare_account_api_token_permission_groups_list" "deploy" {
+  for_each   = local.deploy_token_permission_groups
+  account_id = var.cloudflare_account_id
+  name       = each.key
+  scope      = each.value
+}
+
+resource "cloudflare_account_token" "deploy" {
+  account_id = var.cloudflare_account_id
+  name       = "doedensonline-deploy"
+
+  policies = [
+    {
+      effect = "allow"
+      permission_groups = [
+        { id = data.cloudflare_account_api_token_permission_groups_list.deploy["Cloudflare Tunnel Write"].result[0].id },
+      ]
+      resources = jsonencode({
+        "com.cloudflare.api.account.${var.cloudflare_account_id}" = "*"
+      })
+    },
+    {
+      effect = "allow"
+      permission_groups = [
+        { id = data.cloudflare_account_api_token_permission_groups_list.deploy["DNS Write"].result[0].id },
+        { id = data.cloudflare_account_api_token_permission_groups_list.deploy["Zone Read"].result[0].id },
+      ]
+      resources = jsonencode({
+        "com.cloudflare.api.account.${var.cloudflare_account_id}" = {
+          "com.cloudflare.api.account.zone.${cloudflare_zone.doedensonline.id}" = "*"
+        }
+      })
+    },
+  ]
+}
+
 # GitHub environments and secrets for the deploy job
 
 locals {
@@ -639,20 +687,22 @@ locals {
 
   github_deploy_secrets = {
     dev = {
-      SSH_HOST        = hcloud_server.doedensonline.ipv4_address
-      SSH_PRIVATE_KEY = tls_private_key.github_actions_dev.private_key_openssh
-      SMTP_HOST       = "email-smtp.${local.region}.amazonaws.com"
-      SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
-      SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
-      TUNNEL_TOKEN    = data.cloudflare_zero_trust_tunnel_cloudflared_token.dev.token
+      SSH_HOST             = hcloud_server.doedensonline.ipv4_address
+      SSH_PRIVATE_KEY      = tls_private_key.github_actions_dev.private_key_openssh
+      SMTP_HOST            = "email-smtp.${local.region}.amazonaws.com"
+      SMTP_USERNAME        = module.iam_user_doedensonline_ses.access_key_id
+      SMTP_PASSWORD        = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
+      TUNNEL_TOKEN         = data.cloudflare_zero_trust_tunnel_cloudflared_token.dev.token
+      CLOUDFLARE_API_TOKEN = cloudflare_account_token.deploy.value
     }
     prod = {
-      SSH_HOST        = hcloud_server.doedensonline.ipv4_address
-      SSH_PRIVATE_KEY = tls_private_key.github_actions_dev.private_key_openssh
-      SMTP_HOST       = "email-smtp.${local.region}.amazonaws.com"
-      SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
-      SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
-      TUNNEL_TOKEN    = data.cloudflare_zero_trust_tunnel_cloudflared_token.prod.token
+      SSH_HOST             = hcloud_server.doedensonline.ipv4_address
+      SSH_PRIVATE_KEY      = tls_private_key.github_actions_dev.private_key_openssh
+      SMTP_HOST            = "email-smtp.${local.region}.amazonaws.com"
+      SMTP_USERNAME        = module.iam_user_doedensonline_ses.access_key_id
+      SMTP_PASSWORD        = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
+      TUNNEL_TOKEN         = data.cloudflare_zero_trust_tunnel_cloudflared_token.prod.token
+      CLOUDFLARE_API_TOKEN = cloudflare_account_token.deploy.value
     }
   }
 }
