@@ -532,9 +532,7 @@ resource "cloudflare_dns_record" "doedensonline_amazonses_verification_record" {
   proxied = false
 }
 
-# 32 random bytes, base64-encoded — what `cloudflared` expects for a tunnel
-# secret. Not a random_id: its ID is its value, which OpenTofu prints on
-# every refresh, so it ends up in the public CI logs.
+# 32 random bytes, base64-encoded — what `cloudflared` expects for a tunnel secret.
 resource "random_bytes" "dev_tunnel_secret" {
   length = 32
 }
