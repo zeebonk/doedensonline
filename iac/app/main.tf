@@ -99,7 +99,7 @@ locals {
     "DO_SMTP_HOST=${var.smtp_host}",
     "DO_SMTP_USERNAME=${var.smtp_username}",
     "DO_SMTP_PASSWORD=${var.smtp_password}",
-    "SECRET_KEY_BASE=${random_id.secret_key_base.hex}",
+    "SECRET_KEY_BASE=${random_bytes.secret_key_base.hex}",
   ]
 
   log_opts = {
@@ -108,11 +108,10 @@ locals {
   }
 }
 
-# The environment's Rails secret_key_base. 64 random bytes give 128 hex
-# characters, the same length as `bin/rails secret`. Replacing it logs
-# everyone out, since sessions are stored in cookies signed with it.
-resource "random_id" "secret_key_base" {
-  byte_length = 64
+# Rails secret_key_base. Replacing it logs everyone out. Not a random_id,
+# because OpenTofu logs a random_id's value as its ID.
+resource "random_bytes" "secret_key_base" {
+  length = 64
 }
 
 provider "aws" {
