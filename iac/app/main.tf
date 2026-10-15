@@ -108,12 +108,8 @@ locals {
   }
 }
 
-# The environment's Rails secret_key_base. 64 random bytes give 128 hex
-# characters, the same length as `bin/rails secret`. Replacing it logs
-# everyone out, since sessions are stored in cookies signed with it.
-#
-# Not a random_id: its ID is its value, which OpenTofu prints on every
-# refresh, so it ends up in the public CI logs.
+# Rails secret_key_base. Replacing it logs everyone out. Not a random_id,
+# because OpenTofu logs a random_id's value as its ID.
 resource "random_bytes" "secret_key_base" {
   length = 64
 }
