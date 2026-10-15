@@ -532,15 +532,17 @@ resource "cloudflare_dns_record" "doedensonline_amazonses_verification_record" {
   proxied = false
 }
 
-# 32 random bytes, base64-encoded — what `cloudflared` expects for a tunnel secret.
-resource "random_id" "dev_tunnel_secret" {
-  byte_length = 32
+# 32 random bytes, base64-encoded — what `cloudflared` expects for a tunnel
+# secret. Not a random_id: its ID is its value, which OpenTofu prints on
+# every refresh, so it ends up in the public CI logs.
+resource "random_bytes" "dev_tunnel_secret" {
+  length = 32
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared" "dev" {
   account_id    = var.cloudflare_account_id
   name          = "doedensonline-dev"
-  tunnel_secret = random_id.dev_tunnel_secret.b64_std
+  tunnel_secret = random_bytes.dev_tunnel_secret.base64
 }
 
 data "cloudflare_zero_trust_tunnel_cloudflared_token" "dev" {
@@ -566,14 +568,14 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "dev" {
   }
 }
 
-resource "random_id" "prod_tunnel_secret" {
-  byte_length = 32
+resource "random_bytes" "prod_tunnel_secret" {
+  length = 32
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared" "prod" {
   account_id    = var.cloudflare_account_id
   name          = "doedensonline-prod"
-  tunnel_secret = random_id.prod_tunnel_secret.b64_std
+  tunnel_secret = random_bytes.prod_tunnel_secret.base64
 }
 
 data "cloudflare_zero_trust_tunnel_cloudflared_token" "prod" {
@@ -644,7 +646,6 @@ locals {
       SMTP_HOST       = "email-smtp.${local.region}.amazonaws.com"
       SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
       SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
-      SECRET_KEY_BASE = random_id.dev_secret_key_base.hex
       TUNNEL_TOKEN    = data.cloudflare_zero_trust_tunnel_cloudflared_token.dev.token
     }
     prod = {
@@ -653,21 +654,9 @@ locals {
       SMTP_HOST       = "email-smtp.${local.region}.amazonaws.com"
       SMTP_USERNAME   = module.iam_user_doedensonline_ses.access_key_id
       SMTP_PASSWORD   = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
-      SECRET_KEY_BASE = random_id.prod_secret_key_base.hex
       TUNNEL_TOKEN    = data.cloudflare_zero_trust_tunnel_cloudflared_token.prod.token
     }
   }
-}
-
-# Rails 4.0 secret_key_base for the production and development
-# environments. 64 random bytes → 128 hex chars, the same length the
-# Rails generator produces.
-resource "random_id" "prod_secret_key_base" {
-  byte_length = 64
-}
-
-resource "random_id" "dev_secret_key_base" {
-  byte_length = 64
 }
 
 resource "github_repository_environment" "deploy" {
