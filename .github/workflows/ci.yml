@@ -238,6 +238,5 @@ jobs:
           TF_VAR_smtp_host: ${{ secrets.SMTP_HOST }}
           TF_VAR_smtp_username: ${{ secrets.SMTP_USERNAME }}
           TF_VAR_smtp_password: ${{ secrets.SMTP_PASSWORD }}
-          TF_VAR_secret_key_base: ${{ secrets.SECRET_KEY_BASE }}
           TF_VAR_tunnel_token: ${{ secrets.TUNNEL_TOKEN }}
         run: tofu apply -input=false -auto-approve

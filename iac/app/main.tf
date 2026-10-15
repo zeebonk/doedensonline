@@ -23,6 +23,10 @@ terraform {
       source  = "kreuzwerker/docker"
       version = "~> 4.6"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
   }
 }
 
@@ -45,11 +49,6 @@ variable "smtp_username" {
 }
 
 variable "smtp_password" {
-  type      = string
-  sensitive = true
-}
-
-variable "secret_key_base" {
   type      = string
   sensitive = true
 }
@@ -100,13 +99,20 @@ locals {
     "DO_SMTP_HOST=${var.smtp_host}",
     "DO_SMTP_USERNAME=${var.smtp_username}",
     "DO_SMTP_PASSWORD=${var.smtp_password}",
-    "SECRET_KEY_BASE=${var.secret_key_base}",
+    "SECRET_KEY_BASE=${random_id.secret_key_base.hex}",
   ]
 
   log_opts = {
     max-size = "10m"
     max-file = "5"
   }
+}
+
+# The environment's Rails secret_key_base. 64 random bytes give 128 hex
+# characters, the same length as `bin/rails secret`. Replacing it logs
+# everyone out, since sessions are stored in cookies signed with it.
+resource "random_id" "secret_key_base" {
+  byte_length = 64
 }
 
 provider "aws" {
