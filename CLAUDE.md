@@ -112,13 +112,15 @@ Two OpenTofu root modules, each with its own state:
   locally with `AWS_PROFILE=doedensonline`. The server apply and the dev
   deploy start on the same master push in no particular order: merge an infra
   change that the app depends on (e.g. a new deploy secret) first.
-- `iac/app/main.tf` deploys an environment: its Cloudflare tunnel, ingress
-  and DNS record, and everything that runs on the host: the app container, its
-  state directories and SQLite file, migrations and seeding, and the
-  `cloudflared` tunnel container (kreuzwerker/docker provider, one OpenTofu
-  workspace per environment). The `deploy` job in `.github/workflows/ci.yml`
-  applies it. Change per-environment deploy settings (`RAILS_ENV`,
-  hostnames, ports, mounts, env vars) there.
+- `iac/app` deploys an environment: its Cloudflare tunnel, ingress and DNS
+  record, and everything that runs on the host: the app container, its state
+  directories and SQLite file, migrations and seeding, and the `cloudflared`
+  tunnel container (kreuzwerker/docker provider, one OpenTofu workspace per
+  environment). The `deploy` job in `.github/workflows/ci.yml` applies it.
+  `main.tf` holds the resources and the per-environment deploy settings
+  (`RAILS_ENV`, hostnames, ports, mounts, env vars), `terraform.tf` the
+  backend and provider versions, `variables.tf` the inputs, and
+  `providers.tf` the provider configuration and ECR credentials.
 
 How the host is set up:
 

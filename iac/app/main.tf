@@ -1,66 +1,6 @@
-# Deploys the app container, its Cloudflare tunnel and DNS record, and the
-# tunnel container to a host provisioned by ../server/main.tf. Kept in its own
-# root module and state so CI can deploy without touching (or having access
-# to) the infrastructure state.
-#
-# One OpenTofu workspace per environment: `dev` or `prod`.
-
-terraform {
-  # Credentials come from the environment: AWS_PROFILE=doedensonline
-  # locally, the github-actions-deploy role in CI.
-  backend "s3" {
-    bucket       = "doedensonline-terraform"
-    key          = "deploy"
-    region       = "eu-west-1"
-    use_lockfile = true
-  }
-
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 6.0"
-    }
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "~> 4.6"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.6"
-    }
-    cloudflare = {
-      source  = "cloudflare/cloudflare"
-      version = "~> 5.26"
-    }
-  }
-}
-
-variable "ssh_host" {
-  description = "Host to deploy to; Docker is reached over SSH as root."
-  type        = string
-}
-
-variable "image_tag" {
-  description = "Tag of the app image in ECR to deploy."
-  type        = string
-}
-
-variable "smtp_host" {
-  type = string
-}
-
-variable "smtp_username" {
-  type = string
-}
-
-variable "smtp_password" {
-  type      = string
-  sensitive = true
-}
+# Deploy the app container, its Cloudflare tunnel and DNS record
 
 locals {
-  registry = "313336455033.dkr.ecr.eu-west-1.amazonaws.com"
-
   environments = {
     dev = {
       rails_env = "development"
@@ -76,13 +16,11 @@ locals {
     }
   }
 
-  # Fails with "Invalid index" outside the dev/prod workspaces.
   env = local.environments[terraform.workspace]
 
   name       = "doedensonline-${terraform.workspace}"
   state_path = "/app-state/${terraform.workspace}"
 
-  # Host directory under state_path => container path.
   volumes = {
     db     = "/app/storage"
     small  = "/app/public/images/small"
@@ -104,31 +42,13 @@ locals {
   }
 }
 
-# Rails secret_key_base. Replacing it logs everyone out. Not a random_id,
-# because OpenTofu logs a random_id's value as its ID.
+# Rails secret_key_base
 resource "random_bytes" "secret_key_base" {
   length = 64
 }
 
-provider "aws" {
-  region = "eu-west-1"
-}
-
-# The host has no registry credentials, so pass them along with the pull.
-data "aws_ecr_authorization_token" "this" {}
-
-provider "docker" {
-  host = "ssh://root@${var.ssh_host}"
-
-  registry_auth {
-    address  = local.registry
-    username = data.aws_ecr_authorization_token.this.user_name
-    password = data.aws_ecr_authorization_token.this.password
-  }
-}
-
 resource "docker_image" "app" {
-  name         = "${local.registry}/doedensonline:${var.image_tag}"
+  name         = "${var.registry}/doedensonline:${var.image_tag}"
   keep_locally = true
 
   # Pull the new image before the old container is removed.
@@ -137,8 +57,7 @@ resource "docker_image" "app" {
   }
 }
 
-# One-shot container that migrates (and on dev, seeds) the database before
-# the app container starts. Its logs stay available through `docker logs`.
+# One-shot container that migrates (and on dev, seeds) the database
 resource "docker_container" "migrate" {
   name     = "${local.name}-migrate"
   image    = docker_image.app.image_id
@@ -201,8 +120,6 @@ resource "docker_container" "app" {
   depends_on = [docker_container.migrate]
 }
 
-# Connects the environment's Cloudflare tunnel to the app's port on
-# localhost. The image tag is bumped by hand.
 resource "docker_image" "cloudflared" {
   name = "cloudflare/cloudflared:2026.10.0"
 
@@ -223,13 +140,6 @@ resource "docker_container" "cloudflared" {
   log_opts   = local.log_opts
 }
 
-
-# Cloudflare
-
-# Credentials come from the environment: CLOUDFLARE_API_TOKEN, the
-# doedensonline-deploy token created by ../server/main.tf.
-provider "cloudflare" {}
-
 data "cloudflare_zone" "this" {
   filter = {
     name = "doedensonline.nl"
@@ -239,10 +149,7 @@ data "cloudflare_zone" "this" {
 resource "cloudflare_zero_trust_tunnel_cloudflared" "this" {
   account_id = data.cloudflare_zone.this.account.id
   name       = local.name
-  # The ingress below is managed through the API, not a local config file.
-  # No tunnel_secret: Cloudflare generates one for remotely-managed tunnels
-  # and doesn't return it.
-  config_src = "cloudflare"
+  config_src = "cloudflare" # managed via API, not file
 }
 
 data "cloudflare_zero_trust_tunnel_cloudflared_token" "this" {
