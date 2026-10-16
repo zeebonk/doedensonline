@@ -79,8 +79,9 @@ On first boot, cloud-init installs Docker on the server. The server's
 cloud-init config only applies when the server is created; changing it
 doesn't touch the existing server.
 
-Nothing runs on a fresh server yet: each environment's app and Cloudflare
-tunnel containers come up with its first deploy (see below).
+Nothing runs on a fresh server yet: each environment's Cloudflare tunnel,
+DNS record, and app and tunnel containers come up with its first deploy (see
+below).
 
 
 ## Push latest image to ECR
@@ -122,16 +123,18 @@ image.
 ### Deploy manually
 
 `iac/app` is a separate OpenTofu root module with its own state, one
-workspace per environment. It reaches Docker on the host over SSH as root.
-The variables mirror the secrets of the `dev` and `prod` GitHub environments,
-set by `iac/server/main.tf`:
+workspace per environment. It reaches Docker on the host over SSH as root, and
+manages the environment's Cloudflare tunnel and DNS record. The variables and
+`CLOUDFLARE_API_TOKEN` mirror the secrets of the `dev` and `prod` GitHub
+environments, set by `iac/server/main.tf`. Any token with the same permissions
+works, such as the one in `iac/server/terraform.tfvars`:
 
 ```
 cd iac/app
 export AWS_PROFILE=doedensonline
+export CLOUDFLARE_API_TOKEN=...
 tofu init
 tofu workspace select dev
 tofu apply -var image_tag=master.abc1234 -var ssh_host=... \
-    -var smtp_host=... -var smtp_username=... -var smtp_password=... \
-    -var tunnel_token=...
+    -var smtp_host=... -var smtp_username=... -var smtp_password=...
 ```

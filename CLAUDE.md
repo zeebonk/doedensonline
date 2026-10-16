@@ -103,8 +103,8 @@ docker compose run --rm app <any command>
 Two OpenTofu root modules, each with its own state:
 
 - `iac/server/main.tf` provisions the cloud resources (Hetzner VM, Cloudflare
-  tunnels, AWS SES/IAM/ECR, the `dev`/`prod` GitHub environments and their
-  secrets).
+  zone and deploy token, AWS SES/IAM/ECR, the `dev`/`prod` GitHub environments
+  and their secrets).
   `.github/workflows/server.yml` plans it on every pull request and applies
   it on every master push, drift included. Both wait for an approval on the
   `server` environment.
@@ -112,12 +112,13 @@ Two OpenTofu root modules, each with its own state:
   locally with `AWS_PROFILE=doedensonline`. The server apply and the dev
   deploy start on the same master push in no particular order: merge an infra
   change that the app depends on (e.g. a new deploy secret) first.
-- `iac/app/main.tf` deploys everything that runs on the host: the app
-  container, its state directories and SQLite file, migrations and seeding,
-  and the environment's `cloudflared` tunnel container (kreuzwerker/docker
-  provider, one OpenTofu workspace per environment). The `deploy` job in
-  `.github/workflows/ci.yml` applies it. Change per-environment deploy
-  settings (`RAILS_ENV`, ports, mounts, env vars) there.
+- `iac/app/main.tf` deploys an environment: its Cloudflare tunnel, ingress
+  and DNS record, and everything that runs on the host: the app container, its
+  state directories and SQLite file, migrations and seeding, and the
+  `cloudflared` tunnel container (kreuzwerker/docker provider, one OpenTofu
+  workspace per environment). The `deploy` job in `.github/workflows/ci.yml`
+  applies it. Change per-environment deploy settings (`RAILS_ENV`,
+  hostnames, ports, mounts, env vars) there.
 
 How the host is set up:
 
