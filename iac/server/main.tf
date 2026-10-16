@@ -1,32 +1,4 @@
-terraform {
-  # Credentials come from the environment: AWS_PROFILE=doedensonline
-  # locally, the github-actions-server role in CI.
-  backend "s3" {
-    bucket       = "doedensonline-terraform"
-    key          = "app"
-    region       = "eu-west-1"
-    use_lockfile = true
-  }
-
-  required_providers {
-    hcloud = {
-      source  = "hetznercloud/hcloud"
-      version = "~> 1.60"
-    }
-    github = {
-      source  = "integrations/github"
-      version = "~> 6.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.6"
-    }
-    cloudflare = {
-      source  = "cloudflare/cloudflare"
-      version = "~> 5.26"
-    }
-  }
-}
+# Provision the server, its DNS and mail, the image registry, and CI access
 
 locals {
   region                  = "eu-west-1"
@@ -34,36 +6,7 @@ locals {
   gijs_macbook_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhQZ/xpYhLpKddmIe0X3Cpi2YXXze/PqVYxMBn0+zmd7mVwI5Ki9eS9pA7AVsEpdKQDg4SV941xoVcJ9Jpe+ua0aKlSEJjBfgxH6V0zRSV5cN776uA3c37BAwaL9KzweHL0O4u79+JkAB+ergrDHpDz2WNpVKPgTJe0FzH7r4NT02zrbHMJVDX9gZlQwUNKLdJLpHrbuks2kjFzOuF3nMAqpPqgMM4EtZWhMgJ++2i4/m6Kub4F+mJxJpB2r3kYHO7vkaxWMp4Uhb/S8Y50KXVThkoZftFTXYex4zFRCuT8GiROZuzy9CirRdWA/TWWTz0n47KPzwYzkVKrzWfYLEJ gijs@gbox.local"
 }
 
-provider "aws" {
-  region = local.region
-}
-
-variable "hcloud_token" {
-  type      = string
-  sensitive = true
-}
-
-provider "hcloud" {
-  token = var.hcloud_token
-}
-
-provider "github" {
-  owner = "zeebonk"
-}
-
-variable "cloudflare_api_token" {
-  type      = string
-  sensitive = true
-}
-
-variable "cloudflare_account_id" {
-  type      = string
-  sensitive = true
-}
-
-provider "cloudflare" {
-  api_token = var.cloudflare_api_token
-}
+# AWS ECR and IAM
 
 resource "aws_kms_key" "doedensonline" {
   description = "doedensonline"
@@ -325,10 +268,8 @@ module "iam_role_github_actions_deploy" {
   }
 }
 
-# Plans this module on pull requests and applies it on master from CI. Only
-# jobs in the `server` GitHub environment, which requires an approval, can
-# assume it, not any job like github-actions-build. This module manages IAM,
-# KMS and the OIDC provider, so it's admin-equivalent anyway.
+# Plans and applies this module. Only jobs in the `server` GitHub
+# environment, which requires an approval, can assume it.
 module "iam_role_github_actions_server" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.8.2"
@@ -365,7 +306,6 @@ module "iam_role_github_actions_server" {
   }
 }
 
-
 # Hetzner
 
 resource "hcloud_ssh_key" "gijs_macbook" {
@@ -401,10 +341,8 @@ resource "hcloud_server" "doedensonline" {
       - vim
   EOT
 
-  # ssh_keys and user_data are only honored at server creation, and changing
-  # either would replace the server and its app state. Adding the
-  # github-actions key after the fact requires appending it to
-  # authorized_keys directly; user_data changes have to be applied by hand.
+  # Both only apply at creation and changing them would replace the server,
+  # so apply changes by hand over SSH.
   lifecycle {
     ignore_changes = [ssh_keys, user_data]
   }
@@ -425,7 +363,6 @@ resource "hcloud_firewall_attachment" "doedensonline" {
   firewall_id = hcloud_firewall.doedensonline.id
   server_ids  = [hcloud_server.doedensonline.id]
 }
-
 
 # AWS SES
 
@@ -479,9 +416,7 @@ resource "cloudflare_zone_setting" "doedensonline_always_use_https" {
   value      = "on"
 }
 
-# www.doedensonline.nl exists only so Cloudflare's edge can intercept
-# requests and apply the redirect ruleset below — the tunnel never sees
-# this hostname.
+# Exists only so the redirect ruleset below can catch www requests
 resource "cloudflare_dns_record" "doedensonline_www" {
   zone_id = cloudflare_zone.doedensonline.id
   name    = "www.${local.domain}"
@@ -510,9 +445,7 @@ resource "cloudflare_dns_record" "doedensonline_amazonses_verification_record" {
   proxied = false
 }
 
-# Strip a leading `www.` from any hostname in the zone and redirect to
-# the bare hostname. Handled at the Cloudflare edge — the tunnel never
-# sees `www.*` traffic.
+# Redirect www.<host> to <host> at the Cloudflare edge
 resource "cloudflare_ruleset" "redirect_www_to_apex" {
   zone_id = cloudflare_zone.doedensonline.id
   name    = "Redirect www.* to apex"
@@ -539,11 +472,10 @@ resource "cloudflare_ruleset" "redirect_www_to_apex" {
   ]
 }
 
-# Lets the deploy job (../app) manage each environment's tunnel and DNS
-# record. Tunnel permissions only scope to the whole account, and both
-# hostnames are in one zone, so dev and prod share the token.
+# Lets the deploy job (../app) manage the tunnels and DNS records. Tunnel
+# permissions only scope to the whole account, so dev and prod share it.
 locals {
-  # Permission group name => scope.
+  # Permission group name => scope
   deploy_token_permission_groups = {
     "Cloudflare Tunnel Write" = "com.cloudflare.api.account"
     "DNS Write"               = "com.cloudflare.api.account.zone"
@@ -587,10 +519,10 @@ resource "cloudflare_account_token" "deploy" {
   ]
 }
 
-# GitHub environments and secrets for the deploy job
+# GitHub
 
 locals {
-  # Which refs can deploy to each environment.
+  # Which refs can deploy to each environment
   github_deploy_environments = {
     dev  = { branch_pattern = "master" }
     prod = { tag_pattern = "*.*.*" }
@@ -649,12 +581,4 @@ resource "github_actions_environment_secret" "deploy" {
   environment = github_repository_environment.deploy[each.value.environment].environment
   secret_name = each.value.name
   value       = each.value.value
-}
-
-
-# Outputs
-
-output "dev_ip" {
-  description = "Dev server public IPv4"
-  value       = hcloud_server.doedensonline.ipv4_address
 }

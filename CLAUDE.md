@@ -102,9 +102,11 @@ docker compose run --rm app <any command>
 
 Two OpenTofu root modules, each with its own state:
 
-- `iac/server/main.tf` provisions the cloud resources (Hetzner VM, Cloudflare
-  zone and deploy token, AWS SES/IAM/ECR, the `dev`/`prod` GitHub environments
-  and their secrets).
+- `iac/server` provisions the cloud resources (Hetzner VM, Cloudflare zone
+  and deploy token, AWS SES/IAM/ECR, the `dev`/`prod` GitHub environments and
+  their secrets). `main.tf` holds the resources, `terraform.tf` the backend
+  and provider versions, `variables.tf` the inputs, `providers.tf` the
+  provider configuration, and `outputs.tf` the outputs.
   `.github/workflows/server.yml` plans it on every pull request and applies
   it on every master push, drift included. Both wait for an approval on the
   `server` environment.
