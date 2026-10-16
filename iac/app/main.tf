@@ -1,6 +1,7 @@
-# Deploys the app container and its Cloudflare tunnel to a host provisioned
-# by ../server/main.tf. Kept in its own root module and state so CI can deploy
-# without touching (or having access to) the infrastructure state.
+# Deploys the app container, its Cloudflare tunnel and DNS record, and the
+# tunnel container to a host provisioned by ../server/main.tf. Kept in its own
+# root module and state so CI can deploy without touching (or having access
+# to) the infrastructure state.
 #
 # One OpenTofu workspace per environment: `dev` or `prod`.
 
@@ -26,6 +27,10 @@ terraform {
     random = {
       source  = "hashicorp/random"
       version = "~> 3.6"
+    }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 5.26"
     }
   }
 }
@@ -53,28 +58,19 @@ variable "smtp_password" {
   sensitive = true
 }
 
-variable "tunnel_token" {
-  description = "Token of the environment's Cloudflare tunnel."
-  type        = string
-  sensitive   = true
-
-  validation {
-    condition     = var.tunnel_token != ""
-    error_message = "tunnel_token must not be empty."
-  }
-}
-
 locals {
   registry = "313336455033.dkr.ecr.eu-west-1.amazonaws.com"
 
   environments = {
     dev = {
       rails_env = "development"
+      hostname  = "dev.doedensonline.nl"
       port      = 8080
       seed      = true
     }
     prod = {
       rails_env = "production"
+      hostname  = "doedensonline.nl"
       port      = 8081
       seed      = false
     }
@@ -205,8 +201,8 @@ resource "docker_container" "app" {
   depends_on = [docker_container.migrate]
 }
 
-# Connects the environment's Cloudflare tunnel, set up by ../server/main.tf,
-# to the app's port on localhost. The image tag is bumped by hand.
+# Connects the environment's Cloudflare tunnel to the app's port on
+# localhost. The image tag is bumped by hand.
 resource "docker_image" "cloudflared" {
   name = "cloudflare/cloudflared:2026.10.0"
 
@@ -221,8 +217,95 @@ resource "docker_container" "cloudflared" {
   restart      = "always"
   network_mode = "host"
   command      = ["tunnel", "--no-autoupdate", "run"]
-  env          = ["TUNNEL_TOKEN=${var.tunnel_token}"]
+  env          = ["TUNNEL_TOKEN=${data.cloudflare_zero_trust_tunnel_cloudflared_token.this.token}"]
 
   log_driver = "json-file"
   log_opts   = local.log_opts
+}
+
+
+# Cloudflare
+
+# Credentials come from the environment: CLOUDFLARE_API_TOKEN, the
+# doedensonline-deploy token created by ../server/main.tf.
+provider "cloudflare" {}
+
+data "cloudflare_zone" "this" {
+  filter = {
+    name = "doedensonline.nl"
+  }
+}
+
+resource "cloudflare_zero_trust_tunnel_cloudflared" "this" {
+  account_id = data.cloudflare_zone.this.account.id
+  name       = local.name
+  # The ingress below is managed through the API, not a local config file.
+  # No tunnel_secret: Cloudflare generates one for remotely-managed tunnels
+  # and doesn't return it.
+  config_src = "cloudflare"
+}
+
+data "cloudflare_zero_trust_tunnel_cloudflared_token" "this" {
+  account_id = data.cloudflare_zone.this.account.id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.this.id
+}
+
+resource "cloudflare_zero_trust_tunnel_cloudflared_config" "this" {
+  account_id = data.cloudflare_zone.this.account.id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.this.id
+  source     = "cloudflare"
+
+  config = {
+    ingress = [
+      {
+        hostname = local.env.hostname
+        service  = "http://localhost:${local.env.port}"
+      },
+      {
+        service = "http_status:404"
+      },
+    ]
+  }
+}
+
+resource "cloudflare_dns_record" "this" {
+  zone_id = data.cloudflare_zone.this.zone_id
+  name    = local.env.hostname
+  type    = "CNAME"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.this.id}.cfargotunnel.com"
+  # Cloudflare ignores TTL for proxied records but still requires a value;
+  # `1` means "auto" in their API.
+  ttl     = 1
+  proxied = true
+}
+
+# The tunnels and DNS records were created by ../server/main.tf. Each
+# environment's deploy imports its own; recreating them would change the
+# tunnel ID and token. The IDs aren't secret: the tunnel ID is in the CNAME.
+locals {
+  imported_ids = {
+    dev = {
+      tunnel     = "8e6ad632-fbbd-470c-91c2-e9fc66534301"
+      dns_record = "af5e6d0a3fb527271d0d3f2beb9c8af9"
+    }
+    prod = {
+      tunnel     = "c612b46e-f87c-46ff-93cd-1b544c09cfd3"
+      dns_record = "492171f03506aae7020d3ba240d4f2d7"
+    }
+  }[terraform.workspace]
+}
+
+import {
+  to = cloudflare_zero_trust_tunnel_cloudflared.this
+  id = "${data.cloudflare_zone.this.account.id}/${local.imported_ids.tunnel}"
+}
+
+import {
+  to = cloudflare_zero_trust_tunnel_cloudflared_config.this
+  id = "${data.cloudflare_zone.this.account.id}/${local.imported_ids.tunnel}"
+}
+
+import {
+  to = cloudflare_dns_record.this
+  id = "${data.cloudflare_zone.this.zone_id}/${local.imported_ids.dns_record}"
 }
