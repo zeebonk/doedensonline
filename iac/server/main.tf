@@ -479,17 +479,6 @@ resource "cloudflare_zone_setting" "doedensonline_always_use_https" {
   value      = "on"
 }
 
-resource "cloudflare_dns_record" "doedensonline" {
-  zone_id = cloudflare_zone.doedensonline.id
-  name    = local.domain
-  type    = "CNAME"
-  content = "${cloudflare_zero_trust_tunnel_cloudflared.prod.id}.cfargotunnel.com"
-  # Cloudflare ignores TTL for proxied records but still requires a value;
-  # `1` means "auto" in their API.
-  ttl     = 1
-  proxied = true
-}
-
 # www.doedensonline.nl exists only so Cloudflare's edge can intercept
 # requests and apply the redirect ruleset below — the tunnel never sees
 # this hostname.
@@ -498,17 +487,6 @@ resource "cloudflare_dns_record" "doedensonline_www" {
   name    = "www.${local.domain}"
   type    = "CNAME"
   content = local.domain
-  ttl     = 1
-  proxied = true
-}
-
-resource "cloudflare_dns_record" "doedensonline_dev" {
-  zone_id = cloudflare_zone.doedensonline.id
-  name    = "dev.${local.domain}"
-  type    = "CNAME"
-  content = "${cloudflare_zero_trust_tunnel_cloudflared.dev.id}.cfargotunnel.com"
-  # Cloudflare ignores TTL for proxied records but still requires a value;
-  # `1` means "auto" in their API.
   ttl     = 1
   proxied = true
 }
@@ -532,70 +510,71 @@ resource "cloudflare_dns_record" "doedensonline_amazonses_verification_record" {
   proxied = false
 }
 
-# 32 random bytes, base64-encoded — what `cloudflared` expects for a tunnel secret.
-resource "random_bytes" "dev_tunnel_secret" {
-  length = 32
-}
+# Each environment's tunnel, ingress config and DNS record moved to ../app,
+# which imported them. Forget them here without destroying them, along with
+# the tunnel secrets, which remotely-managed tunnels don't need.
 
-resource "cloudflare_zero_trust_tunnel_cloudflared" "dev" {
-  account_id    = var.cloudflare_account_id
-  name          = "doedensonline-dev"
-  tunnel_secret = random_bytes.dev_tunnel_secret.base64
-}
+removed {
+  from = cloudflare_dns_record.doedensonline
 
-data "cloudflare_zero_trust_tunnel_cloudflared_token" "dev" {
-  account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.dev.id
-}
-
-resource "cloudflare_zero_trust_tunnel_cloudflared_config" "dev" {
-  account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.dev.id
-  source     = "cloudflare"
-
-  config = {
-    ingress = [
-      {
-        hostname = "dev.${local.domain}"
-        service  = "http://localhost:8080"
-      },
-      {
-        service = "http_status:404"
-      },
-    ]
+  lifecycle {
+    destroy = false
   }
 }
 
-resource "random_bytes" "prod_tunnel_secret" {
-  length = 32
+removed {
+  from = cloudflare_dns_record.doedensonline_dev
+
+  lifecycle {
+    destroy = false
+  }
 }
 
-resource "cloudflare_zero_trust_tunnel_cloudflared" "prod" {
-  account_id    = var.cloudflare_account_id
-  name          = "doedensonline-prod"
-  tunnel_secret = random_bytes.prod_tunnel_secret.base64
+removed {
+  from = random_bytes.dev_tunnel_secret
+
+  lifecycle {
+    destroy = false
+  }
 }
 
-data "cloudflare_zero_trust_tunnel_cloudflared_token" "prod" {
-  account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.prod.id
+removed {
+  from = cloudflare_zero_trust_tunnel_cloudflared.dev
+
+  lifecycle {
+    destroy = false
+  }
 }
 
-resource "cloudflare_zero_trust_tunnel_cloudflared_config" "prod" {
-  account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.prod.id
-  source     = "cloudflare"
+removed {
+  from = cloudflare_zero_trust_tunnel_cloudflared_config.dev
 
-  config = {
-    ingress = [
-      {
-        hostname = local.domain
-        service  = "http://localhost:8081"
-      },
-      {
-        service = "http_status:404"
-      },
-    ]
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = random_bytes.prod_tunnel_secret
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = cloudflare_zero_trust_tunnel_cloudflared.prod
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = cloudflare_zero_trust_tunnel_cloudflared_config.prod
+
+  lifecycle {
+    destroy = false
   }
 }
 
@@ -692,7 +671,6 @@ locals {
       SMTP_HOST            = "email-smtp.${local.region}.amazonaws.com"
       SMTP_USERNAME        = module.iam_user_doedensonline_ses.access_key_id
       SMTP_PASSWORD        = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
-      TUNNEL_TOKEN         = data.cloudflare_zero_trust_tunnel_cloudflared_token.dev.token
       CLOUDFLARE_API_TOKEN = cloudflare_account_token.deploy.value
     }
     prod = {
@@ -701,7 +679,6 @@ locals {
       SMTP_HOST            = "email-smtp.${local.region}.amazonaws.com"
       SMTP_USERNAME        = module.iam_user_doedensonline_ses.access_key_id
       SMTP_PASSWORD        = module.iam_user_doedensonline_ses.access_key_ses_smtp_password_v4
-      TUNNEL_TOKEN         = data.cloudflare_zero_trust_tunnel_cloudflared_token.prod.token
       CLOUDFLARE_API_TOKEN = cloudflare_account_token.deploy.value
     }
   }
