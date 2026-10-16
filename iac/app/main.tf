@@ -278,34 +278,3 @@ resource "cloudflare_dns_record" "this" {
   ttl     = 1
   proxied = true
 }
-
-# The tunnels and DNS records were created by ../server/main.tf. Each
-# environment's deploy imports its own; recreating them would change the
-# tunnel ID and token. The IDs aren't secret: the tunnel ID is in the CNAME.
-locals {
-  imported_ids = {
-    dev = {
-      tunnel     = "8e6ad632-fbbd-470c-91c2-e9fc66534301"
-      dns_record = "af5e6d0a3fb527271d0d3f2beb9c8af9"
-    }
-    prod = {
-      tunnel     = "c612b46e-f87c-46ff-93cd-1b544c09cfd3"
-      dns_record = "492171f03506aae7020d3ba240d4f2d7"
-    }
-  }[terraform.workspace]
-}
-
-import {
-  to = cloudflare_zero_trust_tunnel_cloudflared.this
-  id = "${data.cloudflare_zone.this.account.id}/${local.imported_ids.tunnel}"
-}
-
-import {
-  to = cloudflare_zero_trust_tunnel_cloudflared_config.this
-  id = "${data.cloudflare_zone.this.account.id}/${local.imported_ids.tunnel}"
-}
-
-import {
-  to = cloudflare_dns_record.this
-  id = "${data.cloudflare_zone.this.zone_id}/${local.imported_ids.dns_record}"
-}
