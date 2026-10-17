@@ -126,8 +126,8 @@ image.
 workspace per environment. It reaches Docker on the host over SSH as root, and
 manages the environment's Cloudflare tunnel and DNS record. The variables and
 `CLOUDFLARE_API_TOKEN` mirror the secrets of the `dev` and `prod` GitHub
-environments, set by `iac/server/main.tf`. Any token with the same permissions
-works, such as the one in `iac/server/terraform.tfvars`:
+environments, set by `iac/server`. Any token with the same permissions works,
+such as the one in `iac/server/terraform.tfvars`:
 
 ```
 cd iac/app
