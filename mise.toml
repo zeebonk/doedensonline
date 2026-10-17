@@ -2,3 +2,112 @@
 opentofu = "1.13.0"
 docker-compose = "5.0.0"
 tflint = "0.64.0"
+
+# Tasks append any extra arguments to their last command, e.g.
+# `mise run app:test test/models/user_test.rb`, unless they declare their
+# own with `usage`.
+
+# db:prepare creates, migrates and seeds the database on the first run.
+[tasks."app:serve"]
+description = "Run the app on http://127.0.0.1:8080"
+run = [
+  "docker compose run --rm app bin/rails db:prepare",
+  "docker compose up",
+]
+
+# Takes test files or directories, e.g. `mise run app:test test/models`.
+[tasks."app:test"]
+description = "Run the test suite"
+run = '''docker compose run --rm -e RAILS_ENV=test app sh -c 'bundle exec rails db:migrate && bundle exec rails test "$@"' --'''
+
+[tasks."app:lint"]
+description = "Run RuboCop and check the translations with i18n-tasks"
+run = [
+  "docker compose run --rm app bundle exec rubocop",
+  "docker compose run --rm app bundle exec i18n-tasks health",
+]
+
+[tasks."app:fix"]
+description = "Auto-correct RuboCop offences"
+run = "docker compose run --rm app bundle exec rubocop --autocorrect"
+
+# tflint --init installs the plugins in .tflint.hcl; a no-op once they're
+# installed.
+[tasks."server:lint"]
+description = "Check the formatting of iac/server, run TFLint and validate it"
+dir = "{{config_root}}/iac/server"
+run = [
+  "tofu fmt -check -recursive",
+  "tflint --init --config ../.tflint.hcl",
+  "tflint --config ../.tflint.hcl",
+  "tofu init -backend=false",
+  "tofu validate",
+]
+
+[tasks."server:fix"]
+description = "Format iac/server"
+dir = "{{config_root}}/iac/server"
+run = "tofu fmt -recursive"
+
+[tasks."server:plan"]
+description = "Plan iac/server"
+dir = "{{config_root}}/iac/server"
+run = ["tofu init", "tofu plan"]
+
+[tasks."server:apply"]
+description = "Apply iac/server"
+dir = "{{config_root}}/iac/server"
+run = ["tofu init", "tofu apply"]
+
+[tasks."app:release"]
+description = "Build the multi-arch image and push it to ECR"
+usage = '''
+arg "<tag>" help="Image tag; a push to an existing tag fails"
+flag "--cache-from <ref>" var=#true help="Layer cache to build from, e.g. type=registry,ref=...:cache-amd64"
+'''
+run = "docker buildx build --push -t 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:{{usage.tag | quote}}{% for ref in usage.cache_from | default(value=[]) %} --cache-from {{ref | quote}}{% endfor %} --platform=linux/amd64,linux/arm64 ./src"
+
+# The app module only evaluates in the dev and prod workspaces.
+[tasks."deployment:lint"]
+description = "Check the formatting of iac/app, run TFLint and validate it"
+dir = "{{config_root}}/iac/app"
+run = [
+  "tofu fmt -check -recursive",
+  "tflint --init --config ../.tflint.hcl",
+  "tflint --config ../.tflint.hcl",
+  "tofu init -backend=false",
+  "TF_WORKSPACE=dev tofu validate",
+  "TF_WORKSPACE=prod tofu validate",
+]
+
+[tasks."deployment:fix"]
+description = "Format iac/app"
+dir = "{{config_root}}/iac/app"
+run = "tofu fmt -recursive"
+
+# The deployment tasks read the deploy secrets from TF_VAR_* environment variables.
+[tasks."deployment:plan"]
+description = "Plan iac/app for an environment"
+dir = "{{config_root}}/iac/app"
+usage = '''
+arg "<environment>" help="dev or prod"
+arg "<image_tag>" help="Image tag to deploy, e.g. master.abc1234"
+'''
+run = [
+  "tofu init",
+  "tofu workspace select {{usage.environment | quote}}",
+  "tofu plan -var image_tag={{usage.image_tag | quote}}",
+]
+
+[tasks."deployment:apply"]
+description = "Deploy an environment by applying iac/app"
+dir = "{{config_root}}/iac/app"
+usage = '''
+arg "<environment>" help="dev or prod"
+arg "<image_tag>" help="Image tag to deploy, e.g. master.abc1234"
+'''
+run = [
+  "tofu init",
+  "tofu workspace select -or-create {{usage.environment | quote}}",
+  "tofu apply -var image_tag={{usage.image_tag | quote}}",
+]

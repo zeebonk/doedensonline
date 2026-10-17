@@ -1,137 +1,117 @@
-# Working on the Ruby application
+# DoedensOnline
 
-The Rails app lives in `src/` and is developed and run exclusively through
-Docker Compose. Ruby, Bundler, and gems are not installed on the host — every
-Ruby/Rails command must run inside the `app` service container.
+The website of the Doedens family. A Rails app in `src/`, deployed with
+OpenTofu from `iac/`. `README.md` explains how to run it locally.
 
-Run all Docker Compose commands from the repo root, where `docker-compose.yml`
-and `.env` live; the compose service mounts `./src` into the container.
 
-## Run the app
+# Tasks
+
+Every day-to-day operation is a mise task in `mise.toml`, and CI runs the
+same tasks. `mise tasks` lists them; `mise run <task> --help` shows the
+arguments of a task.
+
+- `app:*` tasks work on the Rails app, `server:*` on `iac/server` and
+  `deployment:*` on `iac/app`.
+- Use a task, not the command it wraps. Tasks run with mise's pinned tools
+  first on the `PATH`; a bare `tofu` or `tflint` can be another version.
+- Tasks append extra arguments to their last command, e.g.
+  `mise run app:test test/models/user_test.rb`. Tasks with a `usage` spec
+  take only the arguments they declare.
+- When CI needs a new operation, add a task and call it from the workflow.
+  CI-only concerns stay in the workflow: credentials, caches, job summaries,
+  and settings like `TF_INPUT=false` or `TF_CLI_ARGS_apply=-auto-approve`.
+
+
+# The Rails app
+
+Ruby is not installed on the host. All Ruby runs in the `app` container of
+Docker Compose. Run Docker Compose from the repo root, where
+`docker-compose.yml` and `.env` live; the container mounts `./src` at `/app`.
+
+For commands without a task:
 
 ```
-docker compose up
+docker compose run --rm app bin/rails console
+docker compose run --rm app bin/rails db:migrate
+docker compose run --rm app <command>
 ```
 
-## Run the test suite
+Add `-e RAILS_ENV=test` to use the test database.
 
-```
-docker compose run --rm -e RAILS_ENV=test app bundle exec rails test
-```
+## Update gems
 
-## Run RuboCop
+The Dockerfile bakes `bundle install` into the image. A `Gemfile` change
+that conflicts with `Gemfile.lock` (e.g. a `rails` bump) breaks the build,
+so regenerate the lockfile first:
 
-```
-docker compose run --rm app bundle exec rubocop
-docker compose run --rm app bundle exec rubocop --auto-correct
-```
-
-## Install or update gems
-
-The Dockerfile bakes `bundle install` into the image, so a `Gemfile` change
-that breaks the existing `Gemfile.lock` (e.g. bumping `rails`) will fail the
-build. Regenerate the lockfile **before** rebuilding:
-
-1. Make sure the image is already built against the *old* Gemfile/Gemfile.lock
-   pair. On a fresh checkout this means `docker compose build app` first,
-   *before* editing the Gemfile.
-2. Edit `Gemfile`.
-3. Regenerate the lockfile from inside the container — the `./src:/app` bind
-   mount means bundler reads the host's edited `Gemfile` and writes the new
-   `Gemfile.lock` back to the host:
+1. Build the image against the old `Gemfile` and `Gemfile.lock`. On a fresh
+   checkout, run `docker compose build app` before you edit the `Gemfile`.
+2. Edit the `Gemfile`.
+3. Regenerate the lockfile in the container. The bind mount makes bundler
+   read the edited `Gemfile` and write `Gemfile.lock` back to the host:
 
    ```
    docker compose run --rm app bundle lock --update=<gem> [<gem>...]
    ```
 
-   Pass every gem that needs to move (for a Rails minor bump that's `rails`
-   plus all rails component gems with `=` pins, plus tightly-constrained
-   transitives like `arel` and `minitest`). `bundle lock` only resolves and
-   writes the lockfile — it doesn't install. For broader updates use
-   `bundle update <gem>...`.
-4. Rebuild the image so the new gems get baked in:
+   Pass every gem that moves. For a Rails minor bump that is `rails`, every
+   Rails component gem with an `=` pin, and tight transitives like `arel`
+   and `minitest`. `bundle lock` only writes the lockfile; for broader
+   updates use `bundle update <gem>...`.
+4. Rebuild the image: `docker compose build app`.
 
-   ```
-   docker compose build app
-   ```
-
-A Ruby version bump (changing `ruby` in the `Gemfile` and the Dockerfile's
-base image) can't use the old image for step 3: its Ruby rejects gems that need
-the new Ruby. Regenerate the lockfile in a plain container of the new Ruby,
-with the Bundler version from the Dockerfile, then rebuild as in step 4:
+A Ruby bump (the `ruby` line in the `Gemfile` and the Dockerfile's base
+image) can't use the old image in step 3, because its Ruby rejects gems that
+need the new one. Regenerate the lockfile in a plain container of the new
+Ruby, with the Bundler version from the Dockerfile, then rebuild:
 
 ```
 docker run --rm -v "$PWD/src:/app" -w /app ruby:<new>-alpine \
   sh -c 'gem install bundler -v <bundler> --no-document && bundle _<bundler>_ lock --update'
 ```
 
-For other ad-hoc bundler commands:
-
-```
-docker compose run --rm app bundle <command>
-```
-
-## Run database migrations / rake tasks
-
-```
-docker compose run --rm app bundle exec rails db:migrate
-docker compose run --rm app rake <task>
-```
-
-For the test database use `-e RAILS_ENV=test`.
-
-## Rails console / one-off commands
-
-```
-docker compose run --rm app bin/rails console
-docker compose run --rm app <any command>
-```
-
 ## Don't
 
-- Don't run `bundle`, `rake`, `rails`, `rspec`, `rubocop`, or any Ruby tooling
-  directly on the host — the host has no compatible Ruby toolchain.
-- Don't hand-edit `Gemfile.lock`; regenerate it via `bundle lock` inside the
-  container as described above.
-- Don't expect `docker compose build app` to fix an out-of-sync `Gemfile.lock`
-  — the bake step runs `bundle install`, which errors on Gemfile/lockfile
-  conflicts instead of resolving them.
+- Don't run `bundle`, `rake`, `rails`, `rubocop` or other Ruby tools on the
+  host.
+- Don't hand-edit `Gemfile.lock`; regenerate it as above.
+- Don't expect `docker compose build app` to fix an out-of-sync
+  `Gemfile.lock`. Its `bundle install` fails on conflicts instead of
+  resolving them.
 
 
-# Infrastructure: `iac/server` and `iac/app`
+# Infrastructure
 
-Two OpenTofu root modules, each with its own state:
+`iac/` holds two OpenTofu root modules, each with its own state. Both lint
+with `iac/.tflint.hcl`.
 
-- `iac/server` provisions the cloud resources (Hetzner VM, Cloudflare zone
-  and deploy token, AWS SES/IAM/ECR, the `dev`/`prod` GitHub environments and
-  their secrets). `main.tf` holds the resources, `terraform.tf` the backend
-  and provider versions, `variables.tf` the inputs, `providers.tf` the
-  provider configuration, and `outputs.tf` the outputs.
-  `.github/workflows/server.yml` plans it on every pull request and applies
-  it on every master push, drift included. Both wait for an approval on the
-  `server` environment.
-  Bootstrapping, and fixing a bad apply that locks CI out, are still done
-  locally with `AWS_PROFILE=doedensonline`. The server apply and the dev
-  deploy start on the same master push in no particular order: merge an infra
-  change that the app depends on (e.g. a new deploy secret) first.
-- `iac/app` deploys an environment: its Cloudflare tunnel, ingress and DNS
-  record, and everything that runs on the host: the app container, its state
-  directories and SQLite file, migrations and seeding, and the `cloudflared`
-  tunnel container (kreuzwerker/docker provider, one OpenTofu workspace per
-  environment). The `deploy` job in `.github/workflows/ci.yml` applies it.
-  `main.tf` holds the resources and the per-environment deploy settings
-  (`RAILS_ENV`, hostnames, ports, mounts, env vars), `terraform.tf` the
-  backend and provider versions, `variables.tf` the inputs, and
-  `providers.tf` the provider configuration and ECR credentials.
+- `iac/server` provisions the cloud resources: the Hetzner VM, the
+  Cloudflare zone and deploy token, AWS SES, IAM and ECR, and the `dev` and
+  `prod` GitHub environments with their secrets. `.github/workflows/server.yml`
+  runs `server:plan` on every pull request and `server:apply` on every push
+  to `master`, drift included. Both wait for an approval on the `server`
+  environment. Bootstrapping, and fixing a bad apply that locks CI out,
+  happen locally with `AWS_PROFILE=doedensonline`.
+- `iac/app` deploys one environment per OpenTofu workspace (`dev`, `prod`):
+  its Cloudflare tunnel, ingress and DNS record, and everything on the host
+  (the app container, its state directories and SQLite file, migrations and
+  seeding, and the `cloudflared` container), through the kreuzwerker/docker
+  provider. `main.tf` holds the per-environment settings. The `deploy` job
+  in `.github/workflows/ci.yml` runs `deployment:apply`: pushes to `master`
+  deploy to dev, GitHub Releases to prod.
 
-How the host is set up:
+The server apply and the dev deploy start on the same push to `master`, in
+no particular order. Merge an infra change the app depends on (e.g. a new
+deploy secret) first.
 
-- **cloud-init (`hcloud_server.user_data`) only runs on first boot.** It's in
-  `ignore_changes`, because changing it would replace the server and wipe the
-  app state in `/app-state`. A change there doesn't reach the existing server;
-  apply it by hand over SSH as well.
+How the host works:
+
+- **cloud-init (`hcloud_server.user_data`) only runs on first boot.** It is
+  in `ignore_changes`, because a change would replace the server and wipe
+  the app state in `/app-state`. To change the existing server, also apply
+  the change by hand over SSH.
 - **Docker log rotation is per container, not daemon-wide.** Every
   `docker_container` in `iac/app` sets `log_driver = "json-file"` and
-  `local.log_opts`; set them on new containers too.
+  `local.log_opts`; new containers need them too.
 - **The host holds no registry credentials.** `iac/app` passes ECR
-  credentials along with each pull through the provider's `registry_auth`.
+  credentials with each pull through the provider's `registry_auth`.

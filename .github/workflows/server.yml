@@ -39,9 +39,6 @@ jobs:
           role-to-assume: arn:aws:iam::313336455033:role/github-actions-server
           aws-region: eu-west-1
 
-      - name: Initialize OpenTofu
-        run: tofu init -input=false
-
       - name: Plan
         id: plan
         env:
@@ -49,10 +46,11 @@ jobs:
           TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           GITHUB_TOKEN: ${{ secrets.SERVER_GITHUB_TOKEN }}
+          TF_INPUT: "false"
         run: |
           # -detailed-exitcode: 0 means no changes, 2 means changes pending.
           code=0
-          tofu plan -input=false -lock-timeout=10m -detailed-exitcode -out=server.tfplan || code=$?
+          mise run server:plan -lock-timeout=10m -detailed-exitcode -out=server.tfplan || code=$?
           case "${code}" in
             0) echo "changes=false" >> "$GITHUB_OUTPUT" ;;
             2) echo "changes=true" >> "$GITHUB_OUTPUT" ;;
@@ -69,4 +67,5 @@ jobs:
         if: github.ref == 'refs/heads/master' && steps.plan.outputs.changes == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.SERVER_GITHUB_TOKEN }}
-        run: tofu apply -input=false -lock-timeout=10m server.tfplan
+          TF_INPUT: "false"
+        run: mise run server:apply -lock-timeout=10m server.tfplan
