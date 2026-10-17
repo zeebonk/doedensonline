@@ -3,7 +3,9 @@ version: 2
 # Not covered on purpose:
 # - docker-compose: docker-compose.yml only references our own ECR image.
 # - mise.toml: Dependabot has no mise ecosystem, so the tool versions pinned
-#   there (opentofu, docker-compose) are bumped by hand.
+#   there (opentofu, docker-compose, tflint) are bumped by hand.
+# - tflint plugins: there's no ecosystem for .tflint.hcl either, so the AWS
+#   ruleset version pinned in iac/.tflint.hcl is bumped by hand.
 # - cloudflared: the opentofu ecosystem only bumps providers and modules, not
 #   the image tag pinned in iac/app/main.tf, so it's bumped by hand.
 
