@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       cache-from: ${{ steps.cache.outputs.cache-from }}
+      cache-from-args: ${{ steps.cache.outputs.cache-from-args }}
       cache-to-amd64: ${{ steps.cache.outputs.cache-to-amd64 }}
       cache-to-arm64: ${{ steps.cache.outputs.cache-to-arm64 }}
     steps:
@@ -35,13 +36,18 @@ jobs:
             scopes="pr-${PR_NUMBER}-cache ${scopes}"
           fi
 
+          refs=""
+          for scope in ${scopes}; do
+            refs="${refs} type=registry,ref=${ECR_IMAGE}:${scope}-amd64"
+            refs="${refs} type=registry,ref=${ECR_IMAGE}:${scope}-arm64"
+          done
+
           {
             echo 'cache-from<<EOF'
-            for scope in ${scopes}; do
-              echo "type=registry,ref=${ECR_IMAGE}:${scope}-amd64"
-              echo "type=registry,ref=${ECR_IMAGE}:${scope}-arm64"
-            done
+            printf '%s\n' ${refs}
             echo 'EOF'
+            # The same refs as arguments to the app:release task.
+            echo "cache-from-args=$(printf -- '--cache-from %s ' ${refs})"
             echo "cache-to-amd64=type=registry,ref=${ECR_IMAGE}:${scopes%% *}-amd64,image-manifest=true,oci-mediatypes=true"
             echo "cache-to-arm64=type=registry,ref=${ECR_IMAGE}:${scopes%% *}-arm64,image-manifest=true,oci-mediatypes=true"
           } >> "$GITHUB_OUTPUT"
@@ -149,13 +155,10 @@ jobs:
       - name: Build and push multi-arch image
         env:
           TAG: ${{ steps.tag.outputs.tag }}
-          CACHE_FROM: ${{ needs.prepare.outputs.cache-from }}
-        run: |
-          args=()
-          while read -r ref; do
-            args+=(--cache-from "${ref}")
-          done <<< "${CACHE_FROM}"
-          mise run app:release "${TAG}" "${args[@]}"
+          CACHE_FROM_ARGS: ${{ needs.prepare.outputs.cache-from-args }}
+        # CACHE_FROM_ARGS is unquoted to split it into arguments; the refs
+        # contain no spaces.
+        run: mise run app:release "${TAG}" ${CACHE_FROM_ARGS}
 
   tofu:
     runs-on: ubuntu-latest
