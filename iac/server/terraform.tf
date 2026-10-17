@@ -1,4 +1,6 @@
 terraform {
+  required_version = "~> 1.13"
+
   backend "s3" {
     bucket       = "doedensonline-terraform"
     key          = "app"

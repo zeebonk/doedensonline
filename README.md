@@ -30,6 +30,18 @@ docker compose run --rm app bundle exec rubocop --auto-correct
 ```
 
 
+## Run TFLint
+
+TFLint and OpenTofu are pinned in `mise.toml`. From `iac/`, install the
+plugins in `.tflint.hcl` once, and again after changing their versions, then
+lint:
+
+```
+tflint --init --config "$PWD/.tflint.hcl"
+tflint --recursive --config "$PWD/.tflint.hcl"
+```
+
+
 ## Setup infrastructure
 
 Copy the Terraform variables template and paste your Hetzner Cloud API token
@@ -111,7 +123,7 @@ Releases are automated via GitHub Actions:
   the release tag, then applies `iac/app` in the `prod` workspace, which
   migrates the database and replaces the running prod container.
 
-Both flows run the test, RuboCop, and OpenTofu format and
+Both flows run the test, RuboCop, and OpenTofu format, TFLint and
 validate jobs first; a failure in any of those blocks the deploy.
 
 ### Roll back
