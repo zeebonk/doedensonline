@@ -88,8 +88,6 @@ jobs:
         env:
           CACHE_FROM: ${{ needs.prepare.outputs.cache-from }}
           CACHE_TO: ${{ needs.prepare.outputs[format('cache-to-{0}', matrix.arch)] }}
-        # CACHE_FROM is unquoted to split it into arguments; the refs contain
-        # no spaces.
         run: mise run app:build ${CACHE_FROM} --cache-to "${CACHE_TO}"
 
       # Lint results don't depend on the platform; run them once.
