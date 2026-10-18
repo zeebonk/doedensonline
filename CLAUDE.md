@@ -15,8 +15,8 @@ arguments of a task.
 - Use a task, not the command it wraps. Tasks run with mise's pinned tools
   first on the `PATH`; a bare `tofu` or `tflint` can be another version.
 - Tasks append extra arguments to their last command, e.g.
-  `mise run app:test test/models/user_test.rb`. Tasks with a `usage` spec
-  take only the arguments they declare.
+  `mise run server:plan -out=server.tfplan`. Tasks with a `usage` spec take
+  only the arguments they declare.
 - When CI needs a new operation, add a task and call it from the workflow.
   CI-only concerns stay in the workflow: credentials, caches, job summaries,
   and settings like `TF_INPUT=false` or `TF_CLI_ARGS_apply=-auto-approve`.
