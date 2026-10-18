@@ -3,6 +3,10 @@ opentofu = "1.13.0"
 docker-compose = "5.0.0"
 tflint = "0.64.0"
 
+# Docker Compose's settings, so tasks tag images like Compose names them.
+[env]
+_.file = ".env"
+
 # Tasks append any extra arguments to their last command, e.g.
 # `mise run app:test test/models/user_test.rb`, unless they declare their
 # own with `usage`.
@@ -26,6 +30,15 @@ run = [
   "docker compose run --rm app bundle exec rubocop",
   "docker compose run --rm app bundle exec i18n-tasks health",
 ]
+
+# Tags the image that Docker Compose runs.
+[tasks."app:build"]
+description = "Build the image for this machine's platform"
+usage = '''
+flag "--cache-from <ref>" var=#true help="Layer cache to build from, e.g. type=registry,ref=...:cache-amd64"
+flag "--cache-to <ref>" help="Layer cache to write to"
+'''
+run = "docker buildx build --load -t 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:${TAG:-latest}{% for ref in usage.cache_from | default(value=[]) %} --cache-from {{ref | quote}}{% endfor %}{% if usage.cache_to %} --cache-to {{usage.cache_to | quote}}{% endif %} ./src"
 
 [tasks."app:fix"]
 description = "Auto-correct RuboCop offences"

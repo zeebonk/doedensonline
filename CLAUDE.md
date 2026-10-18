@@ -45,7 +45,7 @@ that conflicts with `Gemfile.lock` (e.g. a `rails` bump) breaks the build,
 so regenerate the lockfile first:
 
 1. Build the image against the old `Gemfile` and `Gemfile.lock`. On a fresh
-   checkout, run `docker compose build app` before you edit the `Gemfile`.
+   checkout, run `mise run app:build` before you edit the `Gemfile`.
 2. Edit the `Gemfile`.
 3. Regenerate the lockfile in the container. The bind mount makes bundler
    read the edited `Gemfile` and write `Gemfile.lock` back to the host:
@@ -58,7 +58,7 @@ so regenerate the lockfile first:
    Rails component gem with an `=` pin, and tight transitives like `arel`
    and `minitest`. `bundle lock` only writes the lockfile; for broader
    updates use `bundle update <gem>...`.
-4. Rebuild the image: `docker compose build app`.
+4. Rebuild the image: `mise run app:build`.
 
 A Ruby bump (the `ruby` line in the `Gemfile` and the Dockerfile's base
 image) can't use the old image in step 3, because its Ruby rejects gems that
@@ -75,9 +75,8 @@ docker run --rm -v "$PWD/src:/app" -w /app ruby:<new>-alpine \
 - Don't run `bundle`, `rake`, `rails`, `rubocop` or other Ruby tools on the
   host.
 - Don't hand-edit `Gemfile.lock`; regenerate it as above.
-- Don't expect `docker compose build app` to fix an out-of-sync
-  `Gemfile.lock`. Its `bundle install` fails on conflicts instead of
-  resolving them.
+- Don't expect `mise run app:build` to fix an out-of-sync `Gemfile.lock`.
+  Its `bundle install` fails on conflicts instead of resolving them.
 
 
 # Infrastructure
