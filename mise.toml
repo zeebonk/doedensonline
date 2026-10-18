@@ -53,8 +53,6 @@ docker buildx build --load \
 description = "Auto-correct RuboCop offences"
 run = "docker compose run --rm app bundle exec rubocop --autocorrect"
 
-# tflint --init installs the plugins in .tflint.hcl; a no-op once they're
-# installed.
 [tasks."server:lint"]
 description = "Check the formatting of iac/server, run TFLint and validate it"
 dir = "{{config_root}}/iac/server"
