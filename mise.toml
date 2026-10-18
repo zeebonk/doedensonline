@@ -35,9 +35,8 @@ run = [
   "docker compose run --rm app bundle exec i18n-tasks health",
 ]
 
-# Tags the image that Docker Compose runs.
 [tasks."app:build"]
-description = "Build the image for this machine's platform"
+description = "Build the image that Docker Compose runs, for this machine's platform"
 usage = '''
 flag "--cache-from <ref>" var=#true help="Layer cache to build from, e.g. type=registry,ref=...:cache-amd64"
 flag "--cache-to <ref>" help="Layer cache to write to"
@@ -114,13 +113,13 @@ description = "Format iac/app"
 dir = "{{config_root}}/iac/app"
 run = "tofu fmt -recursive"
 
-# The deployment tasks read the deploy secrets from TF_VAR_* environment variables.
 [tasks."deployment:plan"]
 description = "Plan iac/app for an environment"
 dir = "{{config_root}}/iac/app"
 usage = '''
 arg "<environment>" help="dev or prod"
 arg "<image_tag>" help="Image tag to deploy, e.g. master.abc1234"
+after_long_help "Reads the deploy secrets from TF_VAR_ssh_host, TF_VAR_smtp_host, TF_VAR_smtp_username and TF_VAR_smtp_password."
 '''
 run = [
   "tofu init",
@@ -134,6 +133,7 @@ dir = "{{config_root}}/iac/app"
 usage = '''
 arg "<environment>" help="dev or prod"
 arg "<image_tag>" help="Image tag to deploy, e.g. master.abc1234"
+after_long_help "Reads the deploy secrets from TF_VAR_ssh_host, TF_VAR_smtp_host, TF_VAR_smtp_username and TF_VAR_smtp_password."
 '''
 run = [
   "tofu init",
