@@ -1,3 +1,6 @@
+# Shows multi-line task commands in full (jdx/mise#10387).
+min_version = "2026.6.7"
+
 [tools]
 opentofu = "1.13.0"
 docker-compose = "5.0.0"
@@ -6,6 +9,9 @@ tflint = "0.64.0"
 # Docker Compose's settings, so tasks tag images like Compose names them.
 [env]
 _.file = ".env"
+
+[vars]
+image = "313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline"
 
 # Tasks append any extra arguments to their last command, e.g.
 # `mise run app:test test/models/user_test.rb`, unless they declare their
@@ -22,7 +28,10 @@ run = [
 # Takes test files or directories, e.g. `mise run app:test test/models`.
 [tasks."app:test"]
 description = "Run the test suite"
-run = '''docker compose run --rm -e RAILS_ENV=test app sh -c 'bundle exec rails db:migrate && bundle exec rails test "$@"' --'''
+run = '''
+docker compose run --rm -e RAILS_ENV=test app \
+  sh -c 'bundle exec rails db:migrate && bundle exec rails test "$@"' --
+'''
 
 [tasks."app:lint"]
 description = "Run RuboCop and check the translations with i18n-tasks"
@@ -38,7 +47,13 @@ usage = '''
 flag "--cache-from <ref>" var=#true help="Layer cache to build from, e.g. type=registry,ref=...:cache-amd64"
 flag "--cache-to <ref>" help="Layer cache to write to"
 '''
-run = "docker buildx build --load -t 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:${TAG:-latest}{% for ref in usage.cache_from | default(value=[]) %} --cache-from {{ref | quote}}{% endfor %}{% if usage.cache_to %} --cache-to {{usage.cache_to | quote}}{% endif %} ./src"
+run = '''
+docker buildx build --load \
+  -t "{{vars.image}}:${TAG:-latest}" \
+  {% for ref in usage.cache_from | default(value=[]) %}--cache-from {{ref | quote}} {% endfor %}\
+  {% if usage.cache_to %}--cache-to {{usage.cache_to | quote}}{% endif %} \
+  ./src
+'''
 
 [tasks."app:fix"]
 description = "Auto-correct RuboCop offences"
@@ -78,7 +93,13 @@ usage = '''
 arg "<tag>" help="Image tag; a push to an existing tag fails"
 flag "--cache-from <ref>" var=#true help="Layer cache to build from, e.g. type=registry,ref=...:cache-amd64"
 '''
-run = "docker buildx build --push -t 313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline:{{usage.tag | quote}}{% for ref in usage.cache_from | default(value=[]) %} --cache-from {{ref | quote}}{% endfor %} --platform=linux/amd64,linux/arm64 ./src"
+run = '''
+docker buildx build --push \
+  -t {{vars.image}}:{{usage.tag | quote}} \
+  {% for ref in usage.cache_from | default(value=[]) %}--cache-from {{ref | quote}} {% endfor %}\
+  --platform=linux/amd64,linux/arm64 \
+  ./src
+'''
 
 # The app module only evaluates in the dev and prod workspaces.
 [tasks."deployment:lint"]
