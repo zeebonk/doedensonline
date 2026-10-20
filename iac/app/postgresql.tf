@@ -14,12 +14,6 @@ resource "random_password" "postgres" {
   special = false
 }
 
-# The app, database and backup sidecar communicate only over this private
-# per-environment network. PostgreSQL deliberately has no published port.
-resource "docker_network" "this" {
-  name = local.name
-}
-
 # Pin the PostgreSQL major version, while pulling patched 18.x images during
 # deploys when the registry digest changes.
 data "docker_registry_image" "postgres" {

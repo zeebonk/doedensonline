@@ -47,6 +47,12 @@ resource "random_bytes" "secret_key_base" {
   length = 64
 }
 
+# The app, database and backup sidecar communicate only over this private
+# per-environment network. PostgreSQL deliberately has no published port.
+resource "docker_network" "this" {
+  name = local.name
+}
+
 resource "docker_image" "app" {
   name         = "${var.registry}/doedensonline:${var.image_tag}"
   keep_locally = true
