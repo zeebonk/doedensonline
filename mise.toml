@@ -15,7 +15,7 @@ image = "313336455033.dkr.ecr.eu-west-1.amazonaws.com/doedensonline"
 [tasks."app:serve"]
 description = "Run the app on http://127.0.0.1:8080"
 run = [
-  "docker compose run --rm app bin/rails db:prepare",
+  "docker compose run --rm app bin/rails db:create db:migrate",
   "docker compose up",
 ]
 
@@ -24,7 +24,7 @@ description = "Run the tests, or only the given files and directories"
 usage = 'arg "[paths]..." var=#true help="Test files or directories, e.g. test/models"'
 run = '''
 docker compose run --rm -e RAILS_ENV=test app \
-  sh -c 'bundle exec rails db:migrate && bundle exec rails test "$@"' -- \
+  sh -c 'bundle exec rails db:create db:migrate && bundle exec rails test "$@"' -- \
   {% for path in usage.paths | default(value=[]) %}{{path | quote}} {% endfor %}
 '''
 
