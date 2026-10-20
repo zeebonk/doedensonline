@@ -1,21 +1,13 @@
-# PostgreSQL, its private network and scheduled backups.
-
 locals {
-  # Hetzner backups run in the UTC window reported by iac/server. Take the
-  # database dump two hours before the window begins so each server backup
-  # contains a recent, restorable dump.
+  # Run the dump two hours before the Hetzner backup window.
   postgres_backup_hour = (tonumber(split("-", var.hetzner_backup_window)[0]) + 22) % 24
 }
 
-# Kept in the per-environment app state, so dev and prod never share a
-# database credential.
 resource "random_password" "postgres" {
   length  = 32
   special = false
 }
 
-# Pin the PostgreSQL major version, while pulling patched 18.x images during
-# deploys when the registry digest changes.
 data "docker_registry_image" "postgres" {
   name = "postgres:18-alpine"
 }
