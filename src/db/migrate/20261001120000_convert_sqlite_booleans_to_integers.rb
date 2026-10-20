@@ -1,21 +1,6 @@
 class ConvertSqliteBooleansToIntegers < ActiveRecord::Migration[5.2]
-  COLUMNS = %w[notify_news isadmin notify_photo_album].freeze
-
-  def up
-    return unless connection.adapter_name == 'SQLite'
-
-    COLUMNS.each do |column|
-      execute "UPDATE users SET #{column} = 1 WHERE #{column} = 't'"
-      execute "UPDATE users SET #{column} = 0 WHERE #{column} = 'f'"
-    end
-  end
-
-  def down
-    return unless connection.adapter_name == 'SQLite'
-
-    COLUMNS.each do |column|
-      execute "UPDATE users SET #{column} = 't' WHERE #{column} = 1"
-      execute "UPDATE users SET #{column} = 'f' WHERE #{column} = 0"
-    end
-  end
+  # The original SQLite conversion was applied before the PostgreSQL cutover.
+  # All supported databases now use PostgreSQL, so retain only the migration
+  # version for existing installations.
+  def change; end
 end
