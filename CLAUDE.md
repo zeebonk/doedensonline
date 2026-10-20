@@ -93,11 +93,12 @@ with `iac/.tflint.hcl`.
   happen locally with `AWS_PROFILE=doedensonline`.
 - `iac/app` deploys one environment per OpenTofu workspace (`dev`, `prod`):
   its Cloudflare tunnel, ingress and DNS record, and everything on the host
-  (the app container, its state directories and SQLite file, migrations and
-  seeding, and the `cloudflared` container), through the kreuzwerker/docker
-  provider. `main.tf` holds the per-environment settings. The `deploy` job
-  in `.github/workflows/ci.yml` runs `deployment:apply`: pushes to `master`
-  deploy to dev, GitHub Releases to prod.
+  (the app container, PostgreSQL and its private network, state and backup
+  directories and password, migrations and seeding, and the `cloudflared`
+  container), through the kreuzwerker/docker provider. `main.tf` holds the
+  per-environment settings. The `deploy` job in `.github/workflows/ci.yml`
+  runs `deployment:apply`: pushes to `master` deploy to dev, GitHub Releases
+  to prod.
 
 The server apply and the dev deploy start on the same push to `master`, in
 no particular order. Merge an infra change the app depends on (e.g. a new

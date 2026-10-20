@@ -348,6 +348,12 @@ resource "hcloud_server" "doedensonline" {
   }
 }
 
+# Read this from the API rather than the resource: backup_window is deprecated
+# on hcloud_server, and Hetzner may change it after the server is created.
+data "hcloud_server" "doedensonline" {
+  id = hcloud_server.doedensonline.id
+}
+
 resource "hcloud_firewall" "doedensonline" {
   name = "doedensonline"
 
@@ -581,4 +587,13 @@ resource "github_actions_environment_secret" "deploy" {
   environment = github_repository_environment.deploy[each.value.environment].environment
   secret_name = each.value.name
   value       = each.value.value
+}
+
+# Both deploy environments use the same VM backup window, and it is not
+# sensitive. The app module uses it to schedule PostgreSQL dumps before the
+# Hetzner backup begins.
+resource "github_actions_variable" "hetzner_backup_window" {
+  repository    = "doedensonline"
+  variable_name = "HETZNER_BACKUP_WINDOW"
+  value         = data.hcloud_server.doedensonline.backup_window
 }
