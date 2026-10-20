@@ -13,10 +13,8 @@ RUN apk add --no-cache \
         imagemagick-jpeg \
         tzdata
 
-RUN gem update --system 4.0.22 --no-document
-
 COPY Gemfile Gemfile.lock ./
-RUN BUNDLE_FROZEN=true bundle _4.0.22_ install
+RUN bundle install
 
 COPY . .
 
