@@ -348,8 +348,7 @@ resource "hcloud_server" "doedensonline" {
   }
 }
 
-# Read this from the API rather than the resource: backup_window is deprecated
-# on hcloud_server, and Hetzner may change it after the server is created.
+# backup_window is deprecated on the hcloud_server resource.
 data "hcloud_server" "doedensonline" {
   id = hcloud_server.doedensonline.id
 }
