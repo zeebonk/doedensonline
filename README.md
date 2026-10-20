@@ -34,13 +34,3 @@ mise tasks
 ```
 
 `mise run <task> --help` shows the arguments of a task.
-
-## Deploy manually
-
-`iac/app` deploys the app alongside a private PostgreSQL container and its
-nightly backups. To apply one environment manually, provide the same values as
-the deploy workflow, including the Hetzner backup window:
-
-```
-mise run deployment:apply dev <image-tag> -var hetzner_backup_window=22-02
-```
