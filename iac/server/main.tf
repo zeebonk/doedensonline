@@ -589,9 +589,6 @@ resource "github_actions_environment_secret" "deploy" {
   value       = each.value.value
 }
 
-# Both deploy environments use the same VM backup window, and it is not
-# sensitive. The app module uses it to schedule PostgreSQL dumps before the
-# Hetzner backup begins.
 resource "github_actions_variable" "hetzner_backup_window" {
   repository    = "doedensonline"
   variable_name = "HETZNER_BACKUP_WINDOW"
