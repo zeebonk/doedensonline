@@ -9,12 +9,14 @@ class CspReportsControllerTest < ActionDispatch::IntegrationTest
     }
   }.to_json
 
-  test "pages send a report-only content security policy" do
+  test "pages enforce the content security policy" do
     get '/sign_in', params: {}
     assert_response :success
-    assert_nil response.headers['Content-Security-Policy']
-    policy = response.headers['Content-Security-Policy-Report-Only']
+    assert_nil response.headers['Content-Security-Policy-Report-Only']
+    policy = response.headers['Content-Security-Policy']
     assert_includes policy, "script-src 'self' https://cdn.jsdelivr.net"
+    assert_includes policy, 'https://static.cloudflareinsights.com'
+    assert_includes policy, "connect-src 'self' https://cdn.jsdelivr.net https://cloudflareinsights.com"
     assert_includes policy, "object-src 'none'"
     assert_includes policy, 'report-uri /csp_reports'
   end
