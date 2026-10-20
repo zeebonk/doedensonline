@@ -348,6 +348,11 @@ resource "hcloud_server" "doedensonline" {
   }
 }
 
+# backup_window is deprecated on the hcloud_server resource.
+data "hcloud_server" "doedensonline" {
+  id = hcloud_server.doedensonline.id
+}
+
 resource "hcloud_firewall" "doedensonline" {
   name = "doedensonline"
 
@@ -581,4 +586,10 @@ resource "github_actions_environment_secret" "deploy" {
   environment = github_repository_environment.deploy[each.value.environment].environment
   secret_name = each.value.name
   value       = each.value.value
+}
+
+resource "github_actions_variable" "hetzner_backup_window" {
+  repository    = "doedensonline"
+  variable_name = "HETZNER_BACKUP_WINDOW"
+  value         = data.hcloud_server.doedensonline.backup_window
 }

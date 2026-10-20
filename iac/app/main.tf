@@ -1,5 +1,3 @@
-# Deploy the app container, its Cloudflare tunnel and DNS record
-
 locals {
   environments = {
     dev = {
@@ -45,6 +43,10 @@ locals {
 # Rails secret_key_base
 resource "random_bytes" "secret_key_base" {
   length = 64
+}
+
+resource "docker_network" "this" {
+  name = local.name
 }
 
 resource "docker_image" "app" {

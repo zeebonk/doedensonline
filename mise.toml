@@ -117,7 +117,7 @@ dir = "{{config_root}}/iac/app"
 usage = '''
 arg "<environment>" help="dev or prod"
 arg "<image_tag>" help="Image tag to deploy, e.g. master.abc1234"
-after_long_help "Reads the deploy secrets from TF_VAR_ssh_host, TF_VAR_smtp_host, TF_VAR_smtp_username and TF_VAR_smtp_password."
+after_long_help "Reads the deploy secrets from TF_VAR_ssh_host, TF_VAR_smtp_host, TF_VAR_smtp_username, TF_VAR_smtp_password and TF_VAR_hetzner_backup_window."
 '''
 run = [
   "tofu init",
@@ -131,7 +131,7 @@ dir = "{{config_root}}/iac/app"
 usage = '''
 arg "<environment>" help="dev or prod"
 arg "<image_tag>" help="Image tag to deploy, e.g. master.abc1234"
-after_long_help "Reads the deploy secrets from TF_VAR_ssh_host, TF_VAR_smtp_host, TF_VAR_smtp_username and TF_VAR_smtp_password."
+after_long_help "Reads the deploy secrets from TF_VAR_ssh_host, TF_VAR_smtp_host, TF_VAR_smtp_username, TF_VAR_smtp_password and TF_VAR_hetzner_backup_window."
 '''
 run = [
   "tofu init",

@@ -29,3 +29,13 @@ variable "smtp_password" {
   type        = string
   sensitive   = true
 }
+
+variable "hetzner_backup_window" {
+  description = "UTC Hetzner backup window in HH-HH format."
+  type        = string
+
+  validation {
+    condition     = can(regex("^\\d{2}-\\d{2}$", var.hetzner_backup_window))
+    error_message = "Hetzner backup window must use HH-HH format."
+  }
+}
