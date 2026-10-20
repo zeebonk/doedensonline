@@ -20,6 +20,9 @@ mise install
 mise run app:serve
 ```
 
+This starts the Rails app and a local PostgreSQL 18 container. PostgreSQL data
+is kept in Docker's `postgresql-data` volume.
+
 Open http://127.0.0.1:8080 and sign in as `Gijs` with the password
 `password`.
 

@@ -20,7 +20,6 @@ locals {
   state_path = "/app-state/${terraform.workspace}"
 
   volumes = {
-    db     = "/app/storage"
     small  = "/app/public/images/small"
     medium = "/app/public/images/medium"
     large  = "/app/public/images/large"
@@ -28,6 +27,10 @@ locals {
 
   container_env = [
     "RAILS_ENV=${local.env.rails_env}",
+    "DATABASE_HOST=${docker_container.postgres.name}",
+    "DATABASE_USERNAME=doedensonline",
+    "DATABASE_PASSWORD=${random_password.postgres.result}",
+    "DATABASE_NAME=doedensonline",
     "DO_SMTP_HOST=${var.smtp_host}",
     "DO_SMTP_USERNAME=${var.smtp_username}",
     "DO_SMTP_PASSWORD=${var.smtp_password}",
@@ -59,6 +62,46 @@ resource "docker_image" "app" {
   }
 }
 
+resource "terraform_data" "stop_sqlite_app" {
+  # Stop the SQLite app before copying so no writes are lost. This resource is
+  # created only once per workspace; subsequent deploys leave the PG app up.
+  provisioner "local-exec" {
+    command = "ssh root@${var.ssh_host} docker stop ${local.name} || true"
+  }
+}
+
+# The copy task is a no-op when SQLite is absent or PostgreSQL already has
+# data, making replacements of this one-shot container safe on later deploys.
+resource "docker_container" "copy_from_sqlite" {
+  name     = "${local.name}-copy-from-sqlite"
+  image    = docker_image.app.image_id
+  command  = ["bundle", "exec", "rails", "db:copy_from_sqlite", "SQLITE_PATH=/app/storage/${local.env.rails_env}.sqlite3"]
+  env      = local.container_env
+  attach   = true
+  must_run = false
+
+  log_driver = "json-file"
+  log_opts   = local.log_opts
+
+  volumes {
+    host_path      = "${local.state_path}/db"
+    container_path = "/app/storage"
+  }
+
+  networks_advanced {
+    name = docker_network.this.name
+  }
+
+  lifecycle {
+    postcondition {
+      condition     = self.exit_code == 0
+      error_message = "SQLite copy failed; see `docker logs ${self.name}` on the host."
+    }
+  }
+
+  depends_on = [terraform_data.stop_sqlite_app]
+}
+
 # One-shot container that migrates (and on dev, seeds) the database
 resource "docker_container" "migrate" {
   name     = "${local.name}-migrate"
@@ -71,9 +114,8 @@ resource "docker_container" "migrate" {
   log_driver = "json-file"
   log_opts   = local.log_opts
 
-  volumes {
-    host_path      = "${local.state_path}/db"
-    container_path = local.volumes.db
+  networks_advanced {
+    name = docker_network.this.name
   }
 
   lifecycle {
@@ -82,6 +124,8 @@ resource "docker_container" "migrate" {
       error_message = "Database migration failed; see `docker logs ${self.name}` on the host."
     }
   }
+
+  depends_on = [docker_container.copy_from_sqlite]
 }
 
 resource "docker_container" "app" {
@@ -117,6 +161,10 @@ resource "docker_container" "app" {
       host_path      = "${local.state_path}/${volumes.key}"
       container_path = volumes.value
     }
+  }
+
+  networks_advanced {
+    name = docker_network.this.name
   }
 
   depends_on = [docker_container.migrate]
