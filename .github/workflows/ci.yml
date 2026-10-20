@@ -35,13 +35,15 @@ jobs:
             scopes="pr-${PR_NUMBER}-cache ${scopes}"
           fi
 
+          refs=""
+          for scope in ${scopes}; do
+            refs="${refs} type=registry,ref=${ECR_IMAGE}:${scope}-amd64"
+            refs="${refs} type=registry,ref=${ECR_IMAGE}:${scope}-arm64"
+          done
+
           {
-            echo 'cache-from<<EOF'
-            for scope in ${scopes}; do
-              echo "type=registry,ref=${ECR_IMAGE}:${scope}-amd64"
-              echo "type=registry,ref=${ECR_IMAGE}:${scope}-arm64"
-            done
-            echo 'EOF'
+            # Arguments to the app:build and app:release tasks.
+            echo "cache-from=$(printf -- '--cache-from %s ' ${refs})"
             echo "cache-to-amd64=type=registry,ref=${ECR_IMAGE}:${scopes%% *}-amd64,image-manifest=true,oci-mediatypes=true"
             echo "cache-to-arm64=type=registry,ref=${ECR_IMAGE}:${scopes%% *}-arm64,image-manifest=true,oci-mediatypes=true"
           } >> "$GITHUB_OUTPUT"
@@ -81,27 +83,20 @@ jobs:
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
+      # Each runner builds for its own platform.
       - name: Build app image
-        uses: docker/build-push-action@v7
-        with:
-          context: ./src
-          platforms: linux/${{ matrix.arch }}
-          load: true
-          tags: ${{ env.ECR_IMAGE }}:latest
-          cache-from: ${{ needs.prepare.outputs.cache-from }}
-          cache-to: ${{ needs.prepare.outputs[format('cache-to-{0}', matrix.arch)] }}
+        env:
+          CACHE_FROM: ${{ needs.prepare.outputs.cache-from }}
+          CACHE_TO: ${{ needs.prepare.outputs[format('cache-to-{0}', matrix.arch)] }}
+        run: mise run app:build ${CACHE_FROM} --cache-to "${CACHE_TO}"
 
       # Lint results don't depend on the platform; run them once.
-      - name: Run RuboCop
+      - name: Lint Ruby
         if: matrix.arch == 'amd64'
-        run: docker compose run --rm app bundle exec rubocop
-
-      - name: Run i18n-tasks
-        if: matrix.arch == 'amd64'
-        run: docker compose run --rm app bundle exec i18n-tasks health
+        run: mise run app:lint
 
       - name: Run tests
-        run: docker compose run --rm -e RAILS_ENV=test app bundle exec rails db:migrate test
+        run: mise run app:test
 
   release:
     needs: [prepare, build]
@@ -120,6 +115,8 @@ jobs:
           exit 1
 
       - uses: actions/checkout@v7
+
+      - uses: jdx/mise-action@v5
 
       - name: Compute image tag
         id: tag
@@ -149,48 +146,27 @@ jobs:
       # This step assumes that all layers are cached in the build stage and
       # therefore nothing actually gets built.
       - name: Build and push multi-arch image
-        uses: docker/build-push-action@v7
-        with:
-          context: ./src
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ env.ECR_IMAGE }}:${{ steps.tag.outputs.tag }}
-          cache-from: ${{ needs.prepare.outputs.cache-from }}
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+          CACHE_FROM: ${{ needs.prepare.outputs.cache-from }}
+        run: mise run app:release "${TAG}" ${CACHE_FROM}
 
   tofu:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: iac
+    env:
+      # Avoids the anonymous rate limit on TFLint plugin downloads.
+      GITHUB_TOKEN: ${{ github.token }}
+      TF_INPUT: "false"
     steps:
       - uses: actions/checkout@v7
 
       - uses: jdx/mise-action@v5
 
-      - name: Check OpenTofu formatting
-        run: tofu fmt -check -recursive
+      - name: Lint iac/server
+        run: mise run server:lint
 
-      - name: Run TFLint
-        env:
-          # Avoids the anonymous rate limit on plugin downloads.
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          tflint --init --config "$PWD/.tflint.hcl"
-          tflint --recursive --config "$PWD/.tflint.hcl"
-
-      - name: Validate server module
-        working-directory: iac/server
-        run: |
-          tofu init -backend=false -input=false
-          tofu validate
-
-      # The app module only evaluates in the dev and prod workspaces.
-      - name: Validate app module
-        working-directory: iac/app
-        run: |
-          tofu init -backend=false -input=false
-          TF_WORKSPACE=dev tofu validate
-          TF_WORKSPACE=prod tofu validate
+      - name: Lint iac/app
+        run: mise run deployment:lint
 
   # Master pushes deploy to dev, releases to prod.
   deploy:
@@ -209,9 +185,6 @@ jobs:
       contents: read
     env:
       ENVIRONMENT: ${{ github.event_name == 'release' && 'prod' || 'dev' }}
-    defaults:
-      run:
-        working-directory: iac/app
     steps:
       - uses: actions/checkout@v7
 
@@ -234,17 +207,14 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H "${SSH_HOST}" >> ~/.ssh/known_hosts
 
-      - name: Initialize OpenTofu
-        run: |
-          tofu init -input=false
-          tofu workspace select -or-create "${ENVIRONMENT}"
-
       - name: Deploy to ${{ env.ENVIRONMENT }}
         env:
           TF_VAR_ssh_host: ${{ secrets.SSH_HOST }}
-          TF_VAR_image_tag: ${{ needs.release.outputs.tag }}
+          IMAGE_TAG: ${{ needs.release.outputs.tag }}
           TF_VAR_smtp_host: ${{ secrets.SMTP_HOST }}
           TF_VAR_smtp_username: ${{ secrets.SMTP_USERNAME }}
           TF_VAR_smtp_password: ${{ secrets.SMTP_PASSWORD }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: tofu apply -input=false -auto-approve
+          TF_INPUT: "false"
+          TF_CLI_ARGS_apply: -auto-approve
+        run: mise run deployment:apply "${ENVIRONMENT}" "${IMAGE_TAG}"
