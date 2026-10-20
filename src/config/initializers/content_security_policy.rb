@@ -1,15 +1,15 @@
-# Report-only for now: violations are logged by CspReportsController. Switch
-# content_security_policy_report_only to false once the reports are clean.
+# Enforce the policy and log violations through CspReportsController.
 Rails.application.config.content_security_policy do |policy|
   policy.default_src :self
   # TinyMCE (plus its plugins, language pack and content CSS) and ColorBox (plus
   # its theme images) are loaded from jsDelivr. TinyMCE and ColorBox set inline
   # styles at runtime.
-  policy.script_src  :self, 'https://cdn.jsdelivr.net'
+  # Cloudflare injects its Web Analytics beacon into the HTML.
+  policy.script_src  :self, 'https://cdn.jsdelivr.net', 'https://static.cloudflareinsights.com'
   policy.style_src   :self, 'https://cdn.jsdelivr.net', :unsafe_inline
   policy.img_src     :self, 'https://cdn.jsdelivr.net', :data, :blob
   policy.font_src    :self, 'https://cdn.jsdelivr.net', :data
-  policy.connect_src :self, 'https://cdn.jsdelivr.net'
+  policy.connect_src :self, 'https://cdn.jsdelivr.net', 'https://cloudflareinsights.com'
   policy.object_src  :none
   policy.base_uri    :self
   policy.form_action :self
@@ -17,4 +17,4 @@ Rails.application.config.content_security_policy do |policy|
   policy.report_uri '/csp_reports'
 end
 
-Rails.application.config.content_security_policy_report_only = true
+Rails.application.config.content_security_policy_report_only = false
