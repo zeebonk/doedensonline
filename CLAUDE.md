@@ -98,9 +98,7 @@ with `iac/.tflint.hcl`.
   container), through the kreuzwerker/docker provider. `main.tf` holds the
   per-environment settings. The `deploy` job in `.github/workflows/ci.yml`
   runs `deployment:apply`: pushes to `master` deploy to dev, GitHub Releases
-  to prod. During the SQLite-to-PostgreSQL cutover, it stops the old app and
-  copies its SQLite file once before running migrations and starting the new
-  app.
+  to prod.
 
 The server apply and the dev deploy start on the same push to `master`, in
 no particular order. Merge an infra change the app depends on (e.g. a new
