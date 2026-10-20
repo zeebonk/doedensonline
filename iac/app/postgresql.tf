@@ -46,8 +46,6 @@ resource "docker_container" "postgres" {
     name = docker_network.this.name
   }
 
-  # PostgreSQL 18 changed its default volume location from
-  # /var/lib/postgresql/data to /var/lib/postgresql.
   volumes {
     host_path      = "${local.state_path}/postgresql"
     container_path = "/var/lib/postgresql"
