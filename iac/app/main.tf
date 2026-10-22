@@ -171,7 +171,7 @@ resource "docker_container" "app" {
 }
 
 resource "docker_image" "cloudflared" {
-  name = "cloudflare/cloudflared:2026.10.0"
+  name = "cloudflare/cloudflared:2026.10.3"
 
   # Dev and prod each manage this image on the same host. Removing it when
   # a tag bump reaches dev would fail while prod's tunnel still uses it.
