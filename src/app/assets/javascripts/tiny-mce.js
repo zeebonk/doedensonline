@@ -1,14 +1,15 @@
 $(document).on('turbolinks:load', function() {
   tinymce.init({
     selector: 'textarea',
+    license_key: 'gpl',
     language: 'nl',
-    language_url: 'https://cdn.jsdelivr.net/npm/tinymce-i18n@26.9.28/langs7/nl.js',
+    language_url: 'https://cdn.jsdelivr.net/npm/tinymce-i18n@26.10.19/langs8/nl.js',
     plugins: 'lists advlist link wordcount emoticons',
     toolbar: 'bold italic underline strikethrough | link | bullist numlist | emoticons',
     menubar: false,
     branding: false,
     paste_as_text: true,
-    content_css: 'https://cdn.jsdelivr.net/npm/tinymce@7.9.3/skins/ui/tinymce-5/content.min.css'
+    content_css: 'https://cdn.jsdelivr.net/npm/tinymce@8.10.0/skins/ui/tinymce-5/content.min.css'
   });
 });
 
