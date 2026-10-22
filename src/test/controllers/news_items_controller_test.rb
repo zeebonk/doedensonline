@@ -55,6 +55,22 @@ class NewsItemsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 2, assigns(:news_items).current_page
   end
 
+  test "index renders when the page query parameter is an array" do
+    get '/news', params: { page: ['1'] }
+
+    assert_response :success
+    assert_template 'index'
+    assert_equal 1, assigns(:news_items).current_page
+  end
+
+  test "index renders when the page query parameter is a hash" do
+    get '/news', params: { page: { x: '1' } }
+
+    assert_response :success
+    assert_template 'index'
+    assert_equal 1, assigns(:news_items).current_page
+  end
+
   # GET /news/new
 
   test "new renders new news_item form" do
