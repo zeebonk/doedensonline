@@ -83,6 +83,22 @@ class PhotoAlbumsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 2, assigns(:photo_albums).current_page
   end
 
+  test "index renders when the page query parameter is an array" do
+    get '/photo_albums', params: { page: ['1'] }
+
+    assert_response :success
+    assert_template 'index'
+    assert_equal 1, assigns(:photo_albums).current_page
+  end
+
+  test "index renders when the page query parameter is a hash" do
+    get '/photo_albums', params: { page: { x: '1' } }
+
+    assert_response :success
+    assert_template 'index'
+    assert_equal 1, assigns(:photo_albums).current_page
+  end
+
   # GET /photo_albums/:id
 
   test "show renders the album with its comments" do
