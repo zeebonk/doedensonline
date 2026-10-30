@@ -1,4 +1,4 @@
-FROM ruby:4.0.7-alpine
+FROM ruby:4.0.8-alpine
 
 WORKDIR /app
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
