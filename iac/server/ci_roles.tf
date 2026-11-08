@@ -72,6 +72,44 @@ module "iam_role_github_actions_ci" {
   )
 }
 
+# Plans and applies this module. Only jobs in the `server` GitHub
+# environment can assume it.
+module "iam_role_github_actions_server" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.8.2"
+
+  name            = "github-actions-server"
+  use_name_prefix = false
+
+  trust_policy_permissions = {
+    AllowAssumeRoleFromGitHubActionsServerEnvironment = {
+      actions = ["sts:AssumeRoleWithWebIdentity"]
+      principals = [
+        {
+          type        = "Federated"
+          identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
+        }
+      ]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "token.actions.githubusercontent.com:aud"
+          values   = ["sts.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "token.actions.githubusercontent.com:sub"
+          values   = ["repo:zeebonk/doedensonline:environment:server"]
+        }
+      ]
+    }
+  }
+
+  policies = {
+    AdministratorAccess = "arn:aws:iam::aws:policy/AdministratorAccess"
+  }
+}
+
 resource "github_actions_variable" "aws_role_arn" {
   repository    = "doedensonline"
   variable_name = "AWS_ROLE_ARN"
