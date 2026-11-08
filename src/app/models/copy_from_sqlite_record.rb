@@ -1,2 +1,0 @@
-class CopyFromSqliteRecord < ApplicationRecord
-end

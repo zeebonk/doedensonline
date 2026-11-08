@@ -1,2 +1,0 @@
-class CopyToPostgresqlRecord < ApplicationRecord
-end
