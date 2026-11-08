@@ -88,9 +88,10 @@ with `iac/.tflint.hcl`.
   Cloudflare zone and deploy token, AWS SES, IAM and ECR, and the `dev` and
   `prod` GitHub environments with their secrets. `.github/workflows/server.yml`
   runs `server:plan` on every pull request and `server:apply` on every push
-  to `master`, drift included. Both wait for an approval on the `server`
-  environment. Bootstrapping, and fixing a bad apply that locks CI out,
-  happen locally with `AWS_PROFILE=doedensonline`.
+  to `master`, drift included. Eligible jobs use the `server` environment
+  and its administrator role. Bootstrapping, and
+  fixing a bad apply that locks CI out, happen locally with
+  `AWS_PROFILE=doedensonline`.
 - `iac/app` deploys one environment per OpenTofu workspace (`dev`, `prod`):
   its Cloudflare tunnel, ingress and DNS record, and everything on the host
   (the app container, PostgreSQL and its private network, state and backup
@@ -107,6 +108,11 @@ release tags, and `github-actions-server` for server administration. Any job
 that uses the `pr` environment can assume the PR role. Dev and prod roles access
 only their own deployment state and lock; the PR role has no state access. All
 three application roles share ECR image and cache write access.
+
+After legacy CI roles are retired, roll back the application by selecting an
+older image while keeping the current workflows and IAM configuration. Old
+workflow commits reference retired roles; restoring those broad roles requires
+intentional infrastructure recovery.
 
 Local deployment tasks require an AWS identity with ECR and the chosen
 workspace's state permissions. Pass `dev` or `prod` to `deployment:plan` or

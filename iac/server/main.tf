@@ -151,125 +151,14 @@ module "ecr_pull_policy" {
   policy = data.aws_iam_policy_document.ecr_pull_policy_document.json
 }
 
-# State of the ../app root module, one object per workspace.
-data "aws_iam_policy_document" "deploy_state_policy_document" {
-  statement {
-    sid       = "AllowListStateBucket"
-    actions   = ["s3:ListBucket"]
-    resources = ["arn:aws:s3:::doedensonline-terraform"]
-  }
-  statement {
-    sid = "AllowDeployState"
-    actions = [
-      "s3:DeleteObject",
-      "s3:GetObject",
-      "s3:PutObject",
-    ]
-    resources = [
-      "arn:aws:s3:::doedensonline-terraform/env:/*/deploy",
-      "arn:aws:s3:::doedensonline-terraform/env:/*/deploy.tflock",
-    ]
-  }
-}
-
-module "deploy_state_policy" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.8.2"
-
-  name = "DeployState"
-  path = "/"
-
-  policy = data.aws_iam_policy_document.deploy_state_policy_document.json
-}
-
 resource "aws_iam_openid_connect_provider" "github_actions" {
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
 
-# Builds and pushes images. PR builds push their layer cache too, so any
-# job can assume it.
-module "iam_role_github_actions_build" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.8.2"
-
-  name            = "github-actions-build"
-  use_name_prefix = false
-
-  trust_policy_permissions = {
-    AllowAssumeRoleFromGitHubActions = {
-      actions = ["sts:AssumeRoleWithWebIdentity"]
-      principals = [
-        {
-          type        = "Federated"
-          identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
-        }
-      ]
-      condition = [
-        {
-          test     = "StringEquals"
-          variable = "token.actions.githubusercontent.com:aud"
-          values   = ["sts.amazonaws.com"]
-        },
-        {
-          test     = "StringLike"
-          variable = "token.actions.githubusercontent.com:sub"
-          values   = ["repo:zeebonk/doedensonline:*"]
-        }
-      ]
-    }
-  }
-
-  policies = {
-    ECRPush = module.ecr_push_policy.arn
-  }
-}
-
-# Applies ../app. Only jobs in the `dev` and `prod` GitHub environments,
-# which only master and release tags can deploy to, can assume it.
-module "iam_role_github_actions_deploy" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.8.2"
-
-  name            = "github-actions-deploy"
-  use_name_prefix = false
-
-  trust_policy_permissions = {
-    AllowAssumeRoleFromGitHubActionsDeployEnvironments = {
-      actions = ["sts:AssumeRoleWithWebIdentity"]
-      principals = [
-        {
-          type        = "Federated"
-          identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
-        }
-      ]
-      condition = [
-        {
-          test     = "StringEquals"
-          variable = "token.actions.githubusercontent.com:aud"
-          values   = ["sts.amazonaws.com"]
-        },
-        {
-          test     = "StringEquals"
-          variable = "token.actions.githubusercontent.com:sub"
-          values = [
-            for environment in keys(local.github_deploy_environments) :
-            "repo:zeebonk/doedensonline:environment:${environment}"
-          ]
-        }
-      ]
-    }
-  }
-
-  policies = {
-    ECRPull     = module.ecr_pull_policy.arn
-    DeployState = module.deploy_state_policy.arn
-  }
-}
-
 # Plans and applies this module. Only jobs in the `server` GitHub
-# environment, which requires an approval, can assume it.
+# environment can assume it.
 module "iam_role_github_actions_server" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.8.2"
