@@ -1,8 +1,9 @@
 locals {
   ci_role_subjects = {
-    pr   = "repo:zeebonk/doedensonline:environment:pr"
-    dev  = "repo:zeebonk/doedensonline:environment:dev"
-    prod = "repo:zeebonk/doedensonline:environment:prod"
+    pr     = "repo:zeebonk/doedensonline:environment:pr"
+    dev    = "repo:zeebonk/doedensonline:environment:dev"
+    prod   = "repo:zeebonk/doedensonline:environment:prod"
+    server = "repo:zeebonk/doedensonline:environment:server"
   }
 }
 
@@ -33,7 +34,7 @@ resource "aws_iam_policy" "ci_deploy_state" {
 }
 
 module "iam_role_github_actions_ci" {
-  for_each = local.ci_role_subjects
+  for_each = { for name, subject in local.ci_role_subjects : name => subject if name != "server" }
   source   = "terraform-aws-modules/iam/aws//modules/iam-role"
   version  = "6.8.2"
 
@@ -99,7 +100,7 @@ module "iam_role_github_actions_server" {
         {
           test     = "StringEquals"
           variable = "token.actions.githubusercontent.com:sub"
-          values   = ["repo:zeebonk/doedensonline:environment:server"]
+          values   = [local.ci_role_subjects.server]
         }
       ]
     }
