@@ -100,6 +100,18 @@ with `iac/.tflint.hcl`.
   runs `deployment:apply`: pushes to `master` deploy to dev, GitHub Releases
   to prod.
 
+`iac/server` manages the `AWS_ROLE_ARN` GitHub variable. The repository value
+selects `github-actions-pr` for jobs in the `pr` environment. Environment
+overrides select `github-actions-dev` on master, `github-actions-prod` on
+release tags, and `github-actions-server` for server administration. Any job
+that uses the `pr` environment can assume the PR role. Dev and prod roles access
+only their own deployment state and lock; the PR role has no state access. All
+three application roles share ECR image and cache write access.
+
+Local deployment tasks require an AWS identity with ECR and the chosen
+workspace's state permissions. Pass `dev` or `prod` to `deployment:plan` or
+`deployment:apply`; each task sets `TF_WORKSPACE` before backend initialization.
+
 The server apply and the dev deploy start on the same push to `master`, in
 no particular order. Merge an infra change the app depends on (e.g. a new
 deploy secret) first.

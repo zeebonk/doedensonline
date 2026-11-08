@@ -120,9 +120,9 @@ arg "<image_tag>" help="Image tag to deploy, e.g. master.abc1234"
 after_long_help "Reads the deploy secrets from TF_VAR_ssh_host, TF_VAR_smtp_host, TF_VAR_smtp_username, TF_VAR_smtp_password and TF_VAR_hetzner_backup_window."
 '''
 run = [
-  "tofu init",
-  "tofu workspace select {{usage.environment | quote}}",
-  "tofu plan -var image_tag={{usage.image_tag | quote}}",
+  "case {{usage.environment | quote}} in dev|prod) ;; *) echo 'Invalid deployment environment' >&2; exit 1 ;; esac",
+  "TF_WORKSPACE={{usage.environment | quote}} tofu init",
+  "TF_WORKSPACE={{usage.environment | quote}} tofu plan -var image_tag={{usage.image_tag | quote}}",
 ]
 
 [tasks."deployment:apply"]
@@ -134,7 +134,7 @@ arg "<image_tag>" help="Image tag to deploy, e.g. master.abc1234"
 after_long_help "Reads the deploy secrets from TF_VAR_ssh_host, TF_VAR_smtp_host, TF_VAR_smtp_username, TF_VAR_smtp_password and TF_VAR_hetzner_backup_window."
 '''
 run = [
-  "tofu init",
-  "tofu workspace select -or-create {{usage.environment | quote}}",
-  "tofu apply -var image_tag={{usage.image_tag | quote}}",
+  "case {{usage.environment | quote}} in dev|prod) ;; *) echo 'Invalid deployment environment' >&2; exit 1 ;; esac",
+  "TF_WORKSPACE={{usage.environment | quote}} tofu init",
+  "TF_WORKSPACE={{usage.environment | quote}} tofu apply -var image_tag={{usage.image_tag | quote}}",
 ]

@@ -20,10 +20,23 @@ jobs:
   prepare:
     runs-on: ubuntu-latest
     outputs:
+      environment: ${{ steps.environment.outputs.name }}
       cache-from: ${{ steps.cache.outputs.cache-from }}
       cache-to-amd64: ${{ steps.cache.outputs.cache-to-amd64 }}
       cache-to-arm64: ${{ steps.cache.outputs.cache-to-arm64 }}
     steps:
+      - name: Select environment
+        id: environment
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          case "${EVENT}" in
+            pull_request) echo "name=pr" >> "$GITHUB_OUTPUT" ;;
+            push) echo "name=dev" >> "$GITHUB_OUTPUT" ;;
+            release) echo "name=prod" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::Unexpected event: ${EVENT}"; exit 1 ;;
+          esac
+
       - name: Compute layer cache refs
         id: cache
         env:
@@ -50,6 +63,7 @@ jobs:
 
   build:
     needs: [prepare]
+    environment: ${{ needs.prepare.outputs.environment }}
     strategy:
       matrix:
         include:
@@ -77,7 +91,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::313336455033:role/github-actions-build
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
       - name: Log in to Amazon ECR
@@ -102,6 +116,7 @@ jobs:
     needs: [prepare, build]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
+    environment: ${{ needs.prepare.outputs.environment }}
     permissions:
       id-token: write
       contents: read
@@ -137,7 +152,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::313336455033:role/github-actions-build
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
       - name: Log in to Amazon ECR
@@ -170,21 +185,20 @@ jobs:
 
   # Master pushes deploy to dev, releases to prod.
   deploy:
-    needs: [release, tofu]
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'release'
+    needs: [prepare, release, tofu]
+    if: ${{ !cancelled() && needs.tofu.result == 'success' && needs.release.result == 'success' && ((github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'release') }}
     concurrency:
-      # The env context isn't available here.
-      group: deploy-${{ github.event_name == 'release' && 'prod' || 'dev' }}
+      group: deploy-${{ needs.prepare.outputs.environment }}
       cancel-in-progress: false
     runs-on: ubuntu-latest
     # Only master can deploy to dev and only release tags to prod. Only these
-    # environments get the deploy secrets and the github-actions-deploy role.
-    environment: ${{ github.event_name == 'release' && 'prod' || 'dev' }}
+    # environments get the deploy secrets and corresponding AWS roles.
+    environment: ${{ needs.prepare.outputs.environment }}
     permissions:
       id-token: write
       contents: read
     env:
-      ENVIRONMENT: ${{ github.event_name == 'release' && 'prod' || 'dev' }}
+      ENVIRONMENT: ${{ needs.prepare.outputs.environment }}
     steps:
       - uses: actions/checkout@v7
 
@@ -193,7 +207,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::313336455033:role/github-actions-deploy
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
       - name: Configure SSH
