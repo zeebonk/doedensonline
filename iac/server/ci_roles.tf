@@ -1,9 +1,27 @@
 locals {
   ci_role_subjects = {
-    pr     = "repo:zeebonk/doedensonline:environment:pr"
-    dev    = "repo:zeebonk/doedensonline:environment:dev"
-    prod   = "repo:zeebonk/doedensonline:environment:prod"
-    server = "repo:zeebonk/doedensonline:environment:server"
+    pr = {
+      subject  = "repo:zeebonk/doedensonline:environment:pr"
+      policies = { ECRPush = module.ecr_push_policy.arn }
+    }
+    dev = {
+      subject = "repo:zeebonk/doedensonline:environment:dev"
+      policies = {
+        ECRPush     = module.ecr_push_policy.arn
+        DeployState = aws_iam_policy.ci_deploy_state["dev"].arn
+      }
+    }
+    prod = {
+      subject = "repo:zeebonk/doedensonline:environment:prod"
+      policies = {
+        ECRPush     = module.ecr_push_policy.arn
+        DeployState = aws_iam_policy.ci_deploy_state["prod"].arn
+      }
+    }
+    server = {
+      subject  = "repo:zeebonk/doedensonline:environment:server"
+      policies = { AdministratorAccess = "arn:aws:iam::aws:policy/AdministratorAccess" }
+    }
   }
 }
 
@@ -34,7 +52,7 @@ resource "aws_iam_policy" "ci_deploy_state" {
 }
 
 module "iam_role_github_actions_ci" {
-  for_each = { for name, subject in local.ci_role_subjects : name => subject if name != "server" }
+  for_each = { for name, role in local.ci_role_subjects : name => role if name != "server" }
   source   = "terraform-aws-modules/iam/aws//modules/iam-role"
   version  = "6.8.2"
 
@@ -61,16 +79,13 @@ module "iam_role_github_actions_ci" {
         {
           test     = "StringEquals"
           variable = "token.actions.githubusercontent.com:sub"
-          values   = [each.value]
+          values   = [each.value.subject]
         },
       ]
     }
   }
 
-  policies = merge(
-    { ECRPush = module.ecr_push_policy.arn },
-    each.key == "pr" ? {} : { DeployState = aws_iam_policy.ci_deploy_state[each.key].arn },
-  )
+  policies = each.value.policies
 }
 
 # Plans and applies this module. Only jobs in the `server` GitHub
@@ -100,15 +115,13 @@ module "iam_role_github_actions_server" {
         {
           test     = "StringEquals"
           variable = "token.actions.githubusercontent.com:sub"
-          values   = [local.ci_role_subjects.server]
+          values   = [local.ci_role_subjects.server.subject]
         }
       ]
     }
   }
 
-  policies = {
-    AdministratorAccess = "arn:aws:iam::aws:policy/AdministratorAccess"
-  }
+  policies = local.ci_role_subjects.server.policies
 }
 
 resource "github_actions_variable" "aws_role_arn" {
