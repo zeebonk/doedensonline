@@ -52,19 +52,19 @@ resource "aws_iam_policy" "ci_deploy_state" {
 }
 
 module "iam_role_github_actions_ci" {
-  for_each = { for name, role in local.ci_role_subjects : name => role if name != "server" }
+  for_each = local.ci_role_subjects
   source   = "terraform-aws-modules/iam/aws//modules/iam-role"
   version  = "6.8.2"
 
   name            = "github-actions-${each.key}"
   use_name_prefix = false
-  tags = merge(
+  tags = each.key == "server" ? {} : merge(
     { project = "doedensonline" },
     each.key == "pr" ? {} : { environment = each.key },
   )
 
   trust_policy_permissions = {
-    GitHubActions = {
+    (each.key == "server" ? "AllowAssumeRoleFromGitHubActionsServerEnvironment" : "GitHubActions") = {
       actions = ["sts:AssumeRoleWithWebIdentity"]
       principals = [{
         type        = "Federated"
@@ -88,40 +88,9 @@ module "iam_role_github_actions_ci" {
   policies = each.value.policies
 }
 
-# Plans and applies this module. Only jobs in the `server` GitHub
-# environment can assume it.
-module "iam_role_github_actions_server" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.8.2"
-
-  name            = "github-actions-server"
-  use_name_prefix = false
-
-  trust_policy_permissions = {
-    AllowAssumeRoleFromGitHubActionsServerEnvironment = {
-      actions = ["sts:AssumeRoleWithWebIdentity"]
-      principals = [
-        {
-          type        = "Federated"
-          identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
-        }
-      ]
-      condition = [
-        {
-          test     = "StringEquals"
-          variable = "token.actions.githubusercontent.com:aud"
-          values   = ["sts.amazonaws.com"]
-        },
-        {
-          test     = "StringEquals"
-          variable = "token.actions.githubusercontent.com:sub"
-          values   = [local.ci_role_subjects.server.subject]
-        }
-      ]
-    }
-  }
-
-  policies = local.ci_role_subjects.server.policies
+moved {
+  from = module.iam_role_github_actions_server
+  to   = module.iam_role_github_actions_ci["server"]
 }
 
 resource "github_actions_variable" "aws_role_arn" {
@@ -142,5 +111,5 @@ resource "github_actions_environment_variable" "aws_role_arn_server" {
   repository    = "doedensonline"
   environment   = "server"
   variable_name = "AWS_ROLE_ARN"
-  value         = module.iam_role_github_actions_server.arn
+  value         = module.iam_role_github_actions_ci["server"].arn
 }
