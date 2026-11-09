@@ -64,7 +64,7 @@ module "iam_role_github_actions_ci" {
   )
 
   trust_policy_permissions = {
-    (each.key == "server" ? "AllowAssumeRoleFromGitHubActionsServerEnvironment" : "GitHubActions") = {
+    GitHubActions = {
       actions = ["sts:AssumeRoleWithWebIdentity"]
       principals = [{
         type        = "Federated"
