@@ -88,11 +88,6 @@ module "iam_role_github_actions_ci" {
   policies = each.value.policies
 }
 
-moved {
-  from = module.iam_role_github_actions_server
-  to   = module.iam_role_github_actions_ci["server"]
-}
-
 resource "github_actions_variable" "aws_role_arn" {
   repository    = "doedensonline"
   variable_name = "AWS_ROLE_ARN"
