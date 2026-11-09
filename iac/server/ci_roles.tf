@@ -1,8 +1,27 @@
 locals {
   ci_role_subjects = {
-    pr   = "repo:zeebonk/doedensonline:environment:pr"
-    dev  = "repo:zeebonk/doedensonline:environment:dev"
-    prod = "repo:zeebonk/doedensonline:environment:prod"
+    pr = {
+      subject  = "repo:zeebonk/doedensonline:environment:pr"
+      policies = { ECRPush = module.ecr_push_policy.arn }
+    }
+    dev = {
+      subject = "repo:zeebonk/doedensonline:environment:dev"
+      policies = {
+        ECRPush     = module.ecr_push_policy.arn
+        DeployState = aws_iam_policy.ci_deploy_state["dev"].arn
+      }
+    }
+    prod = {
+      subject = "repo:zeebonk/doedensonline:environment:prod"
+      policies = {
+        ECRPush     = module.ecr_push_policy.arn
+        DeployState = aws_iam_policy.ci_deploy_state["prod"].arn
+      }
+    }
+    server = {
+      subject  = "repo:zeebonk/doedensonline:environment:server"
+      policies = { AdministratorAccess = "arn:aws:iam::aws:policy/AdministratorAccess" }
+    }
   }
 }
 
@@ -39,7 +58,7 @@ module "iam_role_github_actions_ci" {
 
   name            = "github-actions-${each.key}"
   use_name_prefix = false
-  tags = merge(
+  tags = each.key == "server" ? {} : merge(
     { project = "doedensonline" },
     each.key == "pr" ? {} : { environment = each.key },
   )
@@ -60,16 +79,18 @@ module "iam_role_github_actions_ci" {
         {
           test     = "StringEquals"
           variable = "token.actions.githubusercontent.com:sub"
-          values   = [each.value]
+          values   = [each.value.subject]
         },
       ]
     }
   }
 
-  policies = merge(
-    { ECRPush = module.ecr_push_policy.arn },
-    each.key == "pr" ? {} : { DeployState = aws_iam_policy.ci_deploy_state[each.key].arn },
-  )
+  policies = each.value.policies
+}
+
+moved {
+  from = module.iam_role_github_actions_server
+  to   = module.iam_role_github_actions_ci["server"]
 }
 
 resource "github_actions_variable" "aws_role_arn" {
@@ -90,5 +111,5 @@ resource "github_actions_environment_variable" "aws_role_arn_server" {
   repository    = "doedensonline"
   environment   = "server"
   variable_name = "AWS_ROLE_ARN"
-  value         = module.iam_role_github_actions_server.arn
+  value         = module.iam_role_github_actions_ci["server"].arn
 }
