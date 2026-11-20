@@ -115,7 +115,7 @@ data "aws_iam_policy_document" "ecr_push_policy_document" {
 
 module "ecr_push_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.8.2"
+  version = "6.11.1"
 
   name = "ECRPush"
   path = "/"
@@ -143,7 +143,7 @@ data "aws_iam_policy_document" "ecr_pull_policy_document" {
 
 module "ecr_pull_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.8.2"
+  version = "6.11.1"
 
   name = "ECRPull"
   path = "/"
@@ -228,7 +228,7 @@ resource "aws_ses_domain_identity" "doedensonline" {
 
 module "iam_user_doedensonline_ses" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-user"
-  version = "6.8.2"
+  version = "6.11.1"
 
   name                    = "doedensonline-ses"
   create_login_profile    = false

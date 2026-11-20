@@ -54,7 +54,7 @@ resource "aws_iam_policy" "ci_deploy_state" {
 module "iam_role_github_actions_ci" {
   for_each = local.ci_role_subjects
   source   = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version  = "6.8.2"
+  version  = "6.11.1"
 
   name            = "github-actions-${each.key}"
   use_name_prefix = false
